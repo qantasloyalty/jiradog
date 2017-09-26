@@ -1,0 +1,13 @@
+{
+  "jql":"project={{project}} AND issuetype=Bug AND status NOT IN (Done, Resolved, Closed)",
+  "__comment":"following dict shows total number of developers",
+  "projects": {
+    "MACOSNOTE":"7",
+    "WINNOTE":"4",
+    "ION":"9",
+    "IOSNOTE":"8",
+    "DRDNOTE":"7",
+    "CE":"6"
+    },
+  "key_needed":"total"
+}
