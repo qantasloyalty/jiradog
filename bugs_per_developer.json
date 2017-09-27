@@ -1,15 +1,16 @@
 {
-  "jql":"project={{project}} AND issuetype=Bug AND status NOT IN (Done, Resolved, Closed)",
-  "__comment":"following dict shows total number of developers",
+  "jql": "project={{project}} AND issuetype=Bug AND status NOT IN (Done, Resolved, Closed)",
+  "__comment": "following dict shows total number of developers",
   "projects": {
-    "MACOSNOTE":"7",
-    "WINNOTE":"4",
-    "ION":"9",
-    "IOSNOTE":"8",
-    "DRDNOTE":"7",
-    "CE":"6"
+    "MACOSNOTE": "7",
+    "WINNOTE": "4",
+    "ION": "9",
+    "IOSNOTE": "8",
+    "DRDNOTE": "7",
+    "CE": "6"
+    "ENB": "8.5"
     },
-  "key_needed":"total",
-  "method":"results_per_given",
-  "metric_name":"jiradog.avgOpenBugsPerDeveloper"
+  "key_needed": "total",
+  "method": "results_per_given",
+  "metric_name": "jiradog.avgOpenBugsPerDeveloper"
 }
