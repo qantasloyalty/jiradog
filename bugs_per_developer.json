@@ -9,5 +9,7 @@
     "DRDNOTE":"7",
     "CE":"6"
     },
-  "key_needed":"total"
+  "key_needed":"total",
+  "method":"results_per_given",
+  "metric_name":"jiradog.avgOpenBugsPerDeveloper"
 }
