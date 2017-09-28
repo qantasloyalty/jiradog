@@ -1,0 +1,23 @@
+{
+  "projects": [
+    "MACOSNOTE",
+    "WINNOTE",
+    "ION",
+    "IOSNOTE",
+    "DRDNOTE",
+    "CE",
+    "ENB"
+    ],
+    "method": "avg",
+    "avg_numerator": {
+      "source": "jira",
+      "jql": "project={{project}} AND status NOT IN (Done,Resolved,Closed) AND issuetype=Bug AND priority IN ('1-Critical, stop everything and fix','2-High, fix ASAP') ORDER BY fixVersion ASC",
+      "field": "total"
+      },
+    "avg_denominator": {
+      "source": "jira",
+      "jql": "project={{project}} AND status NOT IN (Done,Resolved,Closed) AND issuetype=Bug ORDER BY fixVersion ASC",
+      "field": "total"
+      },
+    "metric_name":"jiradog.percentageP1P2Tickets"
+}
