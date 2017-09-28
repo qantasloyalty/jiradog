@@ -9,14 +9,32 @@ import re
 from datadog import initialize, api
 from pprint import pprint
 import time
+from jira import JIRA
+import argparse
 
-def results_per_given(results, metric_config, project):
-  result = results[metric_config['key_needed']]
-  given = metric_config['projects'][project]
-  return int(result)/int(given)
+class jira_provider(object):
+  def __init__(self, username, password, server):
+    self.jira = JIRA(server, basic_auth=(username, password))
+
+  def provide(self, provider_config, project):
+    jql_raw_regex = re.sub(r"{{project}}", project, provider_config["jql"])
+    jql_url_encoded = urllib.quote(jql_raw_regex)
+    jira_api_call_url = api_endpoint + jql_url_encoded + "&maxResults=100"
+    jira_api_response = json.loads(requests.get(jira_api_call_url, headers=headers, auth=(api_username, api_password)).text)
+    return jira_api_response[provider_config["field"]]
+
+class constant_provider(object):
+  def __init__(self):
+    pass
+  
+  def provide(self, data, project):
+    return data["data"][project]
+
+def average(avg_numerator, avg_denominator, project):
+  return float(avg_numerator)/float(avg_denominator)
 
 function_map = {
-  'results_per_given': results_per_given
+  'avg': average
 }
 
 config_file = '/etc/jiradog.conf'
@@ -36,30 +54,43 @@ initialize(**config_data_loaded['datadog'])
 with open(metric_file) as metric_data_file:
   metric_data_loaded = json.load(metric_data_file)
 
-metric_file_key_needed = metric_data_loaded['key_needed']
 metric_file_method = metric_data_loaded['method']
 datadog_metric_name = metric_data_loaded['metric_name']
-jql_raw = metric_data_loaded['jql']
+
+jp = jira_provider(api_username, api_password, api_url)
+cp = constant_provider()
 
 timestamp = time.time()
 upload_payload = []
 
 # JIRA api call
 for project in metric_data_loaded['projects']:
-  given = metric_data_loaded['projects'][project]
-  jql_raw_regex = re.sub(r"{{project}}", project, jql_raw)
-  jql_url_encoded = urllib.quote(jql_raw_regex)
-  jira_api_call_url = api_endpoint + jql_url_encoded + "&maxResults=1000"
-  jira_api_call = requests.get(jira_api_call_url, headers=headers, auth=(api_username, api_password))
-  jira_api_results_json = json.loads(jira_api_call.text)
-  metric_data = {
-    'metric': datadog_metric_name,
-    'points': (timestamp, function_map[metric_file_method](jira_api_results_json, metric_data_loaded, project)),
-    'tags': ["jira_project:%s" % project]
-    }
-  upload_payload.append(metric_data) 
+  if metric_data_loaded['method'] == 'avg':
+
+    if metric_data_loaded['avg_numerator']['source'] == 'jira':
+      avg_numerator = jp.provide(metric_data_loaded["avg_numerator"], project)
+    elif metric_data_loaded['avg_numerator']['source'] == 'constant':
+      avg_numerator = cp.provide(metric_data_loaded["avg_numerator"], project)
+    else:
+      print "[ERROR]: avg_numerator source is set to an unknown value: %s" % metric_data_loaded['avg_numerator']['source']
+
+    if metric_data_loaded['avg_denominator']['source'] == 'jira':
+      avg_denominator = jp.provide(metric_data_loaded["avg_denominator"], project)
+    elif metric_data_loaded['avg_denominator']['source'] == 'constant':
+      avg_denominator = cp.provide(metric_data_loaded["avg_denominator"], project)
+    else:
+      print "[ERROR]: avg_denominator source is set to an unknown value: %s" % metric_data_loaded['avg_denominator']['source']
+
+    metric_data = {
+      'metric': datadog_metric_name,
+      'points': (timestamp, function_map[metric_file_method](avg_numerator, avg_denominator, project)),
+      'tags': ["jira_project:%s" % project]
+      }
+
+    upload_payload.append(metric_data) 
 
 # DataDog api call: https://docs.datadoghq.com/api/#metrics-post
+# pprint(upload_payload)
 result = api.Metric.send(upload_payload)
 
 print('Uploaded to DataDog')

@@ -1,16 +1,30 @@
 {
-  "jql": "project={{project}} AND issuetype=Bug AND status NOT IN (Done, Resolved, Closed)",
-  "__comment": "following dict shows total number of developers",
-  "projects": {
-    "MACOSNOTE": "7",
-    "WINNOTE": "4",
-    "ION": "9",
-    "IOSNOTE": "8",
-    "DRDNOTE": "7",
-    "CE": "6",
-    "ENB": "9"
+  "projects": [
+    "MACOSNOTE",
+    "WINNOTE",
+    "ION",
+    "IOSNOTE",
+    "DRDNOTE",
+    "CE",
+    "ENB"
+    ],
+  "method": "avg",
+  "avg_numerator": {
+    "source": "jira",
+    "jql": "project={{project}} AND issuetype=Bug AND status NOT IN (Done, Resolved, Closed)",
+    "field": "total"
     },
-  "key_needed": "total",
-  "method": "results_per_given",
+  "avg_denominator": {
+    "source": "constant",
+    "data": {
+      "MACOSNOTE": "7",
+      "WINNOTE": "4",
+      "ION": "9",
+      "IOSNOTE": "8",
+      "DRDNOTE": "7",
+      "CE": "6",
+      "ENB": "9"  
+      }
+    },
   "metric_name": "jiradog.avgOpenBugsPerDeveloper"
 }
