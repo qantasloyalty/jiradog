@@ -1,0 +1,28 @@
+{
+  "projects": [
+    "MACOSNOTE",
+    "WINNOTE",
+    "ION",
+    "IOSNOTE",
+    "DRDNOTE",
+    "CE",
+    "ENB"
+    ],
+  "method": "mean_time_to_between_statuses",
+  "status_start": {
+    "source": "jira",
+    "jql": "project={{project}} AND priority IN ('1-Critical, stop everything and fix','2-High, fix ASAP') AND created>=startOfDay(-90d) AND issuetype=Bug AND reporter in membersOf('CS_TSR') AND status IN (closed,resolve)",
+    "field": "created"
+    },
+  "status_end": {
+    "source": "jira",
+    "jql": "project={{project}} AND priority IN ('1-Critical, stop everything and fix','2-High, fix ASAP') AND created>=startOfDay(-90d) AND issuetype=Bug AND reporter in membersOf('CS_TSR') AND status IN (closed,resolve)",
+    "field": "updated"
+    },
+  "denominator": {
+    "source": "jira",
+    "jql": "project={{project}} AND priority IN ('1-Critical, stop everything and fix','2-High, fix ASAP') AND created>=startOfDay(-90d) AND issuetype=Bug AND reporter in membersOf('CS_TSR') AND status IN (closed,resolve)",
+    "field": "total"
+    },
+    "metric_name": "jiradog.meanTimeToCloseP1P2Tickets"
+}

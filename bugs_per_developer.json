@@ -8,7 +8,7 @@
     "CE",
     "ENB"
     ],
-  "method": "avg",
+  "method": "average",
   "avg_numerator": {
     "source": "jira",
     "jql": "project={{project}} AND issuetype=Bug AND status NOT IN (Done, Resolved, Closed)",

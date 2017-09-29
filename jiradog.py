@@ -21,20 +21,24 @@ class jira_provider(object):
     jql_url_encoded = urllib.quote(jql_raw_regex)
     jira_api_call_url = api_endpoint + jql_url_encoded + "&maxResults=100"
     jira_api_response = json.loads(requests.get(jira_api_call_url, headers=headers, auth=(api_username, api_password)).text)
-    return jira_api_response[provider_config["field"]]
+    return jira_api_response
 
 class constant_provider(object):
-  def __init__(self):
-    pass
-  
   def provide(self, data, project):
     return data["data"][project]
 
-def average(avg_numerator, avg_denominator, project):
+def average(avg_numerator, avg_denominator):
   return float(avg_numerator)/float(avg_denominator)
 
+def mean_time_to_between_statuses(first_date, second_date):
+  first_date_sec = time.strptime(first_date.split('.')[0],'%Y-%m-%dT%H:%M:%S')
+  second_date_sec = time.strptime(second_date.split('.')[0],'%Y-%m-%dT%H:%M:%S')
+  return (time.mktime(second_date_sec) - time.mktime(first_date_sec)) / 60 / 60 / 24
+  
+
 function_map = {
-  'avg': average
+  'average': average,
+  'mean_time_to_between_statuses': mean_time_to_between_statuses
 }
 
 config_file = '/etc/jiradog.conf'
@@ -65,32 +69,60 @@ upload_payload = []
 
 # JIRA api call
 for project in metric_data_loaded['projects']:
-  if metric_data_loaded['method'] == 'avg':
+  ## Method: Average
+  if metric_data_loaded['method'] == 'average':
 
     if metric_data_loaded['avg_numerator']['source'] == 'jira':
-      avg_numerator = jp.provide(metric_data_loaded["avg_numerator"], project)
+      avg_numerator_raw = jp.provide(metric_data_loaded["avg_numerator"], project)
+      avg_numerator = avg_numerator_raw[metric_data_loaded["avg_denominator"]["field"]]
     elif metric_data_loaded['avg_numerator']['source'] == 'constant':
       avg_numerator = cp.provide(metric_data_loaded["avg_numerator"], project)
     else:
       print "[ERROR]: avg_numerator source is set to an unknown value: %s" % metric_data_loaded['avg_numerator']['source']
 
     if metric_data_loaded['avg_denominator']['source'] == 'jira':
-      avg_denominator = jp.provide(metric_data_loaded["avg_denominator"], project)
+      avg_denominator_raw = jp.provide(metric_data_loaded["avg_denominator"], project)
+      avg_denominator = avg_denominator_raw[metric_data_loaded["avg_denominator"]["field"]]
     elif metric_data_loaded['avg_denominator']['source'] == 'constant':
       avg_denominator = cp.provide(metric_data_loaded["avg_denominator"], project)
     else:
       print "[ERROR]: avg_denominator source is set to an unknown value: %s" % metric_data_loaded['avg_denominator']['source']
+  
+    points = function_map[metric_file_method](avg_numerator, avg_denominator)
 
-    metric_data = {
-      'metric': datadog_metric_name,
-      'points': (timestamp, function_map[metric_file_method](avg_numerator, avg_denominator, project)),
-      'tags': ["jira_project:%s" % project]
-      }
+  ## Method: mean time between statuses
+  if metric_data_loaded['method'] == 'mean_time_to_between_statuses':
+    status_start_dates = []
+    status_start = jp.provide(metric_data_loaded['status_start'], project)
+    for issue_fields in status_start['issues']:
+      status_start_dates.append(issue_fields['fields']['created'])
 
-    upload_payload.append(metric_data) 
+    status_end_dates = []
+    status_end = jp.provide(metric_data_loaded['status_end'], project)
+    for issue_fields in status_end['issues']:
+      status_end_dates.append(issue_fields['fields']['updated'])
 
-# DataDog api call: https://docs.datadoghq.com/api/#metrics-post
-# pprint(upload_payload)
+    status_dates = dict(zip(status_start_dates, status_end_dates))
+    denominator_raw = jp.provide(metric_data_loaded["denominator"], project)
+    denominator = denominator_raw[metric_data_loaded["denominator"]["field"]]
+
+    date_diff_days = []
+    for date in status_dates:
+      date_diff_days.append(mean_time_to_between_statuses(date, status_dates[date]))
+
+    if denominator != 0:
+      points = average(sum(date_diff_days), denominator)
+    else:
+      points = 0
+
+  ## Construct payload for upload
+  metric_data = {
+    'metric': datadog_metric_name,
+    'points': (timestamp, points),
+    'tags': ["jira_project:%s" % project]
+    }
+  upload_payload.append(metric_data) 
+
+# Upload to DataDog
 result = api.Metric.send(upload_payload)
-
 print('Uploaded to DataDog')
