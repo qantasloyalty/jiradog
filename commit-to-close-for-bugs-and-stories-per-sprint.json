@@ -1,0 +1,23 @@
+{
+  "projects": [
+    "MACOSNOTE",
+    "WINNOTE",
+    "ION",
+    "IOSNOTE",
+    "DRDNOTE",
+    "CE",
+    "ENB"
+    ],
+  "method": "average",
+  "avg_numerator": {
+    "source": "jira",
+    "jql": "project={{project}} AND (sprint IN openSprints() AND sprint NOT IN futureSprints()) AND status IN (DONE,CLOSED,RESOLVED)",
+    "field": "total"
+    },
+  "avg_denominator": {
+    "source": "jira",
+    "jql": "project={{project}} AND (sprint IN openSprints() AND sprint NOT IN futureSprints())",
+    "field": "total"
+    },
+  "metric_name": "jiradog.commitToCloseRatePerSprint"
+}
