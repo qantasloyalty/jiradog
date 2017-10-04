@@ -49,23 +49,23 @@ api_username = config_data_loaded['jira']['username']
 api_password = config_data_loaded['jira']['password']
 api_url = config_data_loaded['jira']['server']
 api_endpoint = api_url + '/rest/api/2/search?jql='
-print '[INFO]: api configurations set'
+print '[INFO] api configurations set'
 
 for metric_file in sys.argv[1:]:
-  print '[INFO]: loading metric file: ' + metric_file
+  print '[INFO] loading metric file: ' + metric_file
   headers = {'Content-type': 'application/json'}
   upload_payload = {}
 
-  print '[INFO]: initializing datadog SDK...'
+  print '[INFO] initializing datadog SDK...'
   initialize(**config_data_loaded['datadog'])
   print '[INFO]: initialized datadog SDK'
 
   with open(metric_file) as metric_data_file:
     metric_data_loaded = json.load(metric_data_file)
-  print '[INFO]: loaded metric file'
 
   metric_file_method = metric_data_loaded['method']
   datadog_metric_name = metric_data_loaded['metric_name']
+  print '[INFO][' + datadog_metric_name + '] loaded metric file'
 
   jp = jira_provider(api_username, api_password, api_url)
   cp = constant_provider()
@@ -74,29 +74,29 @@ for metric_file in sys.argv[1:]:
   upload_payload = []
 
   # JIRA api call
-  print '[INFO]: starting API poll...'
+  print '[INFO][' + datadog_metric_name + '] starting API poll...'
   for project in metric_data_loaded['projects']:
-    print '[INFO]: project: ' + project
+    print '[INFO][' + datadog_metric_name + '] project: ' + project
     ## Method: Average
     if metric_data_loaded['method'] == 'average':
-      print '[INFO]: method: ' + metric_data_loaded['method']
+      print '[INFO][' + datadog_metric_name + '][' + project + '] method: ' + metric_data_loaded['method']
 
       if metric_data_loaded['avg_numerator']['source'] == 'jira':
-        print '[INFO]: numerator data provider: ' + metric_data_loaded['avg_numerator']['source']
+        print '[INFO][' + datadog_metric_name + '][' + project + '][' + metric_data_loaded['method'] + '] numerator data provider: ' + metric_data_loaded['avg_numerator']['source']
         avg_numerator_raw = jp.provide(metric_data_loaded["avg_numerator"], project)
         avg_numerator = avg_numerator_raw[metric_data_loaded["avg_numerator"]["field"]]
       elif metric_data_loaded['avg_numerator']['source'] == 'constant':
-        print '[INFO]: numerator data provider: ' + metric_data_loaded['avg_numerator']['source']
+        print '[INFO][' + datadog_metric_name + '][' + project + '][' + metric_data_loaded['method'] + '] numerator data provider: ' + metric_data_loaded['avg_numerator']['source']
         avg_numerator = cp.provide(metric_data_loaded["avg_numerator"], project)
       else:
         print "[ERROR]: avg_numerator source is set to an unknown value: %s" % metric_data_loaded['avg_numerator']['source']
 
       if metric_data_loaded['avg_denominator']['source'] == 'jira':
-        print '[INFO]: denominator data provider: ' + metric_data_loaded['avg_denominator']['source']
+        print '[INFO][' + datadog_metric_name + '][' + project + '][' + metric_data_loaded['method'] + '] denominator data provider: ' + metric_data_loaded['avg_denominator']['source']
         avg_denominator_raw = jp.provide(metric_data_loaded["avg_denominator"], project)
         avg_denominator = avg_denominator_raw[metric_data_loaded["avg_denominator"]["field"]]
       elif metric_data_loaded['avg_denominator']['source'] == 'constant':
-        print '[INFO]: denominator data provider: ' + metric_data_loaded['avg_denominator']['source']
+        print '[INFO][' + datadog_metric_name + '][' + project + '][' + metric_data_loaded['method'] + '] denominator data provider: ' + metric_data_loaded['avg_denominator']['source']
         avg_denominator = cp.provide(metric_data_loaded["avg_denominator"], project)
       else:
         print "[ERROR]: avg_denominator source is set to an unknown value: %s" % metric_data_loaded['avg_denominator']['source']
