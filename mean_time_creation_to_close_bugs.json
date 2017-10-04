@@ -1,0 +1,28 @@
+{
+  "projects": [
+    "MACOSNOTE",
+    "WINNOTE",
+    "ION",
+    "IOSNOTE",
+    "DRDNOTE",
+    "CE",
+    "ENB"
+    ],
+  "method": "mean_time_to_between_statuses",
+  "status_start": {
+    "source": "jira",
+    "jql": "project={{project}} AND issuetype=Bug AND status IN (Done,Resolved,Closed) AND updated > startOfWeek(-14d)",
+    "field": "created"
+    },
+  "status_end": {
+    "source": "jira",
+    "jql": "project={{project}} AND issuetype=Bug AND status IN (Done,Resolved,Closed) AND updated > startOfWeek(-14d)",
+    "field": "updated"
+    },
+  "denominator": {
+    "source": "jira",
+    "jql": "project={{project}} AND issuetype=Bug AND status IN (Done,Resolved,Closed) AND updated > startOfWeek(-14d)",
+    "field": "total"
+    },
+    "metric_name": "jiradog.meanTimeToCloseBugs"
+}
