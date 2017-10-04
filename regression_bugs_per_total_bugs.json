@@ -1,0 +1,25 @@
+{
+  "projects": [
+    "MACOSNOTE",
+    "WINNOTE",
+    "ION",
+    "IOSNOTE",
+    "DRDNOTE",
+    "CE",
+    "ENB"
+    ],
+  "method": "average",
+  "avg_numerator": {
+    "__comment": "Find number of bugs labelled regression",
+    "source": "jira",
+    "jql": "project={{project}} AND issuetype=Bug AND labels=regression AND status NOT IN (Done,Resolved,Closed) AND updated > startOfDay(-90d)",
+    "field": "total"
+    },
+  "avg_denominator": {
+    "__comment": "Find total number of bugs in a project",
+    "source": "jira",
+    "jql": "project={{project}} AND issuetype=Bug AND status NOT IN (Done,Resolved,Closed) AND updated > startOfDay(-90d)",
+    "field": "total"
+    },
+  "metric_name": "jiradog.percentageRegressionBugs"
+}
