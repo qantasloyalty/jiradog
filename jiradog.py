@@ -51,7 +51,10 @@ class constant_provider(object):
     return data["data"][project]
 
 def average(avg_numerator, avg_denominator):
-  return float(avg_numerator)/float(avg_denominator)
+  if avg_denominator != 0:
+    return float(avg_numerator)/float(avg_denominator)
+  else:
+    return 0
 
 def mean_time_to_between_statuses(first_date, second_date):
   first_date_sec = time.strptime(first_date.split('.')[0],'%Y-%m-%dT%H:%M:%S')
@@ -96,6 +99,7 @@ print log_prepend + ' initialized datadog SDK'
 for metric_file in sys.argv[1:]:
   headers = {'Content-type': 'application/json'}
   upload_payload = {}
+  log_prepend = '[INFO]'
 
   with open(metric_file) as metric_data_file:
     metric_data_loaded = json.load(metric_data_file)
@@ -149,6 +153,7 @@ for metric_file in sys.argv[1:]:
         avg_denominator = sum(running_total)
         print log_prepend_denominator + ' denominator: ' + str(avg_denominator)
       elif metric_data_loaded['avg_denominator']['source'] == 'constant':
+        log_prepend_denominator = log_prepend + '[' + metric_data_loaded['avg_denominator']['source'] + ']'
         print log_prepend_denominator + ' denominator data provider: ' + metric_data_loaded['avg_denominator']['source']
         log_prepend_denominator = log_prepend + '[' + metric_data_loaded['avg_denominator']['source'] + ']'
         avg_denominator = cp.provide(metric_data_loaded["avg_denominator"], project)
