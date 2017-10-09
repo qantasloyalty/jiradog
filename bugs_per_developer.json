@@ -12,7 +12,8 @@
   "avg_numerator": {
     "source": "jira",
     "jql": "project={{project}} AND issuetype=Bug AND status NOT IN (Done, Resolved, Closed)",
-    "field": "total"
+    "field": "total",
+    "method": "ticket_count"
     },
   "avg_denominator": {
     "source": "constant",

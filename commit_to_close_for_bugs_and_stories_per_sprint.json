@@ -12,11 +12,13 @@
   "avg_numerator": {
     "source": "jira",
     "jql": "project={{project}} AND (sprint IN openSprints() AND sprint NOT IN futureSprints()) AND status IN (DONE,CLOSED,RESOLVED)",
+    "method": "ticket_count",
     "field": "total"
     },
   "avg_denominator": {
     "source": "jira",
     "jql": "project={{project}} AND (sprint IN openSprints() AND sprint NOT IN futureSprints())",
+    "method": "ticket_count",
     "field": "total"
     },
   "metric_name": "jiradog.commitToCloseRatePerSprint"

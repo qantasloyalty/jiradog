@@ -11,8 +11,8 @@
   "method": "mean_time_to_between_statuses",
   "issues": {
     "source": "jira",
-    "jql": "project={{project}} AND issuetype=Bug AND status IN (Done,Resolved,Closed) AND updated > startOfWeek(-14d)",
+    "jql": "project={{project}} AND issuetype=Bug AND priority='1-Critical, stop everything and fix' AND updated>endOfDay(-90d)",
     "field": "created"
     },
-  "metric_name": "jiradog.meanTimeToCloseBugs"
+  "metric_name": "jiradog.meanTimeToCloseBugsP1"
 }
