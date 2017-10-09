@@ -36,7 +36,7 @@ class jira_provider(object):
         print log_prepend + ' API response: ' + str(jira_api_response.status_code)
         jira_api_responses.append(json.loads(jira_api_response.text))
       else:
-        print re.sub(r"[INFO]", "[WARN]", log prepend) + ' Did not recieve an HTTP status code of 200 in response to the API request. Retrying...'
+        print re.sub(r"[INFO]", "[WARN]", log_prepend) + ' Did not recieve an HTTP status code of 200 in response to the API request. Retrying...'
         time.sleep(10)
         jira_api_response = requests.get(url, headers=headers, auth=(api_username, api_password))
         if jira_api_responses.status_code == 200:
