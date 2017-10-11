@@ -102,23 +102,44 @@ class constant_provider(object):
     """
     return data["data"][project]
 
-def average(avg_numerator, avg_denominator):
+def average(numerator, denominator):
+  """Finds the average of 2 numbers.
+
+  Args:
+      numerator:	Integer		The numerator, found using one of the data providers.
+      denominator:	Integer		The denominator, found using one of the data providers.
+
+  Returns:
+      Integer of the resulting division. If the denominator is 0, sets the returned value as 0.
   """
-  """
-  if avg_denominator != 0:
-    return float(avg_numerator)/float(avg_denominator)
+  if denominator != 0:
+    return float(numerator)/float(denominator)
   else:
     return 0
 
 def mean_time_to_between_statuses(first_date, second_date):
-  """
+  """Calculates the length of time between two statuses
+
+  Args:
+      first_date:	String	A simple string of the start date in the format '%Y-%m-%dT%H:%M:%S'
+      second_date:	String	A simple string of the end date in the format '%Y-%m-%dT%H:%M:%S'
+
+  Returns:
+      Floating point number in days
   """
   first_date_sec = time.strptime(first_date.split('.')[0],'%Y-%m-%dT%H:%M:%S')
   second_date_sec = time.strptime(second_date.split('.')[0],'%Y-%m-%dT%H:%M:%S')
   return (time.mktime(second_date_sec) - time.mktime(first_date_sec)) / 60 / 60 / 24
 
 def ticket_count(result, null_field):
-  """
+  """Gets the count of issues from a JQL query result.
+
+  Args:
+      result:		List	A single page from an API call.
+      null_field:	None	Used to allow automating method type.
+
+  Returns:
+      Integer of the number of issues counted.
   """
   return len(result['issues'])
 
@@ -226,26 +247,18 @@ for metric_file in sys.argv[1:]:
 
     ## Method: mean time between statuses
     if metric_data_loaded['method'] == 'mean_time_to_between_statuses':
-      print log_prepend + ' method: ' + metric_data_loaded['method']
-      log_prepend = log_prepend + '[' + metric_data_loaded['method'] + ']'
-      status_start_dates = []
-      status_end_dates = []
-      status_dates = {}
-      paginated_list = jp.provide(metric_data_loaded['issues'], project, max_results)
-      for status_start in paginated_list:
-        for issue_fields in status_start['issues']:
-          status_start_dates.append(issue_fields['fields']['created'])
-          status_end_dates.append(issue_fields['fields']['updated'])
-          status_dates[issue_fields['fields']['created']] = issue_fields['fields']['updated']
-
-      denominator = paginated_list[0]['total']
+      logging.info('method: ' + metric_data_loaded['method'])
 
       date_diff_days = []
-      for date in status_dates:
-        date_diff_days.append(mean_time_to_between_statuses(date, status_dates[date]))
+      paginated_list = jp.provide(metric_data_loaded['issues'], project, max_results)
+      for status_dates in paginated_list:
+        for issue_fields in status_dates['issues']:
+          date_diff_days.append(mean_time_to_between_statuses(issue_fields['fields']['created'],issue_fields['fields']['updated']))
+      total_time_between_statuses = sum(date_diff_days)
+      total_issue_count = paginated_list[0]['total']
 
-      if denominator != 0:
-        points = average(sum(date_diff_days), denominator)
+      if total_issue_count != 0:
+        points = average(total_time_between_statuses, total_issue_count)
       else:
         points = 0
 
@@ -257,9 +270,8 @@ for metric_file in sys.argv[1:]:
       }
     upload_payload.append(metric_data) 
 
-  print '[INFO][' + datadog_metric_name + '][' + project + '] payload: '
-  print upload_payload
+  logging.info('payload: ' + str(upload_payload))
 
   # Upload to DataDog
   result = api.Metric.send(upload_payload)
-  print '[INFO][' + datadog_metric_name + '] uploaded to DataDog.'
+  logging.info('uploaded to DataDog')
