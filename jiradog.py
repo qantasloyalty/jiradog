@@ -9,6 +9,7 @@ import re
 from datadog import initialize, api
 from pprint import pprint
 import time
+from datetime import datetime, timedelta, timetuple
 from jira import JIRA
 import logging
 
@@ -50,10 +51,11 @@ class jira_provider(object):
     Returns:
         A list of urls, with the appended '&startAt=N' that, when looped, will pull all JQL search results.
     """
-    pages = (total / int(max_results)) + 1
     paginations = []
-    for start_at in range(1, pages):
-      paginations.append(base_api_url + '&startAt=' + str(start_at * int(max_results)))
+    start_at = max_results    
+    while (start_at < total):
+      paginations.append(base_api_url + '&startAt=' + str(start_at))
+      start_at = int(start_at) + int(max_results)
     return paginations
 
   def provide(self, provider_config, project, max_results):
@@ -160,7 +162,6 @@ def get_number_average(provider_config, position, project):
     sys.exit(1)
   return number
 
-
 # Set logging config
 logging_levels = {
   'info': logging.INFO,
@@ -181,6 +182,8 @@ function_map = {
 max_results = str(100)
 config_file = '/etc/jiradog.conf'
 log_prepend = '[INFO]'
+headers = {'Content-type': 'application/json'}
+upload_payload = {}
 
 with open(config_file) as config_data_file:
   config_data_loaded = json.load(config_data_file)
@@ -194,9 +197,10 @@ logging.info('api configuration set')
 initialize(**config_data_loaded['datadog'])
 logging.info('initializated datadog SDK')
 
+print get_last_sprint(368)
+quit()
+
 for metric_file in sys.argv[1:]:
-  headers = {'Content-type': 'application/json'}
-  upload_payload = {}
   log_prepend = '[INFO]'
 
   with open(metric_file) as metric_data_file:
@@ -229,7 +233,7 @@ for metric_file in sys.argv[1:]:
       status_start_dates = []
       status_end_dates = []
       status_dates = {}
-      paginated_list = jp.provide(metric_data_loaded['issues'], project, max_results, log_prepend)
+      paginated_list = jp.provide(metric_data_loaded['issues'], project, max_results)
       for status_start in paginated_list:
         for issue_fields in status_start['issues']:
           status_start_dates.append(issue_fields['fields']['created'])
