@@ -78,10 +78,26 @@ class jira_provider(object):
     return jira_api_responses
 
 class constant_provider(object):
-  """
+  """Data provider for data hard-coded in the metric config file.
+
+  Args:
+      data:                   Dictionary      Data from the metric config file.
+      project:                String          The JIRA project; used to get data from the imported dictionary.
+      NULL_max_results:       Integer         NULL metric, to allow generalized usaged. Unused by this function.
+
+  Returns:
+      A single value from a hard coded dictionary included the in the metric config file.
   """
   def provide(self, data, project, NULL_max_results):
-    """
+    """Retrieves and retunrs explicit data hard-coded into the metric config file.
+
+    Args:
+        data:			Dictionary	Data from the metric config file.
+        project:		String		The JIRA project; used to get data from the imported dictionary.
+        NULL_max_results:	Integer		NULL metric, to allow generalized usaged. Unused by this function.
+
+    Returns:
+        A single value from a hard coded dictionary included the in the metric config file.	
     """
     return data["data"][project]
 
@@ -220,7 +236,6 @@ for metric_file in sys.argv[1:]:
           status_end_dates.append(issue_fields['fields']['updated'])
           status_dates[issue_fields['fields']['created']] = issue_fields['fields']['updated']
 
-     #  status_dates = dict(zip(status_start_dates, status_end_dates))
       denominator = paginated_list[0]['total']
 
       date_diff_days = []
