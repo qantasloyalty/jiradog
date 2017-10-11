@@ -9,7 +9,6 @@ import re
 from datadog import initialize, api
 from pprint import pprint
 import time
-from datetime import datetime, timedelta, timetuple
 from jira import JIRA
 import logging
 
@@ -162,17 +161,6 @@ def get_number_average(provider_config, position, project):
     sys.exit(1)
   return number
 
-# Set logging config
-logging_levels = {
-  'info': logging.INFO,
-  'debug': logging.DEBUG,
-  'warning': logging.WARNING,
-  'error': logging.ERROR,
-  'critical': logging.CRITICAL
-  }
-logging_level = logging_levels.get('debug', logging.NOTSET)
-logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', level=logging_level)
-
 function_map = {
   'average': average,
   'mean_time_to_between_statuses': mean_time_to_between_statuses,
@@ -192,13 +180,23 @@ api_username = config_data_loaded['jira']['username']
 api_password = config_data_loaded['jira']['password']
 api_url = config_data_loaded['jira']['server']
 api_endpoint = api_url + '/rest/api/2/search?jql='
+log_file = config_data_loaded['local']['log_file']
+
+# Set logging config
+logging_levels = {
+  'info': logging.INFO,
+  'debug': logging.DEBUG,
+  'warning': logging.WARNING,
+  'error': logging.ERROR,
+  'critical': logging.CRITICAL
+  }
+logging_level = logging_levels.get('debug', logging.NOTSET)
+logging.basicConfig(filename=log_file, format='%(asctime)s %(levelname)s %(message)s', level=logging_level)
+
 logging.info('api configuration set')
 
 initialize(**config_data_loaded['datadog'])
 logging.info('initializated datadog SDK')
-
-print get_last_sprint(368)
-quit()
 
 for metric_file in sys.argv[1:]:
   log_prepend = '[INFO]'
