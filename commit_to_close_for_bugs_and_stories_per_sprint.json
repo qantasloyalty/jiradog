@@ -1,4 +1,5 @@
 {
+  "__comment": "SYS-1479",
   "projects": [
     "MACOSNOTE",
     "WINNOTE",
@@ -10,14 +11,16 @@
     ],
   "method": "average",
   "avg_numerator": {
+    "__comment": "Get all issues updated the last 90 days, that were in a sprint, and are closed",
     "source": "jira",
-    "jql": "project={{project}} AND (sprint IN openSprints() AND sprint NOT IN futureSprints()) AND status IN (DONE,CLOSED,RESOLVED)",
+    "jql": "project={{project}} AND sprint IN (closedSprints(),openSprints()) AND updated>endOfDay(-90) AND status IN (DONE,CLOSED,RESOLVED)",
     "method": "ticket_count",
     "field": "total"
     },
   "avg_denominator": {
+    "__comment": "Get all issues updated the last 90 days, that were in a sprint",
     "source": "jira",
-    "jql": "project={{project}} AND (sprint IN openSprints() AND sprint NOT IN futureSprints())",
+    "jql": "project={{project}} AND sprint IN (closedSprints(),openSprints()) AND updated>endOfDay(-90)",
     "method": "ticket_count",
     "field": "total"
     },

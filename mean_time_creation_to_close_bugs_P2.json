@@ -1,4 +1,5 @@
 {
+  "__comment": "SYS-1478",
   "projects": [
     "MACOSNOTE",
     "WINNOTE",

@@ -51,8 +51,8 @@ class jira_provider(object):
         A list of urls, with the appended '&startAt=N' that, when looped, will pull all JQL search results.
     """
     paginations = []
-    start_at = max_results    
-    while (start_at < total):
+    start_at = max_results
+    while (int(start_at) < int(total)):
       paginations.append(base_api_url + '&startAt=' + str(start_at))
       start_at = int(start_at) + int(max_results)
     return paginations
