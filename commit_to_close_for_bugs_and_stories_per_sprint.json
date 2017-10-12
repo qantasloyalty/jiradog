@@ -13,16 +13,16 @@
   "avg_numerator": {
     "__comment": "Get all issues updated the last 90 days, that were in a sprint, and are closed",
     "source": "jira",
-    "jql": "project={{project}} AND sprint IN (closedSprints(),openSprints()) AND updated>endOfDay(-90) AND status IN (DONE,CLOSED,RESOLVED)",
+    "jql": "project={{project}} AND sprint IN (closedSprints(),openSprints()) AND updated>endOfDay(-90d) AND status IN (DONE,CLOSED,RESOLVED)",
     "method": "ticket_count",
     "field": "total"
     },
   "avg_denominator": {
     "__comment": "Get all issues updated the last 90 days, that were in a sprint",
     "source": "jira",
-    "jql": "project={{project}} AND sprint IN (closedSprints(),openSprints()) AND updated>endOfDay(-90)",
+    "jql": "project={{project}} AND sprint IN (closedSprints(),openSprints()) AND updated>endOfDay(-90d)",
     "method": "ticket_count",
     "field": "total"
     },
-  "metric_name": "jiradog.commitToCloseRatePerSprint"
+  "metric_name": "jiradog.commitToCloseRateOver90Days"
 }
