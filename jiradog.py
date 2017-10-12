@@ -144,15 +144,22 @@ def ticket_count(result, null_field):
   return len(result['issues'])
 
 def custom_field_sum(result, custom_field):
+  """Sums custom field values together.
+
+  Args:
+      result:		Dictionary	The result from a JIRA JQL query.
+      custom_field:	String		The custom field to sum.
+
+  Returns:
+      Integer of the sum of all the found values of the custom_field.
   """
-  """
-  custom_field_values = []
+  custom_field_sum = 0
   for issue in result['issues']:
     if issue['fields'][custom_field] is None:
-      custom_field_values.append(2)
+      custom_field_sum = int(custom_field_sum) + 2
     else:
-      custom_field_values.append(issue['fields'][custom_field])
-  return sum(custom_field_values)
+      custom_field_sum = int(custom_field_sum) + int(issue['fields'][custom_field])
+  return custom_field_sum
 
 def get_number_average(provider_config, position, project):
   """Gets and returns either numerator or denominator for average method from metric config file and data provider
@@ -182,6 +189,7 @@ def get_number_average(provider_config, position, project):
     sys.exit(1)
   return number
 
+# Setting important variables, all static.
 function_map = {
   'average': average,
   'mean_time_to_between_statuses': mean_time_to_between_statuses,
@@ -194,9 +202,11 @@ log_prepend = '[INFO]'
 headers = {'Content-type': 'application/json'}
 upload_payload = {}
 
+# Loads the configuration file for the script.
 with open(config_file) as config_data_file:
   config_data_loaded = json.load(config_data_file)
 
+# Set important information scraped from the configuration file.
 api_username = config_data_loaded['jira']['username']
 api_password = config_data_loaded['jira']['password']
 api_url = config_data_loaded['jira']['server']
@@ -216,12 +226,15 @@ logging.basicConfig(filename=log_file, format='%(asctime)s %(levelname)s %(messa
 
 logging.info('api configuration set')
 
+# Setting up DataDog SDK
 initialize(**config_data_loaded['datadog'])
 logging.info('initializated datadog SDK')
 
+# Loops through all command line arguments, which is a space delimited list of metric configuration files.
 for metric_file in sys.argv[1:]:
   log_prepend = '[INFO]'
 
+  # Loads the metric configuration file
   with open(metric_file) as metric_data_file:
     metric_data_loaded = json.load(metric_data_file)
   logging.info('loaded metric config')
@@ -229,23 +242,24 @@ for metric_file in sys.argv[1:]:
   metric_file_method = metric_data_loaded['method']
   datadog_metric_name = metric_data_loaded['metric_name']
 
+  # Create the provider objects.
   jp = jira_provider(api_username, api_password, api_url)
   cp = constant_provider()
 
   timestamp = time.time()
   upload_payload = []
 
-  # JIRA api call
+  # Loop over specified projects in the metric config file.
   for project in metric_data_loaded['projects']:
     logging.info('project: ' + project)
-    ## Method: Average
+    ## Find the average from data providers in metric configuration file.
     if metric_data_loaded['method'] == 'average':
       logging.info('method: ' + metric_data_loaded['method'])
       avg_numerator = get_number_average(metric_data_loaded['avg_numerator'], 'numerator', project)
       avg_denominator = get_number_average(metric_data_loaded['avg_denominator'], 'denominator', project)
       points = function_map[metric_file_method](avg_numerator, avg_denominator)
 
-    ## Method: mean time between statuses
+    ## Find the average time between specified statuses.
     if metric_data_loaded['method'] == 'mean_time_to_between_statuses':
       logging.info('method: ' + metric_data_loaded['method'])
 
