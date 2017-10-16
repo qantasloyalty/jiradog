@@ -284,11 +284,12 @@ for metric_file in sys.argv[1:]:
 
       date_diff_days = []
       paginated_list = jp.provide(metric_data_loaded['issues'], project, max_results)
-      for status_dates in paginated_list:
-        for issue_fields in status_dates['issues']:
-          date_diff_days.append(mean_time_to_between_statuses(issue_fields['fields']['created'],issue_fields['fields']['updated']))
-      total_time_between_statuses = sum(date_diff_days)
-      total_issue_count = paginated_list[0]['total']
+      if len(paginated_list) != 0:
+        for status_dates in paginated_list:
+          for issue_fields in status_dates['issues']:
+            date_diff_days.append(mean_time_to_between_statuses(issue_fields['fields']['created'],issue_fields['fields']['updated']))
+        total_time_between_statuses = sum(date_diff_days)
+        total_issue_count = paginated_list[0]['total']
 
       if total_issue_count != 0:
         points = average(total_time_between_statuses, total_issue_count)

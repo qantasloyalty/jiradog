@@ -1,0 +1,19 @@
+{
+  "__comment": "SYS-1633",
+  "projects": [
+    "MACOSNOTE",
+    "WINNOTE",
+    "ION",
+    "IOSNOTE",
+    "DRDNOTE",
+    "CE",
+    "ENB"
+    ],
+  "method": "direct",
+  "issues": {
+    "source": "jira",
+    "jql": "Project={{project}} AND (Status CHANGED FROM 'In Progress' TO 'Open' OR Status CHANGED FROM 'Closed' TO 'In Progress' OR Status CHANGED FROM 'In Review' TO 'In Progress' OR Status CHANGED FROM 'Resolved' TO 'In Review' OR Status WAS 'Reopened') AND Updated>endOfDay(-90d)",
+    "method": "ticket_count"
+    },
+  "metric_name": "jiradog.numberOfBugsReopened"
+}
