@@ -189,12 +189,31 @@ def get_number_average(provider_config, position, project):
     sys.exit(1)
   return number
 
+def direct(provider_config, project):
+  """Gets a single number from JIRA and submits it to DataDog.
+
+  Args:
+      provider_config:	Dictionary	Pulled from the metric config, contains source, and arguments.
+      project:		String		The jira project being injected into the templatized JQL query string.
+
+  Returns:
+      Integer of the results from JIRA API requests.
+  """
+  if provider_config['source'] == 'jira':
+    logging.info('data provider: ' + provider_config['source'])
+    paginated_list = jp.provide(provider_config, project, max_results)
+    running_total = []
+    for result in paginated_list:
+      running_total.append(function_map[provider_config['method']](result,None))
+    return sum(running_total)
+
 # Setting important variables, all static.
 function_map = {
   'average': average,
   'mean_time_to_between_statuses': mean_time_to_between_statuses,
   'ticket_count': ticket_count,
-  'custom_field_sum': custom_field_sum
+  'custom_field_sum': custom_field_sum,
+  'direct': direct
 }
 max_results = str(100)
 config_file = '/etc/jiradog.conf'
@@ -275,6 +294,9 @@ for metric_file in sys.argv[1:]:
         points = average(total_time_between_statuses, total_issue_count)
       else:
         points = 0
+    elif metric_data_loaded['method'] == 'direct':
+      points = direct(metric_data_loaded['issues'], project)
+      print points
 
     ## Construct payload for upload
     metric_data = {
