@@ -11,7 +11,7 @@ from pprint import pprint
 import time
 from jira import JIRA
 import logging
-import 
+import jinja2 
 
 class jira_provider(object):
   """This creates the paginated URLS (multiple urls to hit because the total results exceed the maximum allowable returned results) and calls the API, returning results.
