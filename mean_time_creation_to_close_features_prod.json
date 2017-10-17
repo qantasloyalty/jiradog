@@ -13,7 +13,8 @@
   "issues": {
     "__comment": "List of issues released to GA (Global Acceptance)/Production",
     "source": "jira",
-    "jql": "Project={{project}} AND issuetype=Story AND fixVersion=latestReleasedVersion()"
+    "jql": "Project={{project}} AND issuetype=Story AND fixVersion=latestReleasedVersion()",
+    "filter": "{% if issue.fields.fixVersions.0.name ~ 'GA' %}"
     },
   "metric_name": "jiradog.meanTimeToCloseFeaturesToProd"
 }
