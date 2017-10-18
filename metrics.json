@@ -1,5 +1,6 @@
 [
   {
+    "metric_name": "jiradog.avgOpenBugsPerDeveloper",
     "__comment": "SYS-1473",
     "projects": [
       "MACOSNOTE",
@@ -28,10 +29,10 @@
         "CE": "6",
         "ENB": "9"  
         }
-      },
-    "metric_name": "jiradog.avgOpenBugsPerDeveloper"
+      }
   },
   {
+    "metric_name": "jiradog.commitToCloseRateOver90Days",
     "__comment": "SYS-1479",
     "projects": [
       "MACOSNOTE",
@@ -56,10 +57,10 @@
       "jql": "project={{project}} AND sprint IN (closedSprints()) AND updated>endOfDay(-90d)",
       "method": "ticket_count",
       "field": "total"
-      },
-    "metric_name": "jiradog.commitToCloseRateOver90Days"
+      }
   },
   {
+    "metric_name": "jiradog.meanTimeToCloseBugsP1",
     "__comment": "SYS-1478",
     "projects": [
       "MACOSNOTE",
@@ -75,10 +76,10 @@
       "source": "jira",
       "jql": "project={{project}} AND issuetype=Bug AND priority='1-Critical, stop everything and fix' AND Resolution='Unresolved'",
       "field": "created"
-      },
-    "metric_name": "jiradog.meanTimeToCloseBugsP1"
+      }
   },
   {
+    "metric_name": "jiradog.meanTimeToCloseBugsP2",
     "__comment": "SYS-1478",
     "projects": [
       "MACOSNOTE",
@@ -94,10 +95,10 @@
       "source": "jira",
       "jql": "project={{project}} AND issuetype=Bug AND priority='2-High, fix ASAP' AND Resolution='Unresolved'", 
       "field": "created"
-      },
-    "metric_name": "jiradog.meanTimeToCloseBugsP2"
+      }
   },
   {
+    "metric_name": "jiradog.meanTimeToCloseBugsP3",
     "__comment": "SYS-1478",
     "projects": [
       "MACOSNOTE",
@@ -113,10 +114,10 @@
       "source": "jira",
       "jql": "project={{project}} AND issuetype=Bug AND priority='3-Medium, fix before release ships' AND Resolution='Unresolved'",
       "field": "created"
-      },
-    "metric_name": "jiradog.meanTimeToCloseBugsP3"
+      }
   },
   {
+    "metric_name": "jiradog.meanTimeToCloseBugsP4",
     "__comment": "SYS-1478",
     "projects": [
       "MACOSNOTE",
@@ -132,10 +133,10 @@
       "source": "jira",
       "jql": "project={{project}} AND issuetype=Bug AND priority='4-Low, fix if you have time' AND Resolution='Unresolved'",
       "field": "created"
-      },
-    "metric_name": "jiradog.meanTimeToCloseBugsP4"
+      }
   },
   {
+    "metric_name": "jiradog.meanTimeToCloseFeaturesToProd",
     "__comment": "SYS-1634",
     "projects": [
       "MACOSNOTE",
@@ -152,10 +153,10 @@
       "source": "jira",
       "jql": "Project={{project}} AND issuetype=Story AND fixVersion!=EMPTY AND updated>endOfDay(-90d)",
       "filter": "{% if issue.fields.fixVersions.0.name ~ 'GA' %}"
-      },
-    "metric_name": "jiradog.meanTimeToCloseFeaturesToProd"
+      }
   },
   {
+    "metric_name": "jiradog.meanTimeToCloseP1P2Tickets",
     "projects": [
       "MACOSNOTE",
       "WINNOTE",
@@ -171,8 +172,7 @@
       "source": "jira",
       "jql": "project={{project}} AND priority IN ('1-Critical, stop everything and fix','2-High, fix ASAP') AND created>=startOfDay(-90d) AND issuetype=Bug AND labels IN (suport, support, support-impact-over-100, support-impact-up-to-10, support-impact-up-to-100, support-severity-data-loss, support-severity-inconvenient, support-severity-non-functional, commerce-support) AND status IN (closed,resolve)",
       "field": "created"
-      },
-    "metric_name": "jiradog.meanTimeToCloseP1P2Tickets"
+      }
   },
   {
     "__comment": "SYS-1633",
@@ -194,6 +194,7 @@
     "metric_name": "jiradog.numberOfBugsReopened"
   },
   {
+    "metric_name":"jiradog.percentageP1P2Tickets",
     "__comment": "SYS-1476",
     "projects": [
       "MACOSNOTE",
@@ -218,10 +219,10 @@
         "jql": "project={{project}} AND status NOT IN (Done,Resolved,Closed) AND issuetype=Bug ORDER BY fixVersion ASC",
         "method": "ticket_count",
         "field": "total"
-        },
-      "metric_name":"jiradog.percentageP1P2Tickets"
+        }
   },
   {
+    "metric_name":"jiradog.percentageStoryPointsInBugs",
     "__comment": "SYS-1475",
     "projects": [
       "MACOSNOTE",
@@ -246,10 +247,10 @@
       "jql": "project={{project}} AND issuetype IN (Bug,Story) AND updated > endOfDay(-90d)",
       "method": "custom_field_sum",
       "field": "customfield_10203"
-      },
-    "metric_name":"jiradog.percentageStoryPointsInBugs"
+      }
   },
   {
+    "metric_name":"jiradog.percentageStoryPointsInFeatures",
     "__comment": "SYS-1475",
     "projects": [
       "MACOSNOTE",
@@ -274,10 +275,10 @@
       "jql": "project={{project}} AND issuetype IN (Bug,Story) AND updated > endOfDay(-90d)",
       "method": "custom_field_sum",
       "field": "customfield_10203"
-      },
-    "metric_name":"jiradog.percentageStoryPointsInFeatures"
+      }
   },
   {
+    "metric_name": "jiradog.percentageRegressionBugs",
     "projects": [
       "MACOSNOTE",
       "WINNOTE",
@@ -301,7 +302,6 @@
       "jql": "project={{project}} AND issuetype=Bug AND status NOT IN (Done,Resolved,Closed) AND updated > startOfDay(-90d)",
       "method": "ticket_count",
       "field": "total"
-      },
-    "metric_name": "jiradog.percentageRegressionBugs"
+      }
   }
 ]
