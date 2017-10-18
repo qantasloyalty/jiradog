@@ -1,0 +1,307 @@
+[
+  {
+    "__comment": "SYS-1473",
+    "projects": [
+      "MACOSNOTE",
+      "WINNOTE",
+      "ION",
+      "IOSNOTE",
+      "DRDNOTE",
+      "CE",
+      "ENB"
+      ],
+    "method": "average",
+    "avg_numerator": {
+      "source": "jira",
+      "jql": "project={{project}} AND issuetype=Bug AND status NOT IN (Done, Resolved, Closed)",
+      "field": "total",
+      "method": "ticket_count"
+      },
+    "avg_denominator": {
+      "source": "constant",
+      "data": {
+        "MACOSNOTE": "7",
+        "WINNOTE": "4",
+        "ION": "9",
+        "IOSNOTE": "8",
+        "DRDNOTE": "7",
+        "CE": "6",
+        "ENB": "9"  
+        }
+      },
+    "metric_name": "jiradog.avgOpenBugsPerDeveloper"
+  },
+  {
+    "__comment": "SYS-1479",
+    "projects": [
+      "MACOSNOTE",
+      "WINNOTE",
+      "ION",
+      "IOSNOTE",
+      "DRDNOTE",
+      "CE",
+      "ENB"
+      ],
+    "method": "average",
+    "avg_numerator": {
+      "__comment": "Get all issues updated the last 90 days, that were in a sprint, and are not completed",
+      "source": "jira",
+      "jql": "project={{project}} AND sprint IN (closedSprints()) AND updated>endOfDay(-90d) AND status IN (Done,Resolved,Closed)",
+      "method": "ticket_count",
+      "field": "total"
+      },
+    "avg_denominator": {
+      "__comment": "Get all issues updated the last 90 days, that were in a sprint",
+      "source": "jira",
+      "jql": "project={{project}} AND sprint IN (closedSprints()) AND updated>endOfDay(-90d)",
+      "method": "ticket_count",
+      "field": "total"
+      },
+    "metric_name": "jiradog.commitToCloseRateOver90Days"
+  },
+  {
+    "__comment": "SYS-1478",
+    "projects": [
+      "MACOSNOTE",
+      "WINNOTE",
+      "ION",
+      "IOSNOTE",
+      "DRDNOTE",
+      "CE",
+      "ENB"
+      ],
+    "method": "mean_time_to_between_statuses",
+    "issues": {
+      "source": "jira",
+      "jql": "project={{project}} AND issuetype=Bug AND priority='1-Critical, stop everything and fix' AND Resolution='Unresolved'",
+      "field": "created"
+      },
+    "metric_name": "jiradog.meanTimeToCloseBugsP1"
+  },
+  {
+    "__comment": "SYS-1478",
+    "projects": [
+      "MACOSNOTE",
+      "WINNOTE",
+      "ION",
+      "IOSNOTE",
+      "DRDNOTE",
+      "CE",
+      "ENB"
+      ],
+    "method": "mean_time_to_between_statuses",
+    "issues": {
+      "source": "jira",
+      "jql": "project={{project}} AND issuetype=Bug AND priority='2-High, fix ASAP' AND Resolution='Unresolved'", 
+      "field": "created"
+      },
+    "metric_name": "jiradog.meanTimeToCloseBugsP2"
+  },
+  {
+    "__comment": "SYS-1478",
+    "projects": [
+      "MACOSNOTE",
+      "WINNOTE",
+      "ION",
+      "IOSNOTE",
+      "DRDNOTE",
+      "CE",
+      "ENB"
+      ],
+    "method": "mean_time_to_between_statuses",
+    "issues": {
+      "source": "jira",
+      "jql": "project={{project}} AND issuetype=Bug AND priority='3-Medium, fix before release ships' AND Resolution='Unresolved'",
+      "field": "created"
+      },
+    "metric_name": "jiradog.meanTimeToCloseBugsP3"
+  },
+  {
+    "__comment": "SYS-1478",
+    "projects": [
+      "MACOSNOTE",
+      "WINNOTE",
+      "ION",
+      "IOSNOTE",
+      "DRDNOTE",
+      "CE",
+      "ENB"
+      ],
+    "method": "mean_time_to_between_statuses",
+    "issues": {
+      "source": "jira",
+      "jql": "project={{project}} AND issuetype=Bug AND priority='4-Low, fix if you have time' AND Resolution='Unresolved'",
+      "field": "created"
+      },
+    "metric_name": "jiradog.meanTimeToCloseBugsP4"
+  },
+  {
+    "__comment": "SYS-1634",
+    "projects": [
+      "MACOSNOTE",
+      "WINNOTE",
+      "ION",
+      "IOSNOTE",
+      "DRDNOTE",
+      "CE",
+      "ENB"
+      ],
+    "method": "mean_time_to_between_statuses",
+    "issues": {
+      "__comment": "List of issues released to GA (Global Acceptance)/Production",
+      "source": "jira",
+      "jql": "Project={{project}} AND issuetype=Story AND fixVersion!=EMPTY AND updated>endOfDay(-90d)",
+      "filter": "{% if issue.fields.fixVersions.0.name ~ 'GA' %}"
+      },
+    "metric_name": "jiradog.meanTimeToCloseFeaturesToProd"
+  },
+  {
+    "projects": [
+      "MACOSNOTE",
+      "WINNOTE",
+      "ION",
+      "IOSNOTE",
+      "DRDNOTE",
+      "CE",
+      "ENB"
+      ],
+    "method": "mean_time_to_between_statuses",
+    "issues": {
+      "__comment": "Get create date for all tickets",
+      "source": "jira",
+      "jql": "project={{project}} AND priority IN ('1-Critical, stop everything and fix','2-High, fix ASAP') AND created>=startOfDay(-90d) AND issuetype=Bug AND labels IN (suport, support, support-impact-over-100, support-impact-up-to-10, support-impact-up-to-100, support-severity-data-loss, support-severity-inconvenient, support-severity-non-functional, commerce-support) AND status IN (closed,resolve)",
+      "field": "created"
+      },
+    "metric_name": "jiradog.meanTimeToCloseP1P2Tickets"
+  },
+  {
+    "__comment": "SYS-1633",
+    "projects": [
+      "MACOSNOTE",
+      "WINNOTE",
+      "ION",
+      "IOSNOTE",
+      "DRDNOTE",
+      "CE",
+      "ENB"
+      ],
+    "method": "direct",
+    "issues": {
+      "source": "jira",
+      "jql": "Project={{project}} AND Status WAS 'Reopened' AND Updated>endOfDay(-90d)",
+      "method": "ticket_count"
+      },
+    "metric_name": "jiradog.numberOfBugsReopened"
+  },
+  {
+    "__comment": "SYS-1476",
+    "projects": [
+      "MACOSNOTE",
+      "WINNOTE",
+      "ION",
+      "IOSNOTE",
+      "DRDNOTE",
+      "CE",
+      "ENB"
+      ],
+      "method": "average",
+      "avg_numerator": {
+        "__comment": "Get total of all priority 1 and 2 bugs",
+        "source": "jira",
+        "jql": "project={{project}} AND status NOT IN (Done,Resolved,Closed) AND issuetype=Bug AND priority IN ('1-Critical, stop everything and fix','2-High, fix ASAP') ORDER BY fixVersion ASC",
+        "method": "ticket_count",
+        "field": "total"
+        },
+      "avg_denominator": {
+        "__comment": "Get total of all bugs in projects",
+        "source": "jira",
+        "jql": "project={{project}} AND status NOT IN (Done,Resolved,Closed) AND issuetype=Bug ORDER BY fixVersion ASC",
+        "method": "ticket_count",
+        "field": "total"
+        },
+      "metric_name":"jiradog.percentageP1P2Tickets"
+  },
+  {
+    "__comment": "SYS-1475",
+    "projects": [
+      "MACOSNOTE",
+      "WINNOTE",
+      "ION",
+      "IOSNOTE",
+      "DRDNOTE",
+      "CE",
+      "ENB"
+      ],
+    "method": "average",
+    "avg_numerator": {
+      "__comment": "Get total story points of bugs, rolling 90 day window",
+      "source": "jira",
+      "jql": "project={{project}} AND issuetype=Bug AND updated > endOfDay(-90d)",
+      "method": "custom_field_sum",
+      "field": "customfield_10203"
+      },
+    "avg_denominator": {
+      "__comment": "Get total story points of bugs and stories, rolling 90 day window",
+      "source": "jira",
+      "jql": "project={{project}} AND issuetype IN (Bug,Story) AND updated > endOfDay(-90d)",
+      "method": "custom_field_sum",
+      "field": "customfield_10203"
+      },
+    "metric_name":"jiradog.percentageStoryPointsInBugs"
+  },
+  {
+    "__comment": "SYS-1475",
+    "projects": [
+      "MACOSNOTE",
+      "WINNOTE",
+      "ION",
+      "IOSNOTE",
+      "DRDNOTE",
+      "CE",
+      "ENB"
+      ],
+    "method": "average",
+    "avg_numerator": {
+      "__comment": "Get total story points of features, rolling 90 day window",
+      "source": "jira",
+      "jql": "project={{project}} AND issuetype=Story AND updated > endOfDay(-90d)",
+      "method": "custom_field_sum",
+      "field": "customfield_10203"
+      },
+    "avg_denominator": {
+      "__comment": "Get total story points of bugs and stories, rolling 90 day window",
+      "source": "jira",
+      "jql": "project={{project}} AND issuetype IN (Bug,Story) AND updated > endOfDay(-90d)",
+      "method": "custom_field_sum",
+      "field": "customfield_10203"
+      },
+    "metric_name":"jiradog.percentageStoryPointsInFeatures"
+  },
+  {
+    "projects": [
+      "MACOSNOTE",
+      "WINNOTE",
+      "ION",
+      "IOSNOTE",
+      "DRDNOTE",
+      "CE",
+      "ENB"
+      ],
+    "method": "average",
+    "avg_numerator": {
+      "__comment": "Find number of bugs labelled regression",
+      "source": "jira",
+      "jql": "project={{project}} AND issuetype=Bug AND labels=regression AND status NOT IN (Done,Resolved,Closed) AND updated > startOfDay(-90d)",
+      "method": "ticket_count",
+      "field": "total"
+      },
+    "avg_denominator": {
+      "__comment": "Find total number of bugs in a project",
+      "source": "jira",
+      "jql": "project={{project}} AND issuetype=Bug AND status NOT IN (Done,Resolved,Closed) AND updated > startOfDay(-90d)",
+      "method": "ticket_count",
+      "field": "total"
+      },
+    "metric_name": "jiradog.percentageRegressionBugs"
+  }
+]
