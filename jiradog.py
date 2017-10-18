@@ -1,17 +1,9 @@
 #!/usr/bin/python
 
-import sys
-import requests
-import json
-import io
-import urllib
-import re
 from datadog import initialize, api
 from pprint import pprint
-import time
 from jira import JIRA
-import logging
-import jinja2 
+import jinja2, argparse, sys, requests, json, io, urllib, re, time, logging 
 
 class jira_provider(object):
   """This creates the paginated URLS (multiple urls to hit because the total results exceed the maximum allowable returned results) and calls the API, returning results.
@@ -222,6 +214,11 @@ def direct(provider_config, project):
     return sum(running_total)
 
 def main(argv):
+  parser = argparse.ArgumentParser()
+  parser.add_argument('-m', '--metric',
+    help='Run only the specific metric name from metrics.json')
+
+  args = parser.parse_args()
 
   logging.info('api configuration set')
 
@@ -229,14 +226,23 @@ def main(argv):
   initialize(**config_data_loaded['datadog'])
   logging.info('initializated datadog SDK')
 
-  # Loops through all command line arguments, which is a space delimited list of metric configuration files.
-  for metric_file in argv[1:]:
-    log_prepend = '[INFO]'
+  # Loads the metric configuration file
+  with open(metric_json) as metric_file:
+    metric_file_full = json.load(metric_file)
+  if args.metric:
+    for metric_config in metric_file_full:
+      print "metric_name: " + metric_config['metric_name']
+      print "argument: " + args.metric
+      if metric_config['metric_name'] == args.metric:
+        metric_file_full = [metric_config]
+    pprint(metric_file_full)
+      
 
-    # Loads the metric configuration file
-    with open(metric_file) as metric_data_file:
-      metric_data_loaded = json.load(metric_data_file)
-    logging.info('loaded metric config')
+  logging.info('loaded metric config')
+
+  # Loops through all command line arguments, which is a space delimited list of metric configuration files.
+  for metric_data_loaded in metric_file_full:
+    log_prepend = '[INFO]'
 
     metric_file_method = metric_data_loaded['method']
     datadog_metric_name = metric_data_loaded['metric_name']
@@ -298,7 +304,7 @@ if __name__ == "__main__":
     'direct': direct
   }
   max_results = str(100)
-  config_file = '/etc/jiradog.conf'
+  config_file = 'config.json'
   log_prepend = '[INFO]'
   headers = {'Content-type': 'application/json'}
   upload_payload = {}
@@ -313,6 +319,7 @@ if __name__ == "__main__":
   api_url = config_data_loaded['jira']['server']
   api_endpoint = api_url + '/rest/api/2/search?jql='
   log_file = config_data_loaded['local']['log_file']
+  metric_json = config_data_loaded['local']['metric_file']
   
   # Set logging config
   logging_levels = {
