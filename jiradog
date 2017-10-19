@@ -235,6 +235,7 @@ def get_number_average(provider_config, position, project):
 def main(argv):
   parser = argparse.ArgumentParser()
   parser.add_argument('-m', '--metric',
+    metavar='METRIC',
     help='Run only the specific metric')
   parser.add_argument('-l', '--list',
     help='Get a list of defined metrics',
@@ -243,6 +244,7 @@ def main(argv):
     help='Runs everything and outputs the payload to stdin, instead of uploading to DataDog.',
     action='store_true')
   parser.add_argument('-d', '--describe',
+    metavar='METRIC',
     help='Prints the configuration block for the specified metric')
 
   args = parser.parse_args()
