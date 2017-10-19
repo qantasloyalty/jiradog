@@ -151,7 +151,7 @@
     "issues": {
       "__comment": "List of issues released to GA (Global Acceptance)/Production",
       "source": "jira",
-      "jql": "Project={{project}} AND issuetype=Story AND fixVersion!=EMPTY AND updated>endOfDay(-90d)",
+      "jql": "Project={{project}} AND issuetype=Story AND fixVersion!=EMPTY AND resolved>endOfDay(-180d)",
       "filter": "{% if issue.fields.fixVersions.0.name ~ 'GA' %}"
       }
   },
