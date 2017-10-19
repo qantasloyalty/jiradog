@@ -15,12 +15,12 @@
     "avg_numerator": {
       "source": "jira",
       "jql": "project={{project}} AND issuetype=Bug AND status NOT IN (Done, Resolved, Closed)",
-      "field": "total",
       "method": "ticket_count"
       },
     "avg_denominator": {
       "source": "constant",
       "data": {
+        "__comment": "Total number of developers per project.",
         "MACOSNOTE": "7",
         "WINNOTE": "4",
         "ION": "9",
