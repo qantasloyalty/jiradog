@@ -239,6 +239,11 @@ def main(argv):
   parser.add_argument('-l', '--list',
     help='Get a list of defined metrics',
     action='store_true')
+  parser.add_argument('-n', '--noop',
+    help='Runs everything and outputs the payload to stdin, instead of uploading to DataDog.',
+    action='store_true')
+  parser.add_argument('-d', '--describe',
+    help='Prints the configuration block for the specified metric')
 
   args = parser.parse_args()
 
@@ -259,6 +264,12 @@ def main(argv):
   if args.list:
     for metric in metric_file_full:
       print metric['metric_name']
+    sys.exit(0)
+
+  if args.describe:
+    for metric in metric_file_full:
+      if metric['metric_name'] == args.describe:
+        pprint(metric)
     sys.exit(0)
 
   logging.info('loaded metric config')
@@ -313,9 +324,12 @@ def main(argv):
 
     logging.info('payload: ' + str(upload_payload))
 
-    # Upload to DataDog
-    result = api.Metric.send(upload_payload)
-    logging.info('uploaded to DataDog')
+    if args.noop:
+      pprint(upload_payload)
+    else:
+      # Upload to DataDog
+      result = api.Metric.send(upload_payload)
+      logging.info('uploaded to DataDog')
 
 if __name__ == "__main__":
   # Setting important variables, all static.
