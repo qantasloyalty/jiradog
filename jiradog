@@ -51,7 +51,6 @@ class jira_provider(object):
           regex_result = re.search(value, issue[fields[1]])
 
         if type(regex_result) != type(None):
-          print issue['key']
           issues.append(issue)
     issue_list.append({'issues': issues})
     return issue_list
@@ -94,8 +93,9 @@ class jira_provider(object):
     for url in self.paginate(jira_api_call_url, jira_api_response['total'], max_results):
       jira_api_response = requests.get(url, headers=headers, auth=(api_username, api_password))
       jira_api_responses.append(json.loads(jira_api_response.text))
+    filter_jinja2 = provider_config.get('filter', False)
 
-    if provider_config['filter']:
+    if filter_jinja2 != False:
       paginated_list = self.issue_filter(jira_api_responses, provider_config['filter'])
     else:
       paginated_list = jira_api_responses
@@ -306,7 +306,6 @@ def main(argv):
 
         date_diff_days = []
         paginated_list = jira_provider().provide(metric_data_loaded['issues'], project, max_results)
-        print len(paginated_list[0]['issues'])
         if len(paginated_list) != 0:
           for status_dates in paginated_list:
             for issue_fields in status_dates['issues']:
