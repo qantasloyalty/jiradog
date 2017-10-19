@@ -32,7 +32,7 @@ class jira_provider(object):
         List of dictionaries of lists of issues.
     """
     filtered_list = []
-    operators = '~|=|!='
+    operators = '~'
     filter_jinja2_regex = re.search("(^{% if )(.*)( )("+ operators +")( ')(.*)(' %}$)",filter_jinja2)
     fields = filter_jinja2_regex.group(2).split('.')
     operator = filter_jinja2_regex.group(4)
