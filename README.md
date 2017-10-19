@@ -124,6 +124,20 @@ per data provider methos:
 ```
 The next data provider uses the source `constant`. This provider is for hard-coded information that is, well, constant. The comment adds some constext to what this information is. Right now the script only supports constant source separated by project.
 
+### script-based filtering
+We use a jinja2/nunjucks style filtering with if/then statements. JQL currently doesn't support selecting fixVersions with a "~" (contains) or "LIKE" operator. To get around this, take a look at the `filter` key-value pair in this example data provider block:
+
+```
+    "issues": {
+      "__comment": "List of issues released to GA (Global Acceptance)/Production",
+      "source": "jira",
+      "jql": "Project={{project}} AND issuetype=Story AND fixVersion!=EMPTY AND resolved>endOfDay(-180d)",
+      "filter": "{% if issue.fields.fixVersions.0.name ~ 'GA' %}"
+      }
+```
+
+Following the typical jinja2 if/then statement, we have the statement, which is declared by the surrounding `{%` and `%}`. Inside is a basic structure: `if issue.fields.fixVersions.0.name ~ 'GA'`. `issue.fields.fixVersions.0.name` is the 'path' of the key-value pair in the issue we are looking to compare with the value, in this case `GA`. This will filter all issues to see if they have a `fixVerions` that contains `GA`.
+
 ### More on the metrics.json
 
 The metrics.json file is a JSON list of dictionaries, each one a 'description'/'assertion' of what is needed out of JIRA, how to process, and what to name the metric in DataDog. Because it is json, be wary of JSON's strict syntax, especially with trailing/missing commas.

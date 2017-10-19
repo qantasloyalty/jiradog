@@ -94,7 +94,12 @@ class jira_provider(object):
     for url in self.paginate(jira_api_call_url, jira_api_response['total'], max_results):
       jira_api_response = requests.get(url, headers=headers, auth=(api_username, api_password))
       jira_api_responses.append(json.loads(jira_api_response.text))
-    paginated_list = self.issue_filter(jira_api_responses, provider_config['filter'])
+
+    if provider_config['filter']:
+      paginated_list = self.issue_filter(jira_api_responses, provider_config['filter'])
+    else:
+      paginated_list = jira_api_responses
+
     return paginated_list
 
 class constant_provider(object):
