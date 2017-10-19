@@ -41,7 +41,15 @@ class jira_provider(object):
     issues = []
     for page in paginated_list:
       for issue in page['issues']:
-        regex_result = re.search(value, issue[fields[1]][fields[2]][int(fields[3])][fields[4]])
+        if len(fields) == 5:
+          regex_result = re.search(value, issue[fields[1]][fields[2]][int(fields[3])][fields[4]])
+        elif len(fields) == 4:
+          regex_result = re.search(value, issue[fields[1]][fields[2]][fields[3]])
+        elif len(fields) == 3:
+          regex_result = re.search(value, issue[fields[1]][fields[2]])
+        elif len(fields) == 2:
+          regex_result = re.search(value, issue[fields[1]])
+
         if type(regex_result) != type(None):
           print issue['key']
           issues.append(issue)
