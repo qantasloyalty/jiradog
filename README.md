@@ -126,7 +126,7 @@ The next data provider uses the source `constant`. This provider is for hard-cod
 
 ### More on the metrics.json
 
-The metrics.json file is a JSON list of dictionaries, each one a 'description'/'assertion' of what is needed out of JIRA, how to process, and what to name the metric in DataDog. Because it is json, be weary of JSON's strict syntax, especially with trailing/missing commas.
+The metrics.json file is a JSON list of dictionaries, each one a 'description'/'assertion' of what is needed out of JIRA, how to process, and what to name the metric in DataDog. Because it is json, be wary of JSON's strict syntax, especially with trailing/missing commas.
 
 ### Philosophy
 
@@ -134,4 +134,4 @@ The general philsophy is to use JQL to get the most specific results as possible
 
 ## Authors
 
-* **Bryce McNab** - *Initial work*
+* **Bryce McNab** - *Initial work* - 10/19/2017
