@@ -235,7 +235,10 @@ def get_number_average(provider_config, position, project):
 def main(argv):
   parser = argparse.ArgumentParser()
   parser.add_argument('-m', '--metric',
-    help='Run only the specific metric name from metrics.json')
+    help='Run only the specific metric')
+  parser.add_argument('-l', '--list',
+    help='Get a list of defined metrics',
+    action='store_true')
 
   args = parser.parse_args()
 
@@ -252,6 +255,11 @@ def main(argv):
     for metric_config in metric_file_full:
       if metric_config['metric_name'] == args.metric:
         metric_file_full = [metric_config]
+
+  if args.list:
+    for metric in metric_file_full:
+      print metric['metric_name']
+    sys.exit(0)
 
   logging.info('loaded metric config')
 
