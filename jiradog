@@ -5,6 +5,7 @@ from pprint import pprint
 from jira import JIRA
 import jinja2, argparse, sys, requests, json, io, urllib, re, time, logging 
 
+## Data providers
 class jira_provider(object):
   """This creates the paginated URLS (multiple urls to hit because the total results exceed the maximum allowable returned results) and calls the API, returning results.
 
@@ -44,10 +45,8 @@ class jira_provider(object):
         if type(regex_result) != type(None):
           print issue['key']
           issues.append(issue)
-#         paginated_list[paginated_list.index(page)]['issues'].remove(issue)
     issue_list.append({'issues': issues})
     return issue_list
-#   return paginated_list
 
   def paginate(self, base_api_url, total, max_results):
     """Create a list of JIRA API search urls appended with '&startAt=N' in order to get all results from a JQL query.
@@ -89,7 +88,6 @@ class jira_provider(object):
       jira_api_responses.append(json.loads(jira_api_response.text))
     paginated_list = self.issue_filter(jira_api_responses, provider_config['filter'])
     return paginated_list
-#   return jira_api_responses
 
 class constant_provider(object):
   """Data provider for data hard-coded in the metric config file.
@@ -115,6 +113,25 @@ class constant_provider(object):
     """
     return data["data"][project]
 
+def direct(provider_config, project):
+  """Gets a single number from JIRA and submits it to DataDog.
+
+  Args:
+      provider_config:	Dictionary	Pulled from the metric config, contains source, and arguments.
+      project:		String		The jira project being injected into the templatized JQL query string.
+
+  Returns:
+      Integer of the results from JIRA API requests.
+  """
+  if provider_config['source'] == 'jira':
+    logging.info('data provider: ' + provider_config['source'])
+    paginated_list = jira_provider().provide(provider_config, project, max_results)
+    running_total = []
+    for result in paginated_list:
+      running_total.append(function_map[provider_config['method']](result,None))
+    return sum(running_total)
+
+## post-processing methods
 def average(numerator, denominator):
   """Finds the average of 2 numbers.
 
@@ -144,6 +161,7 @@ def mean_time_to_between_statuses(first_date, second_date):
   second_date_sec = time.strptime(second_date.split('.')[0],'%Y-%m-%dT%H:%M:%S')
   return (time.mktime(second_date_sec) - time.mktime(first_date_sec)) / 60 / 60 / 24
 
+## data provider methods
 def ticket_count(paginated_list, null_field):
   """Gets the count of issues from a JQL query result.
 
@@ -158,7 +176,6 @@ def ticket_count(paginated_list, null_field):
   for page in paginated_list:
     total_issues = total_issues + len(page['issues'])
   return total_issues
-# return len(result['issues'])
 
 def custom_field_sum(result, custom_field):
   """Sums custom field values together.
@@ -206,23 +223,6 @@ def get_number_average(provider_config, position, project):
     sys.exit(1)
   return number
 
-def direct(provider_config, project):
-  """Gets a single number from JIRA and submits it to DataDog.
-
-  Args:
-      provider_config:	Dictionary	Pulled from the metric config, contains source, and arguments.
-      project:		String		The jira project being injected into the templatized JQL query string.
-
-  Returns:
-      Integer of the results from JIRA API requests.
-  """
-  if provider_config['source'] == 'jira':
-    logging.info('data provider: ' + provider_config['source'])
-    paginated_list = jira_provider().provide(provider_config, project, max_results)
-    running_total = []
-    for result in paginated_list:
-      running_total.append(function_map[provider_config['method']](result,None))
-    return sum(running_total)
 
 def main(argv):
   parser = argparse.ArgumentParser()
