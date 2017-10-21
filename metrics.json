@@ -71,7 +71,7 @@
       "CE",
       "ENB"
       ],
-    "method": "mean_time_to_between_statuses",
+    "method": "mean_time_between_statuses",
     "issues": {
       "source": "jira",
       "jql": "project={{project}} AND issuetype=Bug AND priority='1-Critical, stop everything and fix' AND Resolution='Unresolved'",
@@ -90,7 +90,7 @@
       "CE",
       "ENB"
       ],
-    "method": "mean_time_to_between_statuses",
+    "method": "mean_time_between_statuses",
     "issues": {
       "source": "jira",
       "jql": "project={{project}} AND issuetype=Bug AND priority='2-High, fix ASAP' AND Resolution='Unresolved'", 
@@ -109,7 +109,7 @@
       "CE",
       "ENB"
       ],
-    "method": "mean_time_to_between_statuses",
+    "method": "mean_time_between_statuses",
     "issues": {
       "source": "jira",
       "jql": "project={{project}} AND issuetype=Bug AND priority='3-Medium, fix before release ships' AND Resolution='Unresolved'",
@@ -128,7 +128,7 @@
       "CE",
       "ENB"
       ],
-    "method": "mean_time_to_between_statuses",
+    "method": "mean_time_between_statuses",
     "issues": {
       "source": "jira",
       "jql": "project={{project}} AND issuetype=Bug AND priority='4-Low, fix if you have time' AND Resolution='Unresolved'",
@@ -147,7 +147,7 @@
       "CE",
       "ENB"
       ],
-    "method": "mean_time_to_between_statuses",
+    "method": "mean_time_between_statuses",
     "issues": {
       "__comment": "List of issues released to GA (Global Acceptance)/Production",
       "source": "jira",
@@ -166,7 +166,7 @@
       "CE",
       "ENB"
       ],
-    "method": "mean_time_to_between_statuses",
+    "method": "mean_time_between_statuses",
     "issues": {
       "__comment": "Get create date for all tickets",
       "source": "jira",
