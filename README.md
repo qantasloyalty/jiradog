@@ -1,5 +1,6 @@
 # jiradog
 
+Version 1.0
 A tool to poll data from JIRA to upload as a metric to DataDog.
 
 ## Prerequisites
