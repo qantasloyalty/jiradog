@@ -175,6 +175,7 @@
       }
   },
   {
+    "metric_name": "jiradog.numberOfBugsReopened",
     "__comment": "SYS-1633",
     "projects": [
       "MACOSNOTE",
@@ -190,8 +191,7 @@
       "source": "jira",
       "jql": "Project={{project}} AND Status WAS 'Reopened' AND Updated>endOfDay(-90d)",
       "method": "ticket_count"
-      },
-    "metric_name": "jiradog.numberOfBugsReopened"
+      }
   },
   {
     "metric_name":"jiradog.percentageP1P2Tickets",
