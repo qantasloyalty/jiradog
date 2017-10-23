@@ -277,7 +277,6 @@ def get_number_average(provider_config, position, project):
         logging.info(position + ': ' + str(number))
     elif provider_config['source'] == 'constant':
         logging.info('data provider: ' + provider_config['source'])
-#       number = ConstantProvider().provide(provider_config, project)
         number = constant_provider_provide(provider_config, project)
         logging.info(position + ': ' + str(number))
     else:
