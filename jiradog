@@ -23,6 +23,7 @@ from pprint import pprint
 import jinja2
 import requests
 from datadog import initialize, api
+from jira import JIRA
 
 ## Data providers
 class JiraProvider(object):
@@ -307,6 +308,30 @@ def load_metric_file(metric_file, is_args_metric_set):
                 metric_file_full = [metric_config]
     return metric_file_full
 
+def get_issues(jql, project):
+    """Using the JIRA SDK, gets a list of issues.
+
+    Args:
+        jql:		String	The JQL query.
+        project:	String	The project to templatize the jql.
+
+    Returns:
+        List of issues returned from JIRA JQL query.
+    """
+    max_results = 100
+    start_at = 100
+    issues = []
+    jql_rendered = jinja2.Template(jql).render(project=project)
+    search = jira.search_issues(jql_rendered, maxResults=max_results, startAt=0)
+    for issue in search:
+        issues.append(issue)
+    while len(search) == 100:
+        search = jira.search_issues(jql_rendered, maxResults=max_results, startAt=start_at)
+        for issue in search:
+            issues.append(issue)
+        start_at = start_at + max_results
+    return issues
+
 def main():
     """Main function, calls all other functions.
 
@@ -367,12 +392,22 @@ def main():
             if metric_data_loaded['method'] == 'average':
                 ## Find the average from data providers.
                 logging.info('method: ' + metric_data_loaded['method'])
-                points = average(get_number_average(metric_data_loaded['avg_numerator'],
-                                                    'numerator',
-                                                    project),
-                                 get_number_average(metric_data_loaded['avg_denominator'],
-                                                    'denominator',
-                                                    project))
+
+                if metric_data_loaded['numerator']['method'] == 'ticket_count':
+                    numerator = len(get_issues(metric_data_loaded['numerator']['jql'], project))
+                if metric_data_loaded['denominator']['method'] == 'ticket_count':
+                    denominator = len(get_issues(metric_data_loaded['denominator']['jql'], project))
+
+                if (metric_data_loaded['denominator']['method'] == 'ticket_count') and (metric_data_loaded['numerator']['method'] == 'ticket_count'):
+                    points = float(numerator) / float(denominator)
+                else: 
+                    points = average(get_number_average(metric_data_loaded['numerator'],
+                                                        'numerator',
+                                                        project),
+                                     get_number_average(metric_data_loaded['denominator'],
+                                                        'denominator',
+                                                        project))
+
             elif metric_data_loaded['method'] == 'mean_time_between_statuses':
                 ## Find the average time between specified statuses.
                 logging.info('method: ' + metric_data_loaded['method'])
@@ -452,6 +487,7 @@ if __name__ == "__main__":
     logging.basicConfig(filename=LOG_FILE,
                         format='%(asctime)s %(levelname)s %(message)s',
                         level=LOGGING_LEVEL)
+    jira = JIRA(API_URL, basic_auth=(API_USERNAME, API_PASSWORD))
 
     # Executing script
     main()

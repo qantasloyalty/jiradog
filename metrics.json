@@ -12,12 +12,12 @@
       "ENB"
       ],
     "method": "average",
-    "avg_numerator": {
+    "numerator": {
       "source": "jira",
       "jql": "project={{project}} AND issuetype=Bug AND status NOT IN (Done, Resolved, Closed)",
       "method": "ticket_count"
       },
-    "avg_denominator": {
+    "denominator": {
       "source": "constant",
       "data": {
         "__comment": "Total number of developers per project.",
@@ -44,14 +44,14 @@
       "ENB"
       ],
     "method": "average",
-    "avg_numerator": {
+    "numerator": {
       "__comment": "Get all issues updated the last 90 days, that were in a sprint, and are not completed",
       "source": "jira",
       "jql": "project={{project}} AND sprint IN (closedSprints()) AND updated>endOfDay(-90d) AND status IN (Done,Resolved,Closed)",
       "method": "ticket_count",
       "field": "total"
       },
-    "avg_denominator": {
+    "denominator": {
       "__comment": "Get all issues updated the last 90 days, that were in a sprint",
       "source": "jira",
       "jql": "project={{project}} AND sprint IN (closedSprints()) AND updated>endOfDay(-90d)",
@@ -206,14 +206,14 @@
       "ENB"
       ],
       "method": "average",
-      "avg_numerator": {
+      "numerator": {
         "__comment": "Get total of all priority 1 and 2 bugs",
         "source": "jira",
         "jql": "project={{project}} AND status NOT IN (Done,Resolved,Closed) AND issuetype=Bug AND priority IN ('1-Critical, stop everything and fix','2-High, fix ASAP') ORDER BY fixVersion ASC",
         "method": "ticket_count",
         "field": "total"
         },
-      "avg_denominator": {
+      "denominator": {
         "__comment": "Get total of all bugs in projects",
         "source": "jira",
         "jql": "project={{project}} AND status NOT IN (Done,Resolved,Closed) AND issuetype=Bug ORDER BY fixVersion ASC",
@@ -234,14 +234,14 @@
       "ENB"
       ],
     "method": "average",
-    "avg_numerator": {
+    "numerator": {
       "__comment": "Get total story points of bugs, rolling 90 day window",
       "source": "jira",
       "jql": "project={{project}} AND issuetype=Bug AND updated > endOfDay(-90d)",
       "method": "custom_field_sum",
       "field": "customfield_10203"
       },
-    "avg_denominator": {
+    "denominator": {
       "__comment": "Get total story points of bugs and stories, rolling 90 day window",
       "source": "jira",
       "jql": "project={{project}} AND issuetype IN (Bug,Story) AND updated > endOfDay(-90d)",
@@ -262,14 +262,14 @@
       "ENB"
       ],
     "method": "average",
-    "avg_numerator": {
+    "numerator": {
       "__comment": "Get total story points of features, rolling 90 day window",
       "source": "jira",
       "jql": "project={{project}} AND issuetype=Story AND updated > endOfDay(-90d)",
       "method": "custom_field_sum",
       "field": "customfield_10203"
       },
-    "avg_denominator": {
+    "denominator": {
       "__comment": "Get total story points of bugs and stories, rolling 90 day window",
       "source": "jira",
       "jql": "project={{project}} AND issuetype IN (Bug,Story) AND updated > endOfDay(-90d)",
@@ -289,17 +289,17 @@
       "ENB"
       ],
     "method": "average",
-    "avg_numerator": {
+    "numerator": {
       "__comment": "Find number of bugs labelled regression",
       "source": "jira",
-      "jql": "project={{project}} AND issuetype=Bug AND labels=regression AND status NOT IN (Done,Resolved,Closed) AND updated > startOfDay(-90d)",
+      "jql": "project={{project}} AND issuetype=Bug AND labels=regression AND updated > startOfDay(-90d)",
       "method": "ticket_count",
       "field": "total"
       },
-    "avg_denominator": {
+    "denominator": {
       "__comment": "Find total number of bugs in a project",
       "source": "jira",
-      "jql": "project={{project}} AND issuetype=Bug AND status NOT IN (Done,Resolved,Closed) AND updated > startOfDay(-90d)",
+      "jql": "project={{project}} AND issuetype=Bug AND updated > startOfDay(-90d)",
       "method": "ticket_count",
       "field": "total"
       }
