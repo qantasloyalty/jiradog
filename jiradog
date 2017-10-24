@@ -390,6 +390,7 @@ def main():
                     total_issue_count = ticket_count(paginated_list)
                 else:
                     total_time_between_statuses = 0
+                    total_issue_count = 0
 
                 points = average(total_time_between_statuses, total_issue_count)
 
