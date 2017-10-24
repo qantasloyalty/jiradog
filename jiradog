@@ -233,23 +233,37 @@ def ticket_count(paginated_list):
     total_issues = len(paginated_list)
     return total_issues
 
-def custom_field_sum(result, custom_field):
+def custom_field_sum(issues, custom_field):
+#ef custom_field_sum(result, custom_field):
     """Sums custom field values together.
 
     Args:
-        result:		Dictionary	The result from a JIRA JQL query.
+        issues:		List		The issue list from the JQL query
         custom_field:	String		The custom field to sum.
 
     Returns:
         Integer of the sum of all the found values of the custom_field.
     """
-    cf_sum = 0
-    for issue in result['issues']:
-        if issue['fields'][custom_field] is None:
-            cf_sum = int(cf_sum) + 2
+#       result:		Dictionary	The result from a JIRA JQL query.
+#       custom_field:	String		The custom field to sum.
+
+#   Returns:
+#       Integer of the sum of all the found values of the custom_field.
+#   """
+#   cf_sum = 0
+#   for issue in result['issues']:
+#       if issue['fields'][custom_field] is None:
+#           cf_sum = int(cf_sum) + 2
+#       else:
+#           cf_sum = int(cf_sum) + int(issue['fields'][custom_field])
+#       return cf_sum
+    custom_field_running_total= 0
+    for issue in issues:
+        if getattr(issue.fields, field) is None:
+            custom_field_running_total = custom_field_running_total + 2
         else:
-            cf_sum = int(cf_sum) + int(issue['fields'][custom_field])
-        return cf_sum
+            custom_field_running_total = custom_field_running_total + getattr(issue.fields, field)
+    return custom_field_running_total 
 
 def get_number_average(provider_config, position, project):
     """Gets and returns either numerator or denominator for average method from metric config file
@@ -393,12 +407,33 @@ def main():
                 ## Find the average from data providers.
                 logging.info('method: ' + metric_data_loaded['method'])
 
+                numerator_issues = get_issues(metric_data_loaded['numerator']['jql'], project)
                 if metric_data_loaded['numerator']['method'] == 'ticket_count':
-                    numerator = len(get_issues(metric_data_loaded['numerator']['jql'], project))
-                if metric_data_loaded['denominator']['method'] == 'ticket_count':
-                    denominator = len(get_issues(metric_data_loaded['denominator']['jql'], project))
+                    numerator = len(numerator_issues)
+                elif metric_data_loaded['numerator']['method'] == 'custom_field_sum':
+                    numerator = custom_field_sum(numerator_issues, metric_data_loaded['numerator']['field'])
+#                   numerator = 0
+#                   for issue in numerator_issues:
+#                       if getattr(issue.fields, metric_data_loaded['numerator']['field']) is None:
+#                           numerator = numerator + 2
+#                       else:
+#                           numerator = numerator + getattr(issue.fields, metric_data_loaded['numerator']['field']) 
 
-                if (metric_data_loaded['denominator']['method'] == 'ticket_count') and (metric_data_loaded['numerator']['method'] == 'ticket_count'):
+                denominator_issues = get_issues(metric_data_loaded['denominator']['jql'], project)
+                if metric_data_loaded['denominator']['method'] == 'ticket_count':
+                    denominator = len(denominator_issues)
+                elif metric_data_loaded['denominator']['method'] == 'custom_field_sum':
+                    denominator = 0
+                    for issue in denominator_issues:
+                        if getattr(issue.fields, metric_data_loaded['denominator']['field']) is None:
+                            denominator = denominator + 2
+                        else:
+                            denominator = denominator + getattr(issue.fields, metric_data_loaded['denominator']['field']) 
+
+                if (metric_data_loaded['denominator']['method'] == 'ticket_count' and \
+                    metric_data_loaded['numerator']['method'] == 'ticket_count') or \
+                   (metric_data_loaded['denominator']['method'] == 'custom_field_sum' and \
+                    metric_data_loaded['numerator']['method'] == 'custom_field_sum'):
                     points = float(numerator) / float(denominator)
                 else: 
                     points = average(get_number_average(metric_data_loaded['numerator'],
