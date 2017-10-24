@@ -324,8 +324,8 @@ def main():
                         help='Outputs the payload to stdin, does not upload',
                         action='store_true')
     parser.add_argument('-d', '--describe',
-                        metavar='METRIC',
-                        help='Prints the configuration block for the specified metric')
+                        help='Prints the configuration block for the specified metric',
+                        action='store_true')
     parser.add_argument('-v', '--version',
                         help='Display the version number',
                         action='store_true')
@@ -347,9 +347,12 @@ def main():
         sys.exit(0)
 
     if args.describe:
-        for metric in metric_file_full:
-            if metric['metric_name'] == args.describe:
-                pprint(metric)
+        if args.metric:
+            for metric in metric_file_full:
+                if metric['metric_name'] == args.metric:
+                    pprint(metric)
+        else:
+            pprint(metric_file_full)
         sys.exit(0)
 
     if args.version:
