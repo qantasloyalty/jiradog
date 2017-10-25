@@ -152,7 +152,7 @@
       "__comment": "List of issues released to GA (Global Acceptance)/Production",
       "source": "jira",
       "jql": "Project={{project}} AND issuetype=Story AND fixVersion!=EMPTY AND resolved>endOfDay(-180d)",
-      "filter": "{% if issue.fields.fixVersions.0.name ~ 'GA' %}"
+      "filter": "{% if issue.fields.fixVersions[0] ~ 'GA' %}"
       }
   },
   {
@@ -205,21 +205,21 @@
       "CE",
       "ENB"
       ],
-      "method": "average",
-      "numerator": {
-        "__comment": "Get total of all priority 1 and 2 bugs",
-        "source": "jira",
-        "jql": "project={{project}} AND status NOT IN (Done,Resolved,Closed) AND issuetype=Bug AND priority IN ('1-Critical, stop everything and fix','2-High, fix ASAP') ORDER BY fixVersion ASC",
-        "method": "ticket_count",
-        "field": "total"
-        },
-      "denominator": {
-        "__comment": "Get total of all bugs in projects",
-        "source": "jira",
-        "jql": "project={{project}} AND status NOT IN (Done,Resolved,Closed) AND issuetype=Bug ORDER BY fixVersion ASC",
-        "method": "ticket_count",
-        "field": "total"
-        }
+    "method": "average",
+    "numerator": {
+      "__comment": "Get total of all priority 1 and 2 bugs",
+      "source": "jira",
+      "jql": "project={{project}} AND status NOT IN (Done,Resolved,Closed) AND issuetype=Bug AND priority IN ('1-Critical, stop everything and fix','2-High, fix ASAP') ORDER BY fixVersion ASC",
+      "method": "ticket_count",
+      "field": "total"
+      },
+    "denominator": {
+      "__comment": "Get total of all bugs in projects",
+      "source": "jira",
+      "jql": "project={{project}} AND status NOT IN (Done,Resolved,Closed) AND issuetype=Bug ORDER BY fixVersion ASC",
+      "method": "ticket_count",
+      "field": "total"
+      }
   },
   {
     "metric_name":"jiradog.percentageStoryPointsInBugs",

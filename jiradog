@@ -234,7 +234,7 @@ def ticket_count(paginated_list):
     return total_issues
 
 def custom_field_sum(issues, custom_field):
-#ef custom_field_sum(result, custom_field):
+    ## Using JIRA SDK
     """Sums custom field values together.
 
     Args:
@@ -244,26 +244,14 @@ def custom_field_sum(issues, custom_field):
     Returns:
         Integer of the sum of all the found values of the custom_field.
     """
-#       result:		Dictionary	The result from a JIRA JQL query.
-#       custom_field:	String		The custom field to sum.
-
-#   Returns:
-#       Integer of the sum of all the found values of the custom_field.
-#   """
-#   cf_sum = 0
-#   for issue in result['issues']:
-#       if issue['fields'][custom_field] is None:
-#           cf_sum = int(cf_sum) + 2
-#       else:
-#           cf_sum = int(cf_sum) + int(issue['fields'][custom_field])
-#       return cf_sum
-    custom_field_running_total= 0
+    custom_field_running_total = 0
     for issue in issues:
-        if getattr(issue.fields, field) is None:
+        if getattr(issue.fields, custom_field) is None:
             custom_field_running_total = custom_field_running_total + 2
         else:
-            custom_field_running_total = custom_field_running_total + getattr(issue.fields, field)
-    return custom_field_running_total 
+            custom_field_running_total = custom_field_running_total + \
+                                         getattr(issue.fields, custom_field)
+    return custom_field_running_total
 
 def get_number_average(provider_config, position, project):
     """Gets and returns either numerator or denominator for average method from metric config file
@@ -346,6 +334,30 @@ def get_issues(jql, project):
         start_at = start_at + max_results
     return issues
 
+def filter_issues(issues, filter_jinja2):
+    """Filters issues based on jinja2 format if/then statement.
+
+    Args:
+        issues:		List	Issues returned from JIRA SDK
+        filter_jinja2:	String	Jinja2 format string to filter issues on.
+
+    Returns:
+        List of issues that conform to the filter.
+    """
+    filter_jinja2_regex = re.search("(^{% if )(.*)( )(~)( ')(.*)(' %}$)", filter_jinja2)
+    field = filter_jinja2_regex.group(2)
+    operator = filter_jinja2_regex.group(4)
+    value = filter_jinja2_regex.group(6)
+    filtered_issues = []
+    if operator == '~':
+        for issue in issues:
+            regex_result = re.search(value,
+                                     str(eval(field)))
+            if regex_result:
+                filtered_issues.append(issue)
+    return filtered_issues
+    
+
 def main():
     """Main function, calls all other functions.
 
@@ -401,71 +413,54 @@ def main():
     for metric_data_loaded in metric_file_full:
         # Loop over specified projects in the metric config file.
         project = None
+        numbers = []
         for project in metric_data_loaded['projects']:
             logging.info('project: ' + project)
             if metric_data_loaded['method'] == 'average':
                 ## Find the average from data providers.
                 logging.info('method: ' + metric_data_loaded['method'])
 
-                numerator_issues = get_issues(metric_data_loaded['numerator']['jql'], project)
-                if metric_data_loaded['numerator']['method'] == 'ticket_count':
-                    numerator = len(numerator_issues)
-                elif metric_data_loaded['numerator']['method'] == 'custom_field_sum':
-                    numerator = custom_field_sum(numerator_issues, metric_data_loaded['numerator']['field'])
-#                   numerator = 0
-#                   for issue in numerator_issues:
-#                       if getattr(issue.fields, metric_data_loaded['numerator']['field']) is None:
-#                           numerator = numerator + 2
-#                       else:
-#                           numerator = numerator + getattr(issue.fields, metric_data_loaded['numerator']['field']) 
+                for position in ['numerator', 'denominator']:
+                    if metric_data_loaded[position]['source'] == 'jira':
+                        issues = get_issues(metric_data_loaded[position]['jql'], project)
+                        if metric_data_loaded[position]['method'] == 'ticket_count':
+                            numbers.append(len(issues))
+                        if metric_data_loaded[position]['method'] == 'custom_field_sum':
+                            numbers.append(custom_field_sum(issues,
+                                                            metric_data_loaded[position]['field']))
+                    elif metric_data_loaded[position]['source'] == 'constant':
+                        numbers.append(constant_provider_provide(metric_data_loaded[position]['data'],
+                                                                 project))
 
-                denominator_issues = get_issues(metric_data_loaded['denominator']['jql'], project)
-                if metric_data_loaded['denominator']['method'] == 'ticket_count':
-                    denominator = len(denominator_issues)
-                elif metric_data_loaded['denominator']['method'] == 'custom_field_sum':
-                    denominator = 0
-                    for issue in denominator_issues:
-                        if getattr(issue.fields, metric_data_loaded['denominator']['field']) is None:
-                            denominator = denominator + 2
-                        else:
-                            denominator = denominator + getattr(issue.fields, metric_data_loaded['denominator']['field']) 
-
-                if (metric_data_loaded['denominator']['method'] == 'ticket_count' and \
-                    metric_data_loaded['numerator']['method'] == 'ticket_count') or \
-                   (metric_data_loaded['denominator']['method'] == 'custom_field_sum' and \
-                    metric_data_loaded['numerator']['method'] == 'custom_field_sum'):
-                    points = float(numerator) / float(denominator)
-                else: 
-                    points = average(get_number_average(metric_data_loaded['numerator'],
-                                                        'numerator',
-                                                        project),
-                                     get_number_average(metric_data_loaded['denominator'],
-                                                        'denominator',
-                                                        project))
+                    if len(numbers) == 2:
+                        points = float(numbers[0]) / float(numbers[1])
 
             elif metric_data_loaded['method'] == 'mean_time_between_statuses':
                 ## Find the average time between specified statuses.
                 logging.info('method: ' + metric_data_loaded['method'])
 
-                date_diff_days = []
-                paginated_list = JiraProvider().provide(metric_data_loaded['issues'],
-                                                        project,
-                                                        MAX_RESULTS)
-                if paginated_list:
-                    for issue in paginated_list:
-                        m_t = mean_time_between_statuses(issue['fields']['created'],
-                                                         issue['fields']['updated'])
-                        date_diff_days.append(m_t)
-                    total_time_between_statuses = sum(date_diff_days)
-                    total_issue_count = ticket_count(paginated_list)
-                else:
-                    total_time_between_statuses = 0
-                    total_issue_count = 0
+                total_time_between_statuses = 0
+                issues = get_issues(metric_data_loaded['issues']['jql'], project)
+                issues = filter_issues(issues, metric_data_loaded['issues']['filter'])
+                
+                for issue in issues:
+                    m_t = mean_time_between_statuses(issue.fields.created,
+                                                     issue.fields.updated)
+                    total_time_between_statuses = total_time_between_statuses + m_t
+                numbers.append(total_time_between_statuses)
+                numbers.append(len(issues))
 
-                points = average(total_time_between_statuses, total_issue_count)
+                if len(numbers) == 2:
+                    if float(numbers[1]) != 0:
+                        points = float(numbers[0]) / float(numbers[1])
+                    else:
+                        points = 0
 
             elif metric_data_loaded['method'] == 'direct':
-                points = direct(metric_data_loaded['issues'], project)
+                issues = get_issues(metric_data_loaded['issues']['jql'], project)
+                if metric_data_loaded['issues']['method'] == 'ticket_count':
+                    points = len(issues)
+#               points = direct(metric_data_loaded['issues'], project)
 
         ## Construct payload for upload
             metric_data = {
