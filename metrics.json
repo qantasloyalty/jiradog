@@ -12,12 +12,12 @@
       "ENB"
       ],
     "method": "average",
-    "avg_numerator": {
+    "numerator": {
       "source": "jira",
       "jql": "project={{project}} AND issuetype=Bug AND status NOT IN (Done, Resolved, Closed)",
       "method": "ticket_count"
       },
-    "avg_denominator": {
+    "denominator": {
       "source": "constant",
       "data": {
         "__comment": "Total number of developers per project.",
@@ -44,14 +44,14 @@
       "ENB"
       ],
     "method": "average",
-    "avg_numerator": {
+    "numerator": {
       "__comment": "Get all issues updated the last 90 days, that were in a sprint, and are not completed",
       "source": "jira",
       "jql": "project={{project}} AND sprint IN (closedSprints()) AND updated>endOfDay(-90d) AND status IN (Done,Resolved,Closed)",
       "method": "ticket_count",
       "field": "total"
       },
-    "avg_denominator": {
+    "denominator": {
       "__comment": "Get all issues updated the last 90 days, that were in a sprint",
       "source": "jira",
       "jql": "project={{project}} AND sprint IN (closedSprints()) AND updated>endOfDay(-90d)",
@@ -71,11 +71,18 @@
       "CE",
       "ENB"
       ],
-    "method": "mean_time_between_statuses",
-    "issues": {
+    "method": "average",
+    "numerator": {
       "source": "jira",
       "jql": "project={{project}} AND issuetype=Bug AND priority='1-Critical, stop everything and fix' AND Resolution='Unresolved'",
-      "field": "created"
+      "field": "created",
+      "method": "mean_time_between_statuses"
+      },
+    "denominator": {
+      "source": "jira",
+      "jql": "{{metric.numerator.jql}}",
+      "field": "created",
+      "method": "ticket_count"
       }
   },
   {
@@ -90,11 +97,16 @@
       "CE",
       "ENB"
       ],
-    "method": "mean_time_between_statuses",
-    "issues": {
+    "method": "average",
+    "numerator": {
       "source": "jira",
       "jql": "project={{project}} AND issuetype=Bug AND priority='2-High, fix ASAP' AND Resolution='Unresolved'", 
-      "field": "created"
+      "method": "mean_time_between_statuses"
+      },
+    "denominator": {
+      "source": "jira",
+      "jql": "{{metric.numerator.jql}}",
+      "method": "ticket_count"
       }
   },
   {
@@ -109,11 +121,16 @@
       "CE",
       "ENB"
       ],
-    "method": "mean_time_between_statuses",
-    "issues": {
+    "method": "average",
+    "numerator": {
       "source": "jira",
       "jql": "project={{project}} AND issuetype=Bug AND priority='3-Medium, fix before release ships' AND Resolution='Unresolved'",
-      "field": "created"
+      "method": "mean_time_between_statuses"
+      },
+    "denominator": {
+      "source": "jira",
+      "jql": "{{metric.numerator.jql}}",
+      "method": "ticket_count"
       }
   },
   {
@@ -129,10 +146,15 @@
       "ENB"
       ],
     "method": "mean_time_between_statuses",
-    "issues": {
+    "numerator": {
       "source": "jira",
       "jql": "project={{project}} AND issuetype=Bug AND priority='4-Low, fix if you have time' AND Resolution='Unresolved'",
-      "field": "created"
+      "method": "mean_time_between_statuses"
+      },
+    "denominator": {
+      "source": "jira",
+      "jql": "{{metric.numerator.jql}}",
+      "method": "ticket_count"
       }
   },
   {
@@ -147,12 +169,20 @@
       "CE",
       "ENB"
       ],
-    "method": "mean_time_between_statuses",
-    "issues": {
+    "method": "average",
+    "numerator": {
       "__comment": "List of issues released to GA (Global Acceptance)/Production",
       "source": "jira",
       "jql": "Project={{project}} AND issuetype=Story AND fixVersion!=EMPTY AND resolved>endOfDay(-180d)",
-      "filter": "{% if issue.fields.fixVersions.0.name ~ 'GA' %}"
+      "filter": "{% if 'GA' in issue.fields.fixVersions[0].name %}true{% endif %}",
+      "method": "mean_time_between_statuses"
+      },
+    "denominator": {
+      "__comment": "List of issues released to GA (Global Acceptance)/Production",
+      "source": "jira",
+      "jql": "Project={{project}} AND issuetype=Story AND fixVersion!=EMPTY AND resolved>endOfDay(-180d)",
+      "filter": "{% if 'GA' in issue.fields.fixVersions[0].name %}true{% endif %}",
+      "method": "ticket_count"
       }
   },
   {
@@ -210,21 +240,21 @@
       "CE",
       "ENB"
       ],
-      "method": "average",
-      "avg_numerator": {
-        "__comment": "Get total of all priority 1 and 2 bugs",
-        "source": "jira",
-        "jql": "project={{project}} AND status NOT IN (Done,Resolved,Closed) AND issuetype=Bug AND priority IN ('1-Critical, stop everything and fix','2-High, fix ASAP') ORDER BY fixVersion ASC",
-        "method": "ticket_count",
-        "field": "total"
-        },
-      "avg_denominator": {
-        "__comment": "Get total of all bugs in projects",
-        "source": "jira",
-        "jql": "project={{project}} AND status NOT IN (Done,Resolved,Closed) AND issuetype=Bug ORDER BY fixVersion ASC",
-        "method": "ticket_count",
-        "field": "total"
-        }
+    "method": "average",
+    "numerator": {
+      "__comment": "Get total of all priority 1 and 2 bugs",
+      "source": "jira",
+      "jql": "project={{project}} AND status NOT IN (Done,Resolved,Closed) AND issuetype=Bug AND priority IN ('1-Critical, stop everything and fix','2-High, fix ASAP') ORDER BY fixVersion ASC",
+      "method": "ticket_count",
+      "field": "total"
+      },
+    "denominator": {
+      "__comment": "Get total of all bugs in projects",
+      "source": "jira",
+      "jql": "project={{project}} AND status NOT IN (Done,Resolved,Closed) AND issuetype=Bug ORDER BY fixVersion ASC",
+      "method": "ticket_count",
+      "field": "total"
+      }
   },
   {
     "metric_name":"jiradog.percentageStoryPointsInBugs",
@@ -239,14 +269,14 @@
       "ENB"
       ],
     "method": "average",
-    "avg_numerator": {
+    "numerator": {
       "__comment": "Get total story points of bugs, rolling 90 day window",
       "source": "jira",
       "jql": "project={{project}} AND issuetype=Bug AND updated > endOfDay(-90d)",
       "method": "custom_field_sum",
       "field": "customfield_10203"
       },
-    "avg_denominator": {
+    "denominator": {
       "__comment": "Get total story points of bugs and stories, rolling 90 day window",
       "source": "jira",
       "jql": "project={{project}} AND issuetype IN (Bug,Story) AND updated > endOfDay(-90d)",
@@ -267,14 +297,14 @@
       "ENB"
       ],
     "method": "average",
-    "avg_numerator": {
+    "numerator": {
       "__comment": "Get total story points of features, rolling 90 day window",
       "source": "jira",
       "jql": "project={{project}} AND issuetype=Story AND updated > endOfDay(-90d)",
       "method": "custom_field_sum",
       "field": "customfield_10203"
       },
-    "avg_denominator": {
+    "denominator": {
       "__comment": "Get total story points of bugs and stories, rolling 90 day window",
       "source": "jira",
       "jql": "project={{project}} AND issuetype IN (Bug,Story) AND updated > endOfDay(-90d)",
@@ -294,17 +324,17 @@
       "ENB"
       ],
     "method": "average",
-    "avg_numerator": {
+    "numerator": {
       "__comment": "Find number of bugs labelled regression",
       "source": "jira",
-      "jql": "project={{project}} AND issuetype=Bug AND labels=regression AND status NOT IN (Done,Resolved,Closed) AND updated > startOfDay(-90d)",
+      "jql": "project={{project}} AND issuetype=Bug AND labels=regression AND updated > startOfDay(-90d)",
       "method": "ticket_count",
       "field": "total"
       },
-    "avg_denominator": {
+    "denominator": {
       "__comment": "Find total number of bugs in a project",
       "source": "jira",
-      "jql": "project={{project}} AND issuetype=Bug AND status NOT IN (Done,Resolved,Closed) AND updated > startOfDay(-90d)",
+      "jql": "project={{project}} AND issuetype=Bug AND updated > startOfDay(-90d)",
       "method": "ticket_count",
       "field": "total"
       }
