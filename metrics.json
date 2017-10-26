@@ -48,15 +48,13 @@
       "__comment": "Get all issues updated the last 90 days, that were in a sprint, and are not completed",
       "source": "jira",
       "jql": "project={{project}} AND sprint IN (closedSprints()) AND updated>endOfDay(-90d) AND status IN (Done,Resolved,Closed)",
-      "method": "ticket_count",
-      "field": "total"
+      "method": "ticket_count"
       },
     "denominator": {
       "__comment": "Get all issues updated the last 90 days, that were in a sprint",
       "source": "jira",
       "jql": "project={{project}} AND sprint IN (closedSprints()) AND updated>endOfDay(-90d)",
-      "method": "ticket_count",
-      "field": "total"
+      "method": "ticket_count"
       }
   },
   {
@@ -75,13 +73,11 @@
     "numerator": {
       "source": "jira",
       "jql": "project={{project}} AND issuetype=Bug AND priority='1-Critical, stop everything and fix' AND Resolution='Unresolved'",
-      "field": "created",
       "method": "mean_time_between_statuses"
       },
     "denominator": {
       "source": "jira",
       "jql": "{{metric.numerator.jql}}",
-      "field": "created",
       "method": "ticket_count"
       }
   },
@@ -200,8 +196,7 @@
     "issues": {
       "__comment": "Get create date for all tickets",
       "source": "jira",
-      "jql": "project={{project}} AND priority IN ('1-Critical, stop everything and fix','2-High, fix ASAP') AND created>=startOfDay(-90d) AND issuetype=Bug AND labels IN (suport, support, support-impact-over-100, support-impact-up-to-10, support-impact-up-to-100, support-severity-data-loss, support-severity-inconvenient, support-severity-non-functional, commerce-support) AND status IN (closed,resolve)",
-      "field": "created"
+      "jql": "project={{project}} AND priority IN ('1-Critical, stop everything and fix','2-High, fix ASAP') AND created>=startOfDay(-90d) AND issuetype=Bug AND labels IN (suport, support, support-impact-over-100, support-impact-up-to-10, support-impact-up-to-100, support-severity-data-loss, support-severity-inconvenient, support-severity-non-functional, commerce-support) AND status IN (closed,resolve)"
       }
   },
   {
@@ -245,15 +240,13 @@
       "__comment": "Get total of all priority 1 and 2 bugs",
       "source": "jira",
       "jql": "project={{project}} AND status NOT IN (Done,Resolved,Closed) AND issuetype=Bug AND priority IN ('1-Critical, stop everything and fix','2-High, fix ASAP') ORDER BY fixVersion ASC",
-      "method": "ticket_count",
-      "field": "total"
+      "method": "ticket_count"
       },
     "denominator": {
       "__comment": "Get total of all bugs in projects",
       "source": "jira",
       "jql": "project={{project}} AND status NOT IN (Done,Resolved,Closed) AND issuetype=Bug ORDER BY fixVersion ASC",
-      "method": "ticket_count",
-      "field": "total"
+      "method": "ticket_count"
       }
   },
   {
@@ -328,15 +321,13 @@
       "__comment": "Find number of bugs labelled regression",
       "source": "jira",
       "jql": "project={{project}} AND issuetype=Bug AND labels=regression AND updated > startOfDay(-90d)",
-      "method": "ticket_count",
-      "field": "total"
+      "method": "ticket_count"
       },
     "denominator": {
       "__comment": "Find total number of bugs in a project",
       "source": "jira",
       "jql": "project={{project}} AND issuetype=Bug AND updated > startOfDay(-90d)",
-      "method": "ticket_count",
-      "field": "total"
+      "method": "ticket_count"
       }
   }
 ]
