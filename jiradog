@@ -129,18 +129,10 @@ def filter_issues(issues, filter_jinja2):
     Returns:
         List of issues that conform to the filter.
     """
-    filter_jinja2_regex = re.search("(^{% if )(.*)( )(~)( ')(.*)(' %}$)", filter_jinja2)
-    field = filter_jinja2_regex.group(2)
-    operator = filter_jinja2_regex.group(4)
-    value = filter_jinja2_regex.group(6)
     filtered_issues = []
-    if operator == '~':
-        for issue in issues:
-            ## Change to recursive walk function
-            regex_result = re.search(value,
-                                     str(eval(field)))
-            if regex_result:
-                filtered_issues.append(issue)
+    for issue in issues:
+        if jinja2.Template(filter_jinja2).render(issue=issue) == u'true':
+            filtered_issues.append(issue)
     return filtered_issues 
 
 def main():

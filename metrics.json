@@ -174,14 +174,14 @@
       "__comment": "List of issues released to GA (Global Acceptance)/Production",
       "source": "jira",
       "jql": "Project={{project}} AND issuetype=Story AND fixVersion!=EMPTY AND resolved>endOfDay(-180d)",
-      "filter": "{% if issue.fields.fixVersions[0] ~ 'GA' %}",
+      "filter": "{% if 'GA' in issue.fields.fixVersions[0].name %}true{% endif %}",
       "method": "mean_time_between_statuses"
       },
     "denominator": {
       "__comment": "List of issues released to GA (Global Acceptance)/Production",
       "source": "jira",
       "jql": "Project={{project}} AND issuetype=Story AND fixVersion!=EMPTY AND resolved>endOfDay(-180d)",
-      "filter": "{% if issue.fields.fixVersions[0] ~ 'GA' %}",
+      "filter": "{% if 'GA' in issue.fields.fixVersions[0].name %}true{% endif %}",
       "method": "ticket_count"
       }
   },
