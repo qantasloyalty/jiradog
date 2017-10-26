@@ -71,25 +71,6 @@
       "CE",
       "ENB"
       ],
-    "method": "mean_time_between_statuses",
-    "issues": {
-      "source": "jira",
-      "jql": "project={{project}} AND issuetype=Bug AND priority='1-Critical, stop everything and fix' AND Resolution='Unresolved'",
-      "field": "created"
-      }
-  },
-  {
-    "metric_name": "jiradog.meanTimeToCloseBugsP1_test",
-    "__comment": "SYS-1478",
-    "projects": [
-      "MACOSNOTE",
-      "WINNOTE",
-      "ION",
-      "IOSNOTE",
-      "DRDNOTE",
-      "CE",
-      "ENB"
-      ],
     "method": "average",
     "numerator": {
       "source": "jira",
@@ -99,7 +80,7 @@
       },
     "denominator": {
       "source": "jira",
-      "jql": "project={{project}} AND issuetype=Bug AND priority='1-Critical, stop everything and fix' AND Resolution='Unresolved'",
+      "jql": "{{metric.numerator.jql}}",
       "field": "created",
       "method": "ticket_count"
       }
@@ -116,11 +97,16 @@
       "CE",
       "ENB"
       ],
-    "method": "mean_time_between_statuses",
-    "issues": {
+    "method": "average",
+    "numerator": {
       "source": "jira",
       "jql": "project={{project}} AND issuetype=Bug AND priority='2-High, fix ASAP' AND Resolution='Unresolved'", 
-      "field": "created"
+      "method": "mean_time_between_statuses"
+      },
+    "denominator": {
+      "source": "jira",
+      "jql": "{{metric.numerator.jql}}",
+      "method": "ticket_count"
       }
   },
   {
@@ -135,11 +121,16 @@
       "CE",
       "ENB"
       ],
-    "method": "mean_time_between_statuses",
-    "issues": {
+    "method": "average",
+    "numerator": {
       "source": "jira",
       "jql": "project={{project}} AND issuetype=Bug AND priority='3-Medium, fix before release ships' AND Resolution='Unresolved'",
-      "field": "created"
+      "method": "mean_time_between_statuses"
+      },
+    "denominator": {
+      "source": "jira",
+      "jql": "{{metric.numerator.jql}}",
+      "method": "ticket_count"
       }
   },
   {
@@ -155,10 +146,15 @@
       "ENB"
       ],
     "method": "mean_time_between_statuses",
-    "issues": {
+    "numerator": {
       "source": "jira",
       "jql": "project={{project}} AND issuetype=Bug AND priority='4-Low, fix if you have time' AND Resolution='Unresolved'",
-      "field": "created"
+      "method": "mean_time_between_statuses"
+      },
+    "denominator": {
+      "source": "jira",
+      "jql": "{{metric.numerator.jql}}",
+      "method": "ticket_count"
       }
   },
   {
