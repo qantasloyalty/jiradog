@@ -1,6 +1,6 @@
 # jiradog
 
-Version 1.0
+Version 1.1.0
 A tool to poll data from JIRA to upload as a metric to DataDog.
 
 ## Prerequisites
@@ -34,13 +34,12 @@ The information you are pulling from JIRA is built around JIRA's own query langu
       "ENB"
       ],
     "method": "average",
-    "avg_numerator": {
+    "numerator": {
       "source": "jira",
       "jql": "project={{project}} AND issuetype=Bug AND status NOT IN (Done, Resolved, Closed)",
-      "field": "total",
       "method": "ticket_count"
       },
-    "avg_denominator": {
+    "denominator": {
       "source": "constant",
       "data": {
         "MACOSNOTE": "7",
@@ -91,7 +90,7 @@ post-processing methods:
 * **direct**: Upload a direct result with no post-processing math.
 
 ```
-    "avg_numerator": {
+    "numerator": {
       "source": "jira",
       "jql": "project={{project}} AND issuetype=Bug AND status NOT IN (Done, Resolved, Closed)",
       "method": "ticket_count"
@@ -108,7 +107,7 @@ per data provider methos:
 * **custom\_field\_sum**: Get the sum of the values of a custom field.
 
 ```
-    "avg_denominator": {
+    "denominator": {
       "source": "constant",
       "data": {
         "__comment": "Total number of developers per project."
@@ -132,7 +131,7 @@ We use a jinja2/nunjucks style filtering with if/then statements. JQL currently 
       "__comment": "List of issues released to GA (Global Acceptance)/Production",
       "source": "jira",
       "jql": "Project={{project}} AND issuetype=Story AND fixVersion!=EMPTY AND resolved>endOfDay(-180d)",
-      "filter": "{% if issue.fields.fixVersions.0.name ~ 'GA' %}"
+      "filter": "{% if 'GA' in issue.fields.fixVersions[0].name %}true{% endif %}"
       }
 ```
 
@@ -148,4 +147,4 @@ The general philsophy is to use JQL to get the most specific results as possible
 
 ## Authors
 
-* **Bryce McNab** - *Initial work* - 10/19/2017
+* **Bryce McNab** - *Initial work* - 10/26/2017

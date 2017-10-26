@@ -184,7 +184,7 @@ def main():
         sys.exit(0)
 
     if args.version:
-        print os.path.basename(__file__) + ' 1.0'
+        print os.path.basename(__file__) + ' ' + VERSION
         sys.exit(0)
 
     logging.info('loaded metric config')
@@ -272,6 +272,7 @@ def main():
 
 if __name__ == "__main__":
     # Setting important variables, all static.
+    VERSION = '1.1.0'
     FUNCTION_MAP = {
         'mean_time_between_statuses': mean_time_between_statuses,
         'ticket_count': ticket_count,
