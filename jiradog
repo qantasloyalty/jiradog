@@ -14,7 +14,6 @@ Returns:
 import argparse
 import sys
 import json
-import re
 import time
 import logging
 import os
@@ -104,7 +103,9 @@ def get_issues(metric_data_loaded, position, project):
     max_results = 100
     start_at = 100
     issues = []
-    ## If/then statement failed, so I want to find a way to not have to run the jinja statement 2 times.
+    ## If/then statement failed, so I want to   ##
+    ## find a way to not have to run the jinja  ##
+    ## statement 2 times.                       ##
     jql_rendered = jinja2.Template(jinja2.Template(metric_data_loaded[position]['jql']).render(project=project,
                                                                                                metric=metric_data_loaded)).render(project=project)
     search = jira.search_issues(jql_rendered, maxResults=max_results, startAt=0)
@@ -133,7 +134,7 @@ def filter_issues(issues, filter_jinja2):
     for issue in issues:
         if jinja2.Template(filter_jinja2).render(issue=issue) == u'true':
             filtered_issues.append(issue)
-    return filtered_issues 
+    return filtered_issues
 
 def main():
     """Main function, calls all other functions.
@@ -190,9 +191,9 @@ def main():
     logging.info('loaded metric config')
 
     # Loops through list of metrics defined in a single file
+    project = None
     for metric_data_loaded in metric_file_full:
         # Loop over specified projects in the metric config file.
-        project = None
         for project in metric_data_loaded['projects']:
             logging.info('project: ' + project)
             numbers = []
@@ -234,7 +235,7 @@ def main():
                 issues = get_issues(metric_data_loaded['issues']['jql'], project)
                 if metric_data_loaded.get('issues', False).get('filter', False) != False:
                     issues = filter_issues(issues, metric_data_loaded['issues']['filter'])
- 
+
                 for issue in issues:
                     m_t = mean_time_between_statuses(issue.fields.created,
                                                      issue.fields.updated)
