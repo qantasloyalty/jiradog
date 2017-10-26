@@ -308,12 +308,12 @@ def load_metric_file(metric_file, is_args_metric_set):
                 metric_file_full = [metric_config]
     return metric_file_full
 
-def get_issues(jql, project):
+def get_issues(provider_config, project):
     """Using the JIRA SDK, gets a list of issues.
 
     Args:
-        jql:		String	The JQL query.
-        project:	String	The project to templatize the jql.
+        provider_config:	Dictionary	JSON object from the metric config block.
+        project:		String		The project to templatize the jql.
 
     Returns:
         List of issues returned from JIRA JQL query.
@@ -321,7 +321,7 @@ def get_issues(jql, project):
     max_results = 100
     start_at = 100
     issues = []
-    jql_rendered = jinja2.Template(jql).render(project=project)
+    jql_rendered = jinja2.Template(provider_config['jql']).render(project=project)
     search = jira.search_issues(jql_rendered, maxResults=max_results, startAt=0)
     for issue in search:
         issues.append(issue)
@@ -330,6 +330,8 @@ def get_issues(jql, project):
         for issue in search:
             issues.append(issue)
         start_at = start_at + max_results
+    if provider_config.get('filter', False) != False:
+       issues = filter_issues(issues, provider_config['filter'])
     return issues
 
 def filter_issues(issues, filter_jinja2):
@@ -411,35 +413,44 @@ def main():
     for metric_data_loaded in metric_file_full:
         # Loop over specified projects in the metric config file.
         project = None
-        numbers = []
         for project in metric_data_loaded['projects']:
             logging.info('project: ' + project)
+            numbers = []
+            total_time_between_statuses = 0
             if metric_data_loaded['method'] == 'average':
                 ## Find the average from data providers.
                 logging.info('method: ' + metric_data_loaded['method'])
 
                 for position in ['numerator', 'denominator']:
                     if metric_data_loaded[position]['source'] == 'jira':
-                        issues = get_issues(metric_data_loaded[position]['jql'], project)
+                        ## Get's list of issues from JIRA SDK
+                        issues = get_issues(metric_data_loaded[position], project)
                         if metric_data_loaded[position]['method'] == 'ticket_count':
                             numbers.append(len(issues))
-                        if metric_data_loaded[position]['method'] == 'custom_field_sum':
+                        elif metric_data_loaded[position]['method'] == 'custom_field_sum':
                             numbers.append(custom_field_sum(issues,
                                                             metric_data_loaded[position]['field']))
+                        elif metric_data_loaded[position]['method'] == 'mean_time_between_statuses':
+                            for issue in issues:
+                                m_t = mean_time_between_statuses(issue.fields.created,
+                                                                 issue.fields.updated)
+                                total_time_between_statuses = total_time_between_statuses + m_t
+                            numbers.append(total_time_between_statuses)
                     elif metric_data_loaded[position]['source'] == 'constant':
                         numbers.append(constant_provider_provide(metric_data_loaded[position],
                                                                  project))
 
                     if len(numbers) == 2:
-                        points = float(numbers[0]) / float(numbers[1])
+                        if float(numbers[1]) != 0:
+                            points = float(numbers[0]) / float(numbers[1])
+                        else:
+                            points = 0
 
             elif metric_data_loaded['method'] == 'mean_time_between_statuses':
                 ## Find the average time between specified statuses.
                 logging.info('method: ' + metric_data_loaded['method'])
 
-                total_time_between_statuses = 0
                 issues = get_issues(metric_data_loaded['issues']['jql'], project)
-#               if metric_data_loaded['issues']['filter']:
                 if metric_data_loaded.get('issues', False).get('filter', False) != False:
                     issues = filter_issues(issues, metric_data_loaded['issues']['filter'])
                 

@@ -79,6 +79,32 @@
       }
   },
   {
+    "metric_name": "jiradog.meanTimeToCloseBugsP1_test",
+    "__comment": "SYS-1478",
+    "projects": [
+      "MACOSNOTE",
+      "WINNOTE",
+      "ION",
+      "IOSNOTE",
+      "DRDNOTE",
+      "CE",
+      "ENB"
+      ],
+    "method": "average",
+    "numerator": {
+      "source": "jira",
+      "jql": "project={{project}} AND issuetype=Bug AND priority='1-Critical, stop everything and fix' AND Resolution='Unresolved'",
+      "field": "created",
+      "method": "mean_time_between_statuses"
+      },
+    "denominator": {
+      "source": "jira",
+      "jql": "project={{project}} AND issuetype=Bug AND priority='1-Critical, stop everything and fix' AND Resolution='Unresolved'",
+      "field": "created",
+      "method": "ticket_count"
+      }
+  },
+  {
     "metric_name": "jiradog.meanTimeToCloseBugsP2",
     "__comment": "SYS-1478",
     "projects": [
@@ -147,12 +173,20 @@
       "CE",
       "ENB"
       ],
-    "method": "mean_time_between_statuses",
-    "issues": {
+    "method": "average",
+    "numerator": {
       "__comment": "List of issues released to GA (Global Acceptance)/Production",
       "source": "jira",
       "jql": "Project={{project}} AND issuetype=Story AND fixVersion!=EMPTY AND resolved>endOfDay(-180d)",
-      "filter": "{% if issue.fields.fixVersions[0] ~ 'GA' %}"
+      "filter": "{% if issue.fields.fixVersions[0] ~ 'GA' %}",
+      "method": "mean_time_between_statuses"
+      },
+    "denominator": {
+      "__comment": "List of issues released to GA (Global Acceptance)/Production",
+      "source": "jira",
+      "jql": "Project={{project}} AND issuetype=Story AND fixVersion!=EMPTY AND resolved>endOfDay(-180d)",
+      "filter": "{% if issue.fields.fixVersions[0] ~ 'GA' %}",
+      "method": "ticket_count"
       }
   },
   {
