@@ -186,10 +186,15 @@
       "CE",
       "ENB"
       ],
-    "method": "direct",
-    "issues": {
+    "method": "average",
+    "avg_numerator": {
       "source": "jira",
-      "jql": "Project={{project}} AND Status WAS 'Reopened' AND Updated>endOfDay(-90d)",
+      "jql": "Project={{project}} AND Status WAS 'Reopened' AND issueType=Bug AND Updated>endOfDay(-90d)",
+      "method": "ticket_count"
+      },
+    "avg_denominator": {
+      "source": "jira",
+      "jql": "Project={{project}} AND issueType=Bug AND Updated>endOfDay(-90d)",
       "method": "ticket_count"
       }
   },
