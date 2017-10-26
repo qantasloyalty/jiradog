@@ -10,7 +10,6 @@ Dependencies (outside of python standard library)
 * DataDog
 * pprint
 * jinja2
-* requests
 
 ## Installing
 
