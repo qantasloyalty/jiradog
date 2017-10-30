@@ -18,6 +18,7 @@ import time
 import logging
 import os
 from pprint import pprint
+import hashlib
 import jinja2
 from datadog import initialize, api
 from jira import JIRA
@@ -108,16 +109,23 @@ def get_issues(metric_data_loaded, position, project):
     ## 2 times.                                     ##
     jql_rendered = jinja2.Template(jinja2.Template(metric_data_loaded[position]['jql']).render(project=project,
                                                                                                metric=metric_data_loaded)).render(project=project)
-    search = jira.search_issues(jql_rendered, maxResults=max_results, startAt=0)
-    for issue in search:
-        issues.append(issue)
-    while len(search) == 100:
-        search = jira.search_issues(jql_rendered, maxResults=max_results, startAt=start_at)
+    jql_sha512 = hashlib.sha512(jql_rendered).hexdigest()
+    if CACHE.get(jql_sha512, False):
+        logging.info("Using cached version of query and results")
+        issues = CACHE[jql_sha512]
+    else:
+        search = jira.search_issues(jql_rendered, maxResults=max_results, startAt=0)
         for issue in search:
             issues.append(issue)
-        start_at = start_at + max_results
-    if metric_data_loaded.get(position, False).get('filter', False) != False:
-        issues = filter_issues(metric_data_loaded, issues, position)
+        while len(search) == 100:
+            search = jira.search_issues(jql_rendered, maxResults=max_results, startAt=start_at)
+            for issue in search:
+                issues.append(issue)
+            start_at = start_at + max_results
+        if metric_data_loaded.get(position, False).get('filter', False) != False:
+            issues = filter_issues(metric_data_loaded, issues, position)
+        logging.info("Adding query and results to cache")
+        CACHE[jql_sha512] = issues
     return issues
 
 def filter_issues(metric_data_loaded, issues, position):
@@ -135,7 +143,7 @@ def filter_issues(metric_data_loaded, issues, position):
     for issue in issues:
         if jinja2.Template(jinja2.Template(metric_data_loaded[position]['filter']).render(issue=issue,
                                                                                           metric=metric_data_loaded)).render(issue=issue) == u'true':
-           filtered_issues.append(issue)
+            filtered_issues.append(issue)
     return filtered_issues
 
 def main():
@@ -267,6 +275,7 @@ if __name__ == "__main__":
     MAX_RESULTS = str(100)
     CONFIG_FILE = 'config.json'
     HEADERS = {'Content-type': 'application/json'}
+    CACHE = {}
     PAYLOAD = []
 
     # Loads the configuration file for the script.
