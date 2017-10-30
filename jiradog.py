@@ -114,6 +114,7 @@ def get_issues(metric_data_loaded, position, project):
         logging.info("Using cached version of query and results")
         issues = CACHE[jql_sha512]
     else:
+        logging.info("Adding query and results to cache")
         search = jira.search_issues(jql_rendered, maxResults=max_results, startAt=0)
         for issue in search:
             issues.append(issue)
@@ -124,7 +125,6 @@ def get_issues(metric_data_loaded, position, project):
             start_at = start_at + max_results
         if metric_data_loaded.get(position, False).get('filter', False) != False:
             issues = filter_issues(metric_data_loaded, issues, position)
-        logging.info("Adding query and results to cache")
         CACHE[jql_sha512] = issues
     return issues
 
