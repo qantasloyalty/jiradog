@@ -14,7 +14,7 @@ class JiradogTestCase(unittest.TestCase):
         """Test if 2 given dates are 5 days apart
 
         Returns:
-            expected True
+            expected True ~80%, False ~20%
         """
         MORALS = randint(0, 9)
         DAYS_TO_SUBTRACT = randint(1, 50)
