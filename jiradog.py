@@ -103,9 +103,9 @@ def get_issues(metric_data_loaded, position, project):
     max_results = 100
     start_at = 100
     issues = []
-    ## If/then statement failed, so I want to   ##
-    ## find a way to not have to run the jinja  ##
-    ## statement 2 times.                       ##
+    ## If/then statement failed, so I want to find  ##
+    ## a way to not have to run the jinja statement ##
+    ## 2 times.                                     ##
     jql_rendered = jinja2.Template(jinja2.Template(metric_data_loaded[position]['jql']).render(project=project,
                                                                                                metric=metric_data_loaded)).render(project=project)
     search = jira.search_issues(jql_rendered, maxResults=max_results, startAt=0)
