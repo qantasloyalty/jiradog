@@ -94,7 +94,7 @@ def get_issues(metric_data_loaded, position, project):
 
     Args:
         metric_data_loaded:	Dictionary	JSON object from the metric config block.
-        position:		String		Either 'numerator' or 'denominator'
+        position:		String		Either 'numerator' or 'denominator'.
         project:		String		The project to templatize the jql.
 
     Returns:
@@ -117,23 +117,25 @@ def get_issues(metric_data_loaded, position, project):
             issues.append(issue)
         start_at = start_at + max_results
     if metric_data_loaded.get(position, False).get('filter', False) != False:
-        issues = filter_issues(issues, metric_data_loaded[position]['filter'])
+        issues = filter_issues(metric_data_loaded, issues, position)
     return issues
 
-def filter_issues(issues, filter_jinja2):
+def filter_issues(metric_data_loaded, issues, position):
     """Filters issues based on jinja2 format if/then statement.
 
     Args:
-        issues:		List	Issues returned from JIRA SDK
-        filter_jinja2:	String	Jinja2 format string to filter issues on.
+        metric_data_loaded:	Dictionary	JSON object from the metric config block.
+        issues:			List		Issues returned from JIRA SDK.
+        position:		String		Either 'numerator' or 'denominator'.
 
     Returns:
         List of issues that conform to the filter.
     """
     filtered_issues = []
     for issue in issues:
-        if jinja2.Template(filter_jinja2).render(issue=issue) == u'true':
-            filtered_issues.append(issue)
+        if jinja2.Template(jinja2.Template(metric_data_loaded[position]['filter']).render(issue=issue,
+                                                                                          metric=metric_data_loaded)).render(issue=issue) == u'true':
+           filtered_issues.append(issue)
     return filtered_issues
 
 def main():
@@ -215,8 +217,12 @@ def main():
                                                             metric_data_loaded[position]['field']))
                         elif metric_data_loaded[position]['method'] == 'mean_time_between_statuses':
                             for issue in issues:
-                                m_t = mean_time_between_statuses(issue.fields.created,
-                                                                 issue.fields.updated)
+                                if isinstance(issue.fields.resolutiondate, type(None)):
+                                    m_t = mean_time_between_statuses(issue.fields.created,
+                                                                     issue.fields.updated)
+                                else:
+                                    m_t = mean_time_between_statuses(issue.fields.created,
+                                                                     issue.fields.resolutiondate)
                                 total_time_between_statuses = total_time_between_statuses + m_t
                             numbers.append(total_time_between_statuses)
                     elif metric_data_loaded[position]['source'] == 'constant':
@@ -227,27 +233,6 @@ def main():
                             points = float(numbers[0]) / float(numbers[1])
                         else:
                             points = 0
-
-            elif metric_data_loaded['method'] == 'mean_time_between_statuses':
-                ## Find the average time between specified statuses.
-                logging.info('method: ' + metric_data_loaded['method'])
-
-                issues = get_issues(metric_data_loaded['issues']['jql'], project)
-                if metric_data_loaded.get('issues', False).get('filter', False) != False:
-                    issues = filter_issues(issues, metric_data_loaded['issues']['filter'])
-
-                for issue in issues:
-                    m_t = mean_time_between_statuses(issue.fields.created,
-                                                     issue.fields.updated)
-                    total_time_between_statuses = total_time_between_statuses + m_t
-                numbers.append(total_time_between_statuses)
-                numbers.append(len(issues))
-
-                if len(numbers) == 2:
-                    if float(numbers[1]) != 0:
-                        points = float(numbers[0]) / float(numbers[1])
-                    else:
-                        points = 0
 
             elif metric_data_loaded['method'] == 'direct':
                 issues = get_issues(metric_data_loaded['issues']['jql'], project)
