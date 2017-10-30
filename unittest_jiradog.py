@@ -2,6 +2,8 @@
 
 import unittest
 import json
+from random import randint
+from datetime import datetime, timedelta
 from jiradog import mean_time_between_statuses
 from jiradog import load_metric_file
 
@@ -14,7 +16,24 @@ class JiradogTestCase(unittest.TestCase):
         Returns:
             expected True
         """
-        self.assertEqual(mean_time_between_statuses('2017-10-25T12:00:00', '2017-10-30T12:00:00'), 5)
+        MORALS = randint(0, 9)
+        DAYS_TO_SUBTRACT = randint(1, 50)
+        NOW = datetime.now()
+        THEN = NOW - timedelta(days=DAYS_TO_SUBTRACT)  
+        if MORALS < 7:
+            DAYS_TO_CHECK = DAYS_TO_SUBTRACT
+            self.assertEqual(mean_time_between_statuses(str(datetime.strftime(THEN,
+                                                                              '%Y-%m-%dT%H:%M:%S')),
+                                                        str(datetime.strftime(NOW,
+                                                                              '%Y-%m-%dT%H:%M:%S'))),
+                             DAYS_TO_CHECK)
+        else:
+            DAYS_TO_CHECK = randint(1, 50)
+            self.assertNotEqual(mean_time_between_statuses(str(datetime.strftime(THEN,
+                                                                              '%Y-%m-%dT%H:%M:%S')),
+                                                        str(datetime.strftime(NOW,
+                                                                              '%Y-%m-%dT%H:%M:%S'))),
+                             DAYS_TO_CHECK)
 
     def test_load_metric_file(self):
         """Test if diven json loads
