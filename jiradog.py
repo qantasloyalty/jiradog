@@ -104,19 +104,6 @@ def mean_time_between_statuses(first_date, second_date):
     return (time.mktime(second_date_sec) - time.mktime(first_date_sec)) / (60 * 60 * 24)
 
 ## data provider methods
-def ticket_count(paginated_list):
-    """Gets the count of issues from a JQL query result.
-
-    Args:
-        result:		List	A single page from an API call.
-
-    Returns:
-        Integer of the number of issues counted.
-    """
-    total_issues = 0
-    total_issues = len(paginated_list)
-    return total_issues
-
 def custom_field_sum(issues, custom_field):
     ## Using JIRA SDK
     """Sums custom field values together.
