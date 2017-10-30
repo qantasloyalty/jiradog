@@ -34,7 +34,7 @@ def mean_time_between_statuses(first_date, second_date):
     """
     first_date_sec = time.strptime(first_date.split('.')[0], '%Y-%m-%dT%H:%M:%S')
     second_date_sec = time.strptime(second_date.split('.')[0], '%Y-%m-%dT%H:%M:%S')
-    return (time.mktime(second_date_sec) - time.mktime(first_date_sec)) / 60 / 60 / 24
+    return (time.mktime(second_date_sec) - time.mktime(first_date_sec)) / (60 * 60 * 24)
 
 ## data provider methods
 def ticket_count(paginated_list):

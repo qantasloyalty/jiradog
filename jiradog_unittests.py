@@ -33,7 +33,7 @@ class JiradogTestCase(unittest.TestCase):
             'eight',
             'nine'
         ]
-        self.assertEqual(ticket_count(test_list), 10)
+        self.assertIs(ticket_count(test_list), 10)
 
 if __name__ == '__main__':
     unittest.main()
