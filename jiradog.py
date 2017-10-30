@@ -23,6 +23,72 @@ import jinja2
 from datadog import initialize, api
 from jira import JIRA
 
+class JiraProvider(object):
+    """Group of functions/methods to get/manipulate JIRA data
+
+    Returns:
+        List of issues.
+    """
+    def __init__(self, api_url, api_username, api_password):
+        self.jira = JIRA(api_url, basic_auth=(api_username, api_password))
+
+    def get_issues(self, metric_data_loaded, position, project):
+        """Using the JIRA SDK, gets a list of issues.
+
+        Args:
+            metric_data_loaded:	Dictionary	JSON object from the metric config block.
+            position:		String		Either 'numerator' or 'denominator'.
+            project:		String		The project to templatize the jql.
+
+        Returns:
+            List of issues returned from JIRA JQL query.
+        """
+        max_results = 100
+        start_at = 100
+        issues = []
+        ## If/then statement failed, so I want to find  ##
+        ## a way to not have to run the jinja statement ##
+        ## 2 times.                                     ##
+        jql_rendered = jinja2.Template(jinja2.Template(metric_data_loaded[position]['jql']).render(project=project,
+                                                                                                   metric=metric_data_loaded)).render(project=project)
+        jql_sha512 = hashlib.sha512(jql_rendered).hexdigest()
+        if CACHE.get(jql_sha512, False):
+            logging.info("Using cached version of query and results")
+            issues = CACHE[jql_sha512]
+        else:
+            logging.info("Adding query and results to cache")
+            search = self.jira.search_issues(jql_rendered, maxResults=max_results, startAt=0)
+            for issue in search:
+                issues.append(issue)
+            while len(search) == 100:
+                search = self.jira.search_issues(jql_rendered, maxResults=max_results, startAt=start_at)
+                for issue in search:
+                    issues.append(issue)
+                start_at = start_at + max_results
+            if metric_data_loaded.get(position, False).get('filter', False) != False:
+                issues = self.filter_issues(metric_data_loaded, issues, position)
+            CACHE[jql_sha512] = issues
+        return issues
+
+    @classmethod
+    def filter_issues(cls, metric_data_loaded, issues, position):
+        """Filters issues based on jinja2 format if/then statement.
+
+        Args:
+            metric_data_loaded:	Dictionary	JSON object from the metric config block.
+            issues:		List		Issues returned from JIRA SDK.
+            position:		String		Either 'numerator' or 'denominator'.
+
+        Returns:
+            List of issues that conform to the filter.
+        """
+        filtered_issues = []
+        for issue in issues:
+            if jinja2.Template(jinja2.Template(metric_data_loaded[position]['filter']).render(issue=issue,
+                                                                                              metric=metric_data_loaded)).render(issue=issue) == u'true':
+                filtered_issues.append(issue)
+        return filtered_issues
+
 def mean_time_between_statuses(first_date, second_date):
     """Calculates the length of time between two statuses
 
@@ -90,61 +156,6 @@ def load_metric_file(metric_file, is_args_metric_set):
                 metric_file_full = [metric_config]
     return metric_file_full
 
-def get_issues(metric_data_loaded, position, project):
-    """Using the JIRA SDK, gets a list of issues.
-
-    Args:
-        metric_data_loaded:	Dictionary	JSON object from the metric config block.
-        position:		String		Either 'numerator' or 'denominator'.
-        project:		String		The project to templatize the jql.
-
-    Returns:
-        List of issues returned from JIRA JQL query.
-    """
-    max_results = 100
-    start_at = 100
-    issues = []
-    ## If/then statement failed, so I want to find  ##
-    ## a way to not have to run the jinja statement ##
-    ## 2 times.                                     ##
-    jql_rendered = jinja2.Template(jinja2.Template(metric_data_loaded[position]['jql']).render(project=project,
-                                                                                               metric=metric_data_loaded)).render(project=project)
-    jql_sha512 = hashlib.sha512(jql_rendered).hexdigest()
-    if CACHE.get(jql_sha512, False):
-        logging.info("Using cached version of query and results")
-        issues = CACHE[jql_sha512]
-    else:
-        logging.info("Adding query and results to cache")
-        search = jira.search_issues(jql_rendered, maxResults=max_results, startAt=0)
-        for issue in search:
-            issues.append(issue)
-        while len(search) == 100:
-            search = jira.search_issues(jql_rendered, maxResults=max_results, startAt=start_at)
-            for issue in search:
-                issues.append(issue)
-            start_at = start_at + max_results
-        if metric_data_loaded.get(position, False).get('filter', False) != False:
-            issues = filter_issues(metric_data_loaded, issues, position)
-        CACHE[jql_sha512] = issues
-    return issues
-
-def filter_issues(metric_data_loaded, issues, position):
-    """Filters issues based on jinja2 format if/then statement.
-
-    Args:
-        metric_data_loaded:	Dictionary	JSON object from the metric config block.
-        issues:			List		Issues returned from JIRA SDK.
-        position:		String		Either 'numerator' or 'denominator'.
-
-    Returns:
-        List of issues that conform to the filter.
-    """
-    filtered_issues = []
-    for issue in issues:
-        if jinja2.Template(jinja2.Template(metric_data_loaded[position]['filter']).render(issue=issue,
-                                                                                          metric=metric_data_loaded)).render(issue=issue) == u'true':
-            filtered_issues.append(issue)
-    return filtered_issues
 
 def main():
     """Main function, calls all other functions.
@@ -216,7 +227,7 @@ def main():
                     if metric_data_loaded[position]['source'] == 'jira':
 
                         ## Get's list of issues from JIRA SDK
-                        issues = get_issues(metric_data_loaded, position, project)
+                        issues = JP.get_issues(metric_data_loaded, position, project)
 
                         if metric_data_loaded[position]['method'] == 'ticket_count':
                             numbers.append(len(issues))
@@ -243,7 +254,7 @@ def main():
                             points = 0
 
             elif metric_data_loaded['method'] == 'direct':
-                issues = get_issues(metric_data_loaded['issues']['jql'], project)
+                issues = JP.get_issues(metric_data_loaded['issues']['jql'], project)
                 if metric_data_loaded['issues']['method'] == 'ticket_count':
                     points = len(issues)
 
@@ -302,7 +313,7 @@ if __name__ == "__main__":
     logging.basicConfig(filename=LOG_FILE,
                         format='%(asctime)s %(levelname)s %(message)s',
                         level=LOGGING_LEVEL)
-    jira = JIRA(API_URL, basic_auth=(API_USERNAME, API_PASSWORD))
+    JP = JiraProvider(API_URL, API_USERNAME, API_PASSWORD)
 
     # Executing script
     main()
