@@ -17,6 +17,7 @@ import json
 import time
 import logging
 import os
+import requests
 from pprint import pprint
 import hashlib
 import jinja2
@@ -88,6 +89,14 @@ class JiraProvider(object):
                                                                                               metric=metric_data_loaded)).render(issue=issue) == u'true':
                 filtered_issues.append(issue)
         return filtered_issues
+
+    @classmethod
+    def get_sprints(cls, metric_data_loaded, position):
+        sprints = []
+        start_at = 50
+        url = 'https://evernote.jira.com/rest/agile/1.0/board/' + \
+              metric_data_loaded[position]['sprints']['board'] + \
+              '/sprint?maxResults=50&startAt=0'
 
 def mean_time_between_statuses(first_date, second_date):
     """Calculates the length of time between two statuses
@@ -267,8 +276,7 @@ if __name__ == "__main__":
     VERSION = '1.1.0'
     FUNCTION_MAP = {
         'mean_time_between_statuses': mean_time_between_statuses,
-        'ticket_count': ticket_count,
-        'custom_field_sum': custom_field_sum,
+        'custom_field_sum': custom_field_sum
         }
     MAX_RESULTS = str(100)
     CONFIG_FILE = 'config.json'
