@@ -80,7 +80,7 @@
     "method": "average",
     "numerator": {
       "source": "jira",
-      "jql": "project={{project}} AND issuetype=Bug AND priority='1-Critical, stop everything and fix' AND Resolved>endOfDay(-90d) ABD Resolution=Fixed",
+      "jql": "project={{project}} AND issuetype=Bug AND priority='1-Critical, stop everything and fix' AND Resolved>endOfDay(-90d) AND Resolution=Fixed",
       "statuses": [
         "{{issue.fields.created}}",
         "{{issue.fields.resolutiondate}}"
