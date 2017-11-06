@@ -48,13 +48,21 @@
       "__comment": "Get all issues updated the last 90 days, that were in a sprint, and are not completed",
       "source": "jira",
       "jql": "{{metric.denominator.jql}} AND status IN (Done,Resolved,Closed)",
-      "method": "ticket_count"
+      "method": "ticket_count",
+      "group_by": {
+        "key": "sprint",
+        "board_ids": {
+          "MACOSNOTE": 368
+          },
+        "last": 6
+        }
       },
     "denominator": {
       "__comment": "Get all issues updated the last 90 days, that were in a sprint",
       "source": "jira",
       "jql": "project={{project}} AND sprint IN (closedSprints()) AND updated>endOfDay(-90d)",
-      "method": "ticket_count"
+      "method": "ticket_count",
+      "group_by": "{{metric.numerator.group_by}}"
       }
   },
   {
@@ -72,7 +80,11 @@
     "method": "average",
     "numerator": {
       "source": "jira",
-      "jql": "project={{project}} AND issuetype=Bug AND priority='1-Critical, stop everything and fix' AND Resolution='Unresolved'",
+      "jql": "project={{project}} AND issuetype=Bug AND priority='1-Critical, stop everything and fix' AND Resolved>endOfDay(-90d) ABD Resolution=Fixed",
+      "statuses": [
+        "{{issue.fields.created}}",
+        "{{issue.fields.resolutiondate}}"
+        ],
       "method": "mean_time_between_statuses"
       },
     "denominator": {
@@ -96,7 +108,11 @@
     "method": "average",
     "numerator": {
       "source": "jira",
-      "jql": "project={{project}} AND issuetype=Bug AND priority='2-High, fix ASAP' AND Resolution='Unresolved'", 
+      "jql": "project={{project}} AND priority='2-High, fix ASAP' AND Resolved>endOfWeek(-90d) AND Resolution=Fixed", 
+      "statuses": [
+        "{{issue.fields.created}}",
+        "{{issue.fields.resolutiondate}}"
+        ],
       "method": "mean_time_between_statuses"
       },
     "denominator": {
@@ -120,8 +136,12 @@
     "method": "average",
     "numerator": {
       "source": "jira",
-      "jql": "project={{project}} AND issuetype=Bug AND priority='3-Medium, fix before release ships' AND Resolution='Unresolved'",
-      "method": "mean_time_between_statuses"
+      "jql": "project={{project}} AND issuetype=Bug AND priority='3-Medium, fix before release ships' AND Resolved>endOfDay(-90d) AND Resolution=Fixed",
+      "method": "mean_time_between_statuses",
+      "statuses": [
+        "{{issue.fields.created}}",
+        "{{issue.fields.resolutiondate}}"
+        ]
       },
     "denominator": {
       "source": "jira",
@@ -144,8 +164,12 @@
     "method": "average",
     "numerator": {
       "source": "jira",
-      "jql": "project={{project}} AND issuetype=Bug AND priority='4-Low, fix if you have time' AND Resolution='Unresolved'",
-      "method": "mean_time_between_statuses"
+      "jql": "project={{project}} AND issuetype=Bug AND priority='4-Low, fix if you have time' AND Resolved>endOfDay(-90d) AND Resolution=Fixed",
+      "method": "mean_time_between_statuses",
+      "statuses": [
+        "{{issue.fields.created}}",
+        "{{issue.fields.resolutiondate}}"
+        ]
       },
     "denominator": {
       "source": "jira",
@@ -171,7 +195,11 @@
       "source": "jira",
       "jql": "Project={{project}} AND issuetype=Story AND fixVersion!=EMPTY AND resolved>endOfDay(-90d)",
       "filter": "{% if 'GA' in issue.fields.fixVersions[0].name or 'Beta' in issue.fields.fixVersions[0].name %}true{% endif %}",
-      "method": "mean_time_between_statuses"
+      "method": "mean_time_between_statuses",
+      "statuses": [
+        "{{issue.fields.created}}",
+        "{{issue.fields.resolutiondate}}"
+        ]
       },
     "denominator": {
       "__comment": "List of issues released to GA (Global Acceptance)/Production",
@@ -197,7 +225,11 @@
       "__comment": "Get create date for all tickets",
       "source": "jira",
       "jql": "project={{project}} AND priority IN ('1-Critical, stop everything and fix','2-High, fix ASAP') AND created>=startOfDay(-90d) AND issuetype=Bug AND labels IN (suport, support, support-impact-over-100, support-impact-up-to-10, support-impact-up-to-100, support-severity-data-loss, support-severity-inconvenient, support-severity-non-functional, commerce-support) AND status IN (closed,resolve)",
-      "method": "mean_time_between_statuses"
+      "method": "mean_time_between_statuses",
+      "statuses": [
+        "{{issue.fields.created}}",
+        "{{issue.fields.resolutiondate}}"
+        ]
       },
     "denominator": {
       "source": "jira",
@@ -218,14 +250,14 @@
       "ENB"
       ],
     "method": "average",
-    "avg_numerator": {
+    "numerator": {
       "source": "jira",
-      "jql": "Project={{project}} AND Status WAS 'Reopened' AND issueType=Bug AND Updated>endOfDay(-90d)",
+      "jql": "Project={{project}} AND issueType=Bug AND Updated>endOfDay(-90d) AND Status WAS 'Reopened'",
       "method": "ticket_count"
       },
-    "avg_denominator": {
+    "denominator": {
       "source": "jira",
-      "jql": "Project={{project}} AND issueType=Bug AND Updated>endOfDay(-90d)",
+      "jql": "Project={{project}} AND issueType=Bug AND Updated>endOfDay(-90d) AND status IN (Done,Resolved,Closed)",
       "method": "ticket_count"
       }
   },
@@ -245,13 +277,13 @@
     "numerator": {
       "__comment": "Get total of all priority 1 and 2 bugs",
       "source": "jira",
-      "jql": "project={{project}} AND status NOT IN (Done,Resolved,Closed) AND issuetype=Bug AND priority IN ('1-Critical, stop everything and fix','2-High, fix ASAP') ORDER BY fixVersion ASC",
+      "jql": "{{metric.denominator.jql}} AND priority IN ('1-Critical, stop everything and fix','2-High, fix ASAP')",
       "method": "ticket_count"
       },
     "denominator": {
       "__comment": "Get total of all bugs in projects",
       "source": "jira",
-      "jql": "project={{project}} AND status NOT IN (Done,Resolved,Closed) AND issuetype=Bug ORDER BY fixVersion ASC",
+      "jql": "project={{project}} AND status NOT IN (Done,Resolved,Closed) AND issuetype=Bug",
       "method": "ticket_count"
       }
   },
@@ -326,13 +358,125 @@
     "numerator": {
       "__comment": "Find number of bugs labelled regression",
       "source": "jira",
-      "jql": "project={{project}} AND issuetype=Bug AND labels=regression AND updated > startOfDay(-90d)",
+      "jql": "{{metric.denominator.jql}} AND labels=regression",
       "method": "ticket_count"
       },
     "denominator": {
       "__comment": "Find total number of bugs in a project",
       "source": "jira",
       "jql": "project={{project}} AND issuetype=Bug AND updated > startOfDay(-90d)",
+      "method": "ticket_count"
+      }
+  },
+  {
+    "metric_name": "jiradog.meanAgeUnresolvedP1Bugs",
+    "projects": [
+      "MACOSNOTE",
+      "WINNOTE",
+      "ION",
+      "IOSNOTE",
+      "DRDNOTE",
+      "CE",
+      "ENB"
+      ],
+    "method": "average",
+    "numerator": {
+      "__comment": "Find all open P1 bugs and get current age",
+      "source": "jira",
+      "jql": "project={{project}} AND issueType=Bug AND Priority='1-Critical, stop everything and fix' AND Status NOT IN (Done,Resolved,Closed)",
+      "method": "mean_time_between_statuses",
+      "statuses": [
+        "{{issue.fields.created}}",
+        "{{issue.fields.updated}}"
+        ]
+      },
+    "denominator": {
+      "source": "jira",
+      "jql": "{{metric.numerator.jql}}",
+      "method": "ticket_count"
+      }
+  },
+  {
+    "metric_name": "jiradog.meanAgeUnresolvedP2Bugs",
+    "projects": [
+      "MACOSNOTE",
+      "WINNOTE",
+      "ION",
+      "IOSNOTE",
+      "DRDNOTE",
+      "CE",
+      "ENB"
+      ],
+    "method": "average",
+    "numerator": {
+      "__comment": "Find all open P2 bugs and get current age",
+      "source": "jira",
+      "jql": "project={{project}} AND issueType=Bug AND Priority='2-High, fix ASAP' AND Status NOT IN (Done,Resolved,Closed)",
+      "method": "mean_time_between_statuses",
+      "statuses": [
+        "{{issue.fields.created}}",
+        "{{issue.fields.updated}}"
+        ]
+      },
+    "denominator": {
+      "source": "jira",
+      "jql": "{{metric.numerator.jql}}",
+      "method": "ticket_count"
+      }
+  },
+  {
+    "metric_name": "jiradog.meanAgeUnresolvedP3Bugs",
+    "projects": [
+      "MACOSNOTE",
+      "WINNOTE",
+      "ION",
+      "IOSNOTE",
+      "DRDNOTE",
+      "CE",
+      "ENB"
+      ],
+    "method": "average",
+    "numerator": {
+      "__comment": "Find all open P3 bugs and get current age",
+      "source": "jira",
+      "jql": "project={{project}} AND issueType=Bug AND Priority='3-Medium, fix before release ships' AND Status NOT IN (Done,Resolved,Closed)",
+      "method": "mean_time_between_statuses",
+      "statuses": [
+        "{{issue.fields.created}}",
+        "{{issue.fields.updated}}"
+        ]
+      },
+    "denominator": {
+      "source": "jira",
+      "jql": "{{metric.numerator.jql}}",
+      "method": "ticket_count"
+      }
+  },
+  {
+    "metric_name": "jiradog.meanAgeUnresolvedP4Bugs",
+    "projects": [
+      "MACOSNOTE",
+      "WINNOTE",
+      "ION",
+      "IOSNOTE",
+      "DRDNOTE",
+      "CE",
+      "ENB"
+      ],
+    "method": "average",
+    "numerator": {
+      "__comment": "Find all open P4 bugs and get current age",
+      "source": "jira",
+      "jql": "project={{project}} AND issueType=Bug AND Priority='4-Low, fix if you have time' AND Status NOT IN (Done,Resolved,Closed)",
+      "method": "mean_time_between_statuses",
+      "statuses": [
+        "{{issue.fields.created}}",
+        "{{issue.fields.updated}}"
+        ]
+      },
+    "denominator": {
+      "source": "jira",
+      "jql": "{{metric.numerator.jql}}",
       "method": "ticket_count"
       }
   }

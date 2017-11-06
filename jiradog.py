@@ -85,18 +85,29 @@ class JiraProvider(object):
         """
         filtered_issues = []
         for issue in issues:
-            if jinja2.Template(jinja2.Template(metric_data_loaded[position]['filter']).render(issue=issue,
-                                                                                              metric=metric_data_loaded)).render(issue=issue) == u'true':
+            if jinja2.Template(jinja2.Template(metric_data_loaded \
+                                               [position] \
+                                               ['filter']).render(issue=issue,
+                                                                  metric=metric_data_loaded)).render(issue=issue) == u'true':
                 filtered_issues.append(issue)
         return filtered_issues
 
     @classmethod
     def get_sprints(cls, metric_data_loaded, position):
         sprints = []
-        start_at = 50
+        max_results = 50
+        start_at = max_results
         url = 'https://evernote.jira.com/rest/agile/1.0/board/' + \
               metric_data_loaded[position]['sprints']['board'] + \
-              '/sprint?maxResults=50&startAt=0'
+              '/sprint?maxResults=' + \
+              max_results
+        search = requests.get(url + '&startAt=0', auth=(API_USERNAME, API_PASSWORD)).json
+        sprints = search['values']
+        while search['isLast'] == False:
+            search = requests.get(url + '&startAt=' + start_at, auth=(API_USERNAME, API_PASSWORD)).json
+            sprints.append(search['values'])
+            start_at = start_at + max_results
+        return sprints
 
 def mean_time_between_statuses(first_date, second_date):
     """Calculates the length of time between two statuses
@@ -232,12 +243,14 @@ def main():
                                                             metric_data_loaded[position]['field']))
                         elif metric_data_loaded[position]['method'] == 'mean_time_between_statuses':
                             for issue in issues:
-                                if isinstance(issue.fields.resolutiondate, type(None)):
-                                    m_t = mean_time_between_statuses(issue.fields.created,
-                                                                     issue.fields.updated)
-                                else:
-                                    m_t = mean_time_between_statuses(issue.fields.created,
-                                                                     issue.fields.resolutiondate)
+                                m_t = mean_time_between_statuses(jinja2.Template(metric_data_loaded \
+                                                                                 [position] \
+                                                                                 ['statuses'] \
+                                                                                 [0]).render(issue=issue),
+                                                                 jinja2.Template(metric_data_loaded \
+                                                                                 [position] \
+                                                                                 ['statuses'] \
+                                                                                 [1]).render(issue=issue))
                                 total_time_between_statuses = total_time_between_statuses + m_t
                             numbers.append(total_time_between_statuses)
                     elif metric_data_loaded[position]['source'] == 'constant':
