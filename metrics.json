@@ -193,7 +193,7 @@
     "numerator": {
       "__comment": "List of issues released to GA (Global Acceptance)/Production",
       "source": "jira",
-      "jql": "Project={{project}} AND issuetype=Story AND fixVersion!=EMPTY AND resolved>endOfDay(-90d)",
+      "jql": "project={{project}} AND issuetype=Story AND fixVersion!=EMPTY AND resolved>endOfDay(-90d)",
       "filter": "{% if 'GA' in issue.fields.fixVersions[0].name or 'Beta' in issue.fields.fixVersions[0].name %}true{% endif %}",
       "method": "mean_time_between_statuses",
       "statuses": [
@@ -252,12 +252,12 @@
     "method": "average",
     "numerator": {
       "source": "jira",
-      "jql": "Project={{project}} AND issueType=Bug AND Updated>endOfDay(-90d) AND Status WAS 'Reopened'",
+      "jql": "project={{project}} AND issueType=Bug AND updated>endOfDay(-90d) AND status WAS Reopened",
       "method": "ticket_count"
       },
     "denominator": {
       "source": "jira",
-      "jql": "Project={{project}} AND issueType=Bug AND Updated>endOfDay(-90d) AND status IN (Done,Resolved,Closed)",
+      "jql": "project={{project}} AND issueType=Bug AND updated>endOfDay(-90d) AND (status WAS Reopened OR status IN (Done,Resolved,Closed))",
       "method": "ticket_count"
       }
   },
@@ -383,7 +383,7 @@
     "numerator": {
       "__comment": "Find all open P1 bugs and get current age",
       "source": "jira",
-      "jql": "project={{project}} AND issueType=Bug AND Priority='1-Critical, stop everything and fix' AND Status NOT IN (Done,Resolved,Closed)",
+      "jql": "project={{project}} AND issueType=Bug AND Priority='1-Critical, stop everything and fix' AND status NOT IN (Done,Resolved,Closed)",
       "method": "mean_time_between_statuses",
       "statuses": [
         "{{issue.fields.created}}",
@@ -411,7 +411,7 @@
     "numerator": {
       "__comment": "Find all open P2 bugs and get current age",
       "source": "jira",
-      "jql": "project={{project}} AND issueType=Bug AND Priority='2-High, fix ASAP' AND Status NOT IN (Done,Resolved,Closed)",
+      "jql": "project={{project}} AND issueType=Bug AND Priority='2-High, fix ASAP' AND status NOT IN (Done,Resolved,Closed)",
       "method": "mean_time_between_statuses",
       "statuses": [
         "{{issue.fields.created}}",
@@ -439,7 +439,7 @@
     "numerator": {
       "__comment": "Find all open P3 bugs and get current age",
       "source": "jira",
-      "jql": "project={{project}} AND issueType=Bug AND Priority='3-Medium, fix before release ships' AND Status NOT IN (Done,Resolved,Closed)",
+      "jql": "project={{project}} AND issueType=Bug AND Priority='3-Medium, fix before release ships' AND status NOT IN (Done,Resolved,Closed)",
       "method": "mean_time_between_statuses",
       "statuses": [
         "{{issue.fields.created}}",
@@ -467,7 +467,7 @@
     "numerator": {
       "__comment": "Find all open P4 bugs and get current age",
       "source": "jira",
-      "jql": "project={{project}} AND issueType=Bug AND Priority='4-Low, fix if you have time' AND Status NOT IN (Done,Resolved,Closed)",
+      "jql": "project={{project}} AND issueType=Bug AND Priority='4-Low, fix if you have time' AND status NOT IN (Done,Resolved,Closed)",
       "method": "mean_time_between_statuses",
       "statuses": [
         "{{issue.fields.created}}",

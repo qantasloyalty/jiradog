@@ -1,6 +1,6 @@
 # jiradog
 
-Version 1.1.2
+Version 1.1.0
 A tool to poll data from JIRA to upload as a metric to DataDog.
 
 ## Prerequisites
@@ -13,15 +13,16 @@ Dependencies (outside of python standard library)
 
 ## Installing
 
-Clone the engineering_velocity_metrics project from the operations source control repository
+Clone the engineering\_velocity\_metrics project from the operations source control repository
 
 ## metrics.json syntax
 
 How to build a metric.
 
 The information you are pulling from JIRA is built around JIRA's own query language: JQL (JIRA Query Language). Here is an example section from the metrics.json file:
+
 ```
-{
+  {
     "metric_name": "jiradog.avgOpenBugsPerDeveloper",
     "__comment": "SYS-1473",
     "projects": [
@@ -96,7 +97,7 @@ post-processing methods:
       "method": "ticket_count"
       },
 ```
-For the method 'average', the script looks for both the 'avg_numerator' and 'avg_denominator' dictionaries in the metric config block. These are both data providers, describing the source and any needed information for getting what is needed.
+For the method 'average', the script looks for both the 'numerator' and 'denominator' dictionaries in the metric config block. These are both data providers, describing the source and any needed information for getting what is needed.
 
 In this case: We are getting information from Jira (`"source": "jira",`), and defines the JQL (`"jql": "project={{project}} AND issuetype=Bug AND status NOT IN (Done, Resolved, Closed)",`). A few things to note about the JQL: Instead of a hard-set project, there is a jinja2 style variable `{{project}}`. The script uses this jql string as a jinja2 template to build the actual JQL call. Later versions of the script will include other inline jinja2 style templates for more granularity.
 
