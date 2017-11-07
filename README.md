@@ -36,7 +36,7 @@ The information you are pulling from JIRA is built around JIRA's own query langu
     "method": "average",
     "numerator": {
       "source": "jira",
-      "jql": "project={{project}} AND issuetype=Bug AND status NOT IN (Done, Resolved, Closed)",
+      "jql": "project={{project}} AND issuetype=Bug AND status NOT IN (Done,Resolved,Closed)",
       "method": "ticket_count"
       },
     "denominator": {
@@ -145,6 +145,35 @@ The metrics.json file is a JSON list of dictionaries, each one a 'description'/'
 
 The general philsophy is to use JQL to get the most specific results as possible, within the limitations of JQL. As I expand the script-based filtering, we want to rely on that as little as possible. script-based filtering will be removed if JQL gains the functionality we are looking for. When building a new metric, be as specific as possible with your JQL for issue searches and preferrably use no script-based filtering if possible.
 
+### Style guide
+
+#### JQL
+
+None of the following styles, whether followed or not, will break script functionality.
+
+##### Whitespace
+Here is a correctly styled JQL query.
+`project={{project}} AND issuetype=Bug AND status NOT IN (Done,Resolved,Closed)`
+
+The 'official' whitespace rules are:
+
+- Whitespace = SPACE (`U+0020`)
+- No _leading_ or _trailing_ whitespace
+- Mathmatical operators (=, !=, >, <, >=, <=, etc) should not be surrounded by whitespace
+- Word operators (IN, NOT IN, WAS, etc) should be surrounded by whitespace.
+- One whitespace character maximum concurrently (there should be no double spaces)
+- In paranthesized groups, no whitespace following comma: `(Done,Resolved,Closed)`
+
+##### Fields
+
+When referencing a field in JQL, use CamelCase:
+
+- `project`
+- `issueType`
+- `fixVersions`
+- `resolved`
+- `updatedDate`
+
 ## Authors
 
-* **Bryce McNab** - *Initial work* - 10/26/2017
+* **Bryce McNab** - *Initial work* - 11/07/2017
