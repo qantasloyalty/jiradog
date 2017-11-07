@@ -310,7 +310,7 @@
     "denominator": {
       "__comment": "Get total story points of bugs and stories, rolling 90 day window",
       "source": "jira",
-      "jql": "project={{project}} AND issuetype IN (Bug,Story) AND resolved>=fDay(-90d)",
+      "jql": "project={{project}} AND issuetype IN (Bug,Story) AND resolved>=endOfDay(-90d)",
       "method": "custom_field_sum",
       "field": "customfield_10203"
       }
