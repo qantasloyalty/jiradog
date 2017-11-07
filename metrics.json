@@ -262,7 +262,7 @@
       }
   },
   {
-    "metric_name":"jiradog.percentageP1P2Tickets",
+    "metric_name": "jiradog.percentageP1P2Tickets",
     "__comment": "SYS-1476",
     "projects": [
       "MACOSNOTE",
@@ -283,7 +283,7 @@
     "denominator": {
       "__comment": "Get total of all bugs in projects",
       "source": "jira",
-      "jql": "project={{project}} AND status NOT IN (Done,Resolved,Closed) AND issuetype=Bug",
+      "jql": "project={{project}} AND createdDate>=startOfDay(-90d) AND issuetype=Bug AND support!=Empty",
       "method": "ticket_count"
       }
   },
