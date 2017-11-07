@@ -224,7 +224,7 @@
     "numerator": {
       "__comment": "Get create date for all tickets",
       "source": "jira",
-      "jql": "project={{project}} AND priority IN ('1-Critical, stop everything and fix','2-High, fix ASAP') AND resolutiondate>=startOfDay(-90d) AND issuetype=Bug AND Support != Empty",
+      "jql": "project={{project}} AND priority IN ('1-Critical, stop everything and fix','2-High, fix ASAP') AND resolutionDate>=startOfDay(-90d) AND issueType=Bug AND Support != Empty",
       "method": "mean_time_between_statuses",
       "statuses": [
         "{{issue.fields.created}}",
