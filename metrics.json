@@ -364,7 +364,7 @@
     "denominator": {
       "__comment": "Find total number of bugs in a project",
       "source": "jira",
-      "jql": "project={{project}} AND issuetype=Bug AND updated > startOfDay(-90d)",
+      "jql": "project={{project}} AND issuetype=Bug AND created>=startOfDay(-90d)",
       "method": "ticket_count"
       }
   },
