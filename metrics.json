@@ -80,7 +80,7 @@
     "method": "average",
     "numerator": {
       "source": "jira",
-      "jql": "project={{project}} AND issuetype=Bug AND priority='1-Critical, stop everything and fix' AND Resolved>endOfDay(-90d) AND Resolution=Fixed",
+      "jql": "project={{project}} AND issueType=Bug AND priority='1-Critical, stop everything and fix' AND resolved>endOfDay(-90d) AND resolution=Fixed",
       "statuses": [
         "{{issue.fields.created}}",
         "{{issue.fields.resolutiondate}}"
@@ -108,7 +108,7 @@
     "method": "average",
     "numerator": {
       "source": "jira",
-      "jql": "project={{project}} AND priority='2-High, fix ASAP' AND Resolved>endOfWeek(-90d) AND Resolution=Fixed", 
+      "jql": "project={{project}} AND issueType=Bug AND priority='2-High, fix ASAP' AND resolved>endOfWeek(-90d) AND resolution=Fixed", 
       "statuses": [
         "{{issue.fields.created}}",
         "{{issue.fields.resolutiondate}}"
@@ -136,7 +136,7 @@
     "method": "average",
     "numerator": {
       "source": "jira",
-      "jql": "project={{project}} AND issuetype=Bug AND priority='3-Medium, fix before release ships' AND Resolved>endOfDay(-90d) AND Resolution=Fixed",
+      "jql": "project={{project}} AND issueType=Bug AND priority='3-Medium, fix before release ships' AND resolved>endOfDay(-90d) AND resolution=Fixed",
       "method": "mean_time_between_statuses",
       "statuses": [
         "{{issue.fields.created}}",
@@ -164,7 +164,7 @@
     "method": "average",
     "numerator": {
       "source": "jira",
-      "jql": "project={{project}} AND issuetype=Bug AND priority='4-Low, fix if you have time' AND Resolved>endOfDay(-90d) AND Resolution=Fixed",
+      "jql": "project={{project}} AND issueType=Bug AND priority='4-Low, fix if you have time' AND resolved>endOfDay(-90d) AND resolution=Fixed",
       "method": "mean_time_between_statuses",
       "statuses": [
         "{{issue.fields.created}}",
