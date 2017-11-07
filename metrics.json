@@ -479,5 +479,30 @@
       "jql": "{{metric.numerator.jql}}",
       "method": "ticket_count"
       }
+  },
+  {
+    "metric_name": "jiradog.bugsIntroducedVSBugsFixed",
+    "projects": [
+      "MACOSNOTE",
+      "WINNOTE",
+      "ION",
+      "IOSNOTE",
+      "DRDNOTE",
+      "CE",
+      "ENB"
+      ],
+    "method": "average",
+    "numerator": {
+      "__comment": "All Bug issue types created in the last 90 days",
+      "source": "jira",
+      "jql": "project={{project}} AND issueType=Bug AND created>=endOfDay(-90d)",
+      "method": "ticket_count"
+      },
+    "denominator": {
+      "__comment": "All Bug issue types resolved in the last 90 days",
+      "source": "jira",
+      "jql": "project={{project}} AND issueType=Bug AND resolved>=endOfDay(-90d)",
+      "method": "ticket_count"
+      }
   }
 ]

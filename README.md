@@ -159,20 +159,26 @@ The 'official' whitespace rules are:
 
 - Whitespace = SPACE (`U+0020`)
 - No _leading_ or _trailing_ whitespace
-- Mathmatical operators (=, !=, >, <, >=, <=, etc) should not be surrounded by whitespace
-- Word operators (IN, NOT IN, WAS, etc) should be surrounded by whitespace.
 - One whitespace character maximum concurrently (there should be no double spaces)
 - In paranthesized groups, no whitespace following comma: `(Done,Resolved,Closed)`
 
 ##### Fields
 
-When referencing a field in JQL, use CamelCase:
+When referencing a field in JQL, use camelCase:
 
 - `project`
 - `issueType`
 - `fixVersions`
 - `resolved`
 - `updatedDate`
+
+##### Operators
+
+Operators are used to join several conditions or expand on a condition.
+
+- Operators must be written in UPPERCASE (`AND`, `WAS`, `OR`, `NOT`, `IN`, etc)
+- Operators should be surrounded by whitespace (`x AND y`, `status NOT IN (foo,bar)`)
+- Mathmatical operators (=, !=, >, <, >=, <=, etc) should not be surrounded by whitespace (`x=4`, `assignee!=currentUser()`, `updated>=endOfDay(-90d)`)
 
 ## Authors
 
