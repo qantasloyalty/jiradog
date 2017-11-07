@@ -178,8 +178,10 @@ def main():
                         help='Get a list of defined metrics',
                         action='store_true')
     parser.add_argument('-n', '--noop',
-                        help='Outputs the payload to stdin, does not upload',
-                        action='store_true')
+                        help='Outputs the payload to stdin, does not upload. Default format is JSON',
+                        metavar='FORMAT',
+                        nargs='?',
+                        const=True)
     parser.add_argument('-d', '--describe',
                         help='Prints the configuration block for the specified metric',
                         action='store_true')
@@ -278,7 +280,16 @@ def main():
     logging.info('payload: ' + str(PAYLOAD))
 
     if args.noop:
-        pprint(PAYLOAD)
+        if args.noop == True or args.noop == 'json':
+            pprint(PAYLOAD)
+        elif args.noop == 'jira_table' or args.noop == 'markdown_table':
+            if args.noop == 'jira_table':
+                print '||metric||project||points||'
+            elif args.noop == 'markdown_table':
+                print '|metric|project|points|'
+                print '| ----- | ----- | ----- |'
+            for payload in PAYLOAD:
+                print '|' + payload['metric'] + '|' + payload['tags'][0] + '|' + str(payload['points'][1]) + '|'
     else:
         # Upload to DataDog
         api.Metric.send(PAYLOAD)

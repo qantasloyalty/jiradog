@@ -303,14 +303,14 @@
     "numerator": {
       "__comment": "Get total story points of bugs, rolling 90 day window",
       "source": "jira",
-      "jql": "project={{project}} AND issuetype=Bug AND updated > endOfDay(-90d)",
+      "jql": "project={{project}} AND issuetype=Bug AND resolved>=endOfDay(-90d)",
       "method": "custom_field_sum",
       "field": "customfield_10203"
       },
     "denominator": {
       "__comment": "Get total story points of bugs and stories, rolling 90 day window",
       "source": "jira",
-      "jql": "project={{project}} AND issuetype IN (Bug,Story) AND updated > endOfDay(-90d)",
+      "jql": "project={{project}} AND issuetype IN (Bug,Story) AND resolved>=fDay(-90d)",
       "method": "custom_field_sum",
       "field": "customfield_10203"
       }
@@ -331,14 +331,14 @@
     "numerator": {
       "__comment": "Get total story points of features, rolling 90 day window",
       "source": "jira",
-      "jql": "project={{project}} AND issuetype=Story AND updated > endOfDay(-90d)",
+      "jql": "project={{project}} AND issuetype=Story AND resolved>=endOfDay(-90d)",
       "method": "custom_field_sum",
       "field": "customfield_10203"
       },
     "denominator": {
       "__comment": "Get total story points of bugs and stories, rolling 90 day window",
       "source": "jira",
-      "jql": "project={{project}} AND issuetype IN (Bug,Story) AND updated > endOfDay(-90d)",
+      "jql": "project={{project}} AND issuetype IN (Bug,Story) AND resolved>=endOfDay(-90d)",
       "method": "custom_field_sum",
       "field": "customfield_10203"
       }
