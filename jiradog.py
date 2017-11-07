@@ -179,9 +179,10 @@ def main():
                         action='store_true')
     parser.add_argument('-n', '--noop',
                         help='Outputs the payload to stdin, does not upload. Default format is JSON',
-                        metavar='FORMAT',
-                        nargs='?',
-                        const=True)
+                        action='store_true')
+    parser.add_argument('-f', '--formatting',
+                        help='Specifies output format, default is JSON',
+                        metavar='FORMATTING')
     parser.add_argument('-d', '--describe',
                         help='Prints the configuration block for the specified metric',
                         action='store_true')
@@ -280,12 +281,12 @@ def main():
     logging.info('payload: ' + str(PAYLOAD))
 
     if args.noop:
-        if args.noop == True or args.noop == 'json':
+        if not args.formatting or args.formatting == 'json':
             pprint(PAYLOAD)
-        elif args.noop == 'jira_table' or args.noop == 'markdown_table':
-            if args.noop == 'jira_table':
+        elif args.formatting == 'jira_table' or args.formatting == 'markdown_table':
+            if args.formatting == 'jira_table':
                 print '||metric||project||points||'
-            elif args.noop == 'markdown_table':
+            elif args.formatting == 'markdown_table':
                 print '|metric|project|points|'
                 print '| ----- | ----- | ----- |'
             for payload in PAYLOAD:
