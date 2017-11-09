@@ -1,6 +1,6 @@
 [
   {
-    "metric_name": "jiradog.avgOpenBugsPerDeveloper",
+    "metric_name": "jiradog.openBugs",
     "__comment": "SYS-1473",
     "projects": [
       "MACOSNOTE",
@@ -11,24 +11,11 @@
       "CE",
       "ENB"
       ],
-    "method": "average",
-    "numerator": {
+    "method": "direct",
+    "issues": {
       "source": "jira",
-      "jql": "project={{project}} AND issuetype=Bug AND status NOT IN (Done, Resolved, Closed)",
+      "jql": "project={{project}} AND issueType=Bug AND resolution=unresolved",
       "method": "ticket_count"
-      },
-    "denominator": {
-      "source": "constant",
-      "data": {
-        "__comment": "Total number of developers per project.",
-        "MACOSNOTE": "7",
-        "WINNOTE": "4",
-        "ION": "9",
-        "IOSNOTE": "8",
-        "DRDNOTE": "7",
-        "CE": "6",
-        "ENB": "9"  
-        }
       }
   },
   {
@@ -80,7 +67,7 @@
     "method": "average",
     "numerator": {
       "source": "jira",
-      "jql": "project={{project}} AND issueType=Bug AND priority='1-Critical, stop everything and fix' AND resolved>endOfDay(-90d) AND resolution=Fixed",
+      "jql": "project={{project}} AND issueType=Bug AND priority='1-Critical, stop everything and fix' AND resolved>endOfDay(-90d) AND resolution=fixed",
       "statuses": [
         "{{issue.fields.created}}",
         "{{issue.fields.resolutiondate}}"
@@ -108,7 +95,7 @@
     "method": "average",
     "numerator": {
       "source": "jira",
-      "jql": "project={{project}} AND issueType=Bug AND priority='2-High, fix ASAP' AND resolved>endOfWeek(-90d) AND resolution=Fixed", 
+      "jql": "project={{project}} AND issueType=Bug AND priority='2-High, fix ASAP' AND resolved>endOfDay(-90d) AND resolution=fixed", 
       "statuses": [
         "{{issue.fields.created}}",
         "{{issue.fields.resolutiondate}}"
@@ -136,7 +123,7 @@
     "method": "average",
     "numerator": {
       "source": "jira",
-      "jql": "project={{project}} AND issueType=Bug AND priority='3-Medium, fix before release ships' AND resolved>endOfDay(-90d) AND resolution=Fixed",
+      "jql": "project={{project}} AND issueType=Bug AND priority='3-Medium, fix before release ships' AND resolved>endOfDay(-90d) AND resolution=fixed",
       "method": "mean_time_between_statuses",
       "statuses": [
         "{{issue.fields.created}}",
@@ -164,7 +151,7 @@
     "method": "average",
     "numerator": {
       "source": "jira",
-      "jql": "project={{project}} AND issueType=Bug AND priority='4-Low, fix if you have time' AND resolved>endOfDay(-90d) AND resolution=Fixed",
+      "jql": "project={{project}} AND issueType=Bug AND priority='4-Low, fix if you have time' AND resolved>endOfDay(-90d) AND resolution=fixed",
       "method": "mean_time_between_statuses",
       "statuses": [
         "{{issue.fields.created}}",
@@ -194,7 +181,7 @@
       "__comment": "List of issues released to GA (Global Acceptance)/Production",
       "source": "jira",
       "jql": "project={{project}} AND issuetype=Story AND fixVersion!=EMPTY AND resolved>endOfDay(-90d)",
-      "filter": "{% if 'GA' in issue.fields.fixVersions[0].name or 'Beta' in issue.fields.fixVersions[0].name %}true{% endif %}",
+      "filter": "{% if 'GA' in issue.fields.fixVersions[0].name or 'Beta' in issue.fields.fixVersions[0].name %}true{% endif %}{# Find fix versions with 'GA' or 'Beta' in the name #}",
       "method": "mean_time_between_statuses",
       "statuses": [
         "{{issue.fields.created}}",
@@ -210,7 +197,7 @@
       }
   },
   {
-    "metric_name": "jiradog.meanTimeToCloseP1P2Tickets",
+    "metric_name": "jiradog.meanTimeToCloseSupportFiledBugsP1",
     "projects": [
       "MACOSNOTE",
       "WINNOTE",
@@ -224,11 +211,39 @@
     "numerator": {
       "__comment": "Get create date for all tickets",
       "source": "jira",
-      "jql": "project={{project}} AND priority IN ('1-Critical, stop everything and fix','2-High, fix ASAP') AND resolutionDate>=startOfDay(-90d) AND issueType=Bug AND Support != Empty",
+      "jql": "project={{project}} AND priority='1-Critical, stop everything and fix' AND issueType=bug AND (resolution=unresolved OR resolved>=endOfDay(-90d)) AND support!=empty", 
       "method": "mean_time_between_statuses",
       "statuses": [
         "{{issue.fields.created}}",
-        "{{issue.fields.resolutiondate}}"
+        "{% if issue.fields.resolutiondate != None %}{{issue.fields.resolutiondate}}{% else %}{{issue.fields.updated}}{% endif %}{# If there is no resolution date, use the updated date #}"
+        ]
+      },
+    "denominator": {
+      "source": "jira",
+      "jql": "{{metric.numerator.jql}}",
+      "method": "ticket_count"
+      }
+  },
+  {
+    "metric_name": "jiradog.meanTimeToCloseSupportFiledBugsP2",
+    "projects": [
+      "MACOSNOTE",
+      "WINNOTE",
+      "ION",
+      "IOSNOTE",
+      "DRDNOTE",
+      "CE",
+      "ENB"
+      ],
+    "method": "average",
+    "numerator": {
+      "__comment": "Get create date for all tickets",
+      "source": "jira",
+      "jql": "project={{project}} AND priority='2-High, fix ASAP' AND issueType=bug AND (resolution=unresolved OR resolved>=endOfDay(-90d)) AND support!=empty", 
+      "method": "mean_time_between_statuses",
+      "statuses": [
+        "{{issue.fields.created}}",
+        "{% if issue.fields.resolutiondate != None %}{{issue.fields.resolutiondate}}{% else %}{{issue.fields.updated}}{% endif %}{# If there is no resolution date, use the updated date #}"
         ]
       },
     "denominator": {

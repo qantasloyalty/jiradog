@@ -1,6 +1,6 @@
 # jiradog
 
-Version 1.1.0
+Version 1.1.2
 A tool to poll data from JIRA to upload as a metric to DataDog.
 
 ## Prerequisites
@@ -181,6 +181,40 @@ Operators are used to join several conditions or expand on a condition.
 - Operators should be surrounded by whitespace (`x AND y`, `status NOT IN (foo,bar)`)
 - Mathmatical operators (=, !=, >, <, >=, <=, etc) should not be surrounded by whitespace (`x=4`, `assignee!=currentUser()`, `updated>=endOfDay(-90d)`)
 
+#### Jinja2
+
+None of the following styles, whether followed or not, will break script functionality.
+
+##### Spacing
+
+Lifted from the jinja2 style guide from the chromium project: https://www.chromium.org/developers/jinja#TOC-Spacing
+
+```
+  {{foo}}
+  {{foo | filter}}
+  {% for i in x|filter %}
+```
+
+> I.e., no spacing within {{}}, but do space around |, except in block control statements. This is the opposite of Jinja spec convention, which is {{ foo }} and {{ foo|filter }} – reasoning is that {{}} are functioning like parentheses or quotes, hence no spacing inside them; while | is functioning like a binary operator, like arithmetic operations, hence spaces around it. However, in block control statements | has higher precedence than the control flow keywords, and thus omitting spaces makes the precedence clearer.
+More pragmatically, {{}} is very widely used for variable substitution, hence want to keep it short and looking like a single unit, while usage of filters via | is logically complex, and thus should stick out visually, with the steps in the pipeline clearly separated. However, adding spaces within a block control statement makes it confusing, due to the spaces around the control flow keywords, and thus spaces around | should be omitted. (von Barth, "Jinja")
+
+##### Comments
+
+> If a block is long, particularly if it is nested, please add a comment at the end to help clarify which block is ending; use the same content as the if condition or for list. (von Barth, "Jinja")
+
+Example comment:
+
+```
+{# foo #}
+```
+
+## Citations
+Von Barth, N. (n.d.). Jinja. Retrieved November 09, 2017, from
+    https://www.chromium.org/developers/jinja#TOC-Spacing
+    
+Von Barth, N. (n.d.). Jinja. Retrieved November 09, 2017, from
+    https://www.chromium.org/developers/jinja#TOC-Comment-end-of-long-blocks
+
 ## Authors
 
-* **Bryce McNab** - *Initial work* - 11/07/2017
+* **Bryce McNab** - *Initial work* - 11/09/2017

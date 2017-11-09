@@ -144,7 +144,7 @@ def custom_field_sum(issues, custom_field):
                                          getattr(issue.fields, custom_field)
     return custom_field_running_total
 
-def load_metric_file(metric_file, is_args_metric_set):
+def load_metric_file(metric_file, metrics):
     """Created python dictionary from metrics.json file.
 
     Args:
@@ -157,11 +157,14 @@ def load_metric_file(metric_file, is_args_metric_set):
     """
     with open(metric_file) as metric_file_loaded:
         metric_file_full = json.load(metric_file_loaded)
-    if is_args_metric_set:
-        for metric_config in metric_file_full:
-            if metric_config['metric_name'] == is_args_metric_set:
-                metric_file_full = [metric_config]
-    return metric_file_full
+    metric_configs = metric_file_full
+    if metrics:
+        metric_configs = []
+        for requested_metric in metrics:
+            for metric in metric_file_full:
+                if requested_metric == metric['metric_name']:
+                    metric_configs.append(metric)  
+    return metric_configs
 
 
 def main():
@@ -173,6 +176,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-m', '--metric',
                         metavar='METRIC',
+                        action='append',
                         help='Run only the specific metric')
     parser.add_argument('-l', '--list',
                         help='Get a list of defined metrics',
@@ -209,8 +213,8 @@ def main():
     if args.describe:
         if args.metric:
             for metric in metric_file_full:
-                if metric['metric_name'] == args.metric:
-                    pprint(metric)
+                if args.metric in metric['metric_name']:
+                        pprint(metric)
         else:
             pprint(metric_file_full)
         sys.exit(0)
@@ -246,14 +250,16 @@ def main():
                                                             metric_data_loaded[position]['field']))
                         elif metric_data_loaded[position]['method'] == 'mean_time_between_statuses':
                             for issue in issues:
-                                m_t = mean_time_between_statuses(jinja2.Template(metric_data_loaded \
-                                                                                 [position] \
-                                                                                 ['statuses'] \
-                                                                                 [0]).render(issue=issue),
-                                                                 jinja2.Template(metric_data_loaded \
-                                                                                 [position] \
-                                                                                 ['statuses'] \
-                                                                                 [1]).render(issue=issue))
+                                first_date = jinja2.Template(metric_data_loaded \
+                                                             [position] \
+                                                             ['statuses'] \
+                                                             [0]).render(issue=issue)
+                                second_date = jinja2.Template(metric_data_loaded \
+                                                             [position] \
+                                                             ['statuses'] \
+                                                             [1]).render(issue=issue)
+                                m_t = mean_time_between_statuses(first_date,
+                                                                 second_date)
                                 total_time_between_statuses = total_time_between_statuses + m_t
                             numbers.append(total_time_between_statuses)
                     elif metric_data_loaded[position]['source'] == 'constant':
@@ -266,14 +272,14 @@ def main():
                             points = 0
 
             elif metric_data_loaded['method'] == 'direct':
-                issues = JP.get_issues(metric_data_loaded['issues']['jql'], project)
+                issues = JP.get_issues(metric_data_loaded, 'issues', project)
                 if metric_data_loaded['issues']['method'] == 'ticket_count':
                     points = len(issues)
 
         ## Construct payload for upload
             metric_data = {
                 'metric': metric_data_loaded['metric_name'],
-                'points': (time.time(), points),
+                'points': (NOW, points),
                 'tags': ["jira_project:%s" % project]
                 }
             PAYLOAD.append(metric_data)
@@ -283,10 +289,10 @@ def main():
     if args.noop:
         if not args.formatting or args.formatting == 'json':
             pprint(PAYLOAD)
-        elif args.formatting == 'jira_table' or args.formatting == 'markdown_table':
-            if args.formatting == 'jira_table':
+        elif args.formatting == 'jira' or args.formatting == 'markdown':
+            if args.formatting == 'jira':
                 print '||metric||project||points||'
-            elif args.formatting == 'markdown_table':
+            elif args.formatting == 'markdown':
                 print '|metric|project|points|'
                 print '| ----- | ----- | ----- |'
             for payload in PAYLOAD:
@@ -308,6 +314,7 @@ if __name__ == "__main__":
     HEADERS = {'Content-type': 'application/json'}
     CACHE = {}
     PAYLOAD = []
+    NOW = time.time()
 
     # Loads the configuration file for the script.
     with open(CONFIG_FILE) as config_data_file:
