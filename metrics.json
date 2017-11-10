@@ -1,6 +1,6 @@
 [
   {
-    "metric_name": "jiradog.openBugs",
+    "metric_name": "jiradog.countOpenBugs",
     "__comment": "SYS-1473",
     "projects": [
       "MACOSNOTE",
@@ -19,7 +19,7 @@
       }
   },
   {
-    "metric_name": "jiradog.commitToCloseRateOver90Days",
+    "metric_name": "jiradog.percentageCommittedIssuesToClosedIssuesPerSprint",
     "__comment": "SYS-1479",
     "projects": [
       "MACOSNOTE",
@@ -165,7 +165,7 @@
       }
   },
   {
-    "metric_name": "jiradog.meanTimeToCloseFeaturesToProd",
+    "metric_name": "jiradog.meanTimeToCloseStoriesToProd",
     "__comment": "SYS-1634",
     "projects": [
       "MACOSNOTE",
@@ -253,7 +253,7 @@
       }
   },
   {
-    "metric_name": "jiradog.numberOfBugsReopened",
+    "metric_name": "jiradog.percentageReopenedBugsToAllBugs",
     "__comment": "SYS-1633",
     "projects": [
       "MACOSNOTE",
@@ -277,7 +277,7 @@
       }
   },
   {
-    "metric_name": "jiradog.percentageIssuesP1P2",
+    "metric_name": "jiradog.percentageIssuesP1P2ToAllIssues",
     "__comment": "SYS-1476",
     "projects": [
       "MACOSNOTE",
@@ -303,7 +303,7 @@
       }
   },
   {
-    "metric_name":"jiradog.percentageStoryPointsInBugs",
+    "metric_name": "jiradog.percentageBugStoryPointsToAllStoryPoints",
     "__comment": "SYS-1475",
     "projects": [
       "MACOSNOTE",
@@ -331,7 +331,7 @@
       }
   },
   {
-    "metric_name":"jiradog.percentageStoryPointsInFeatures",
+    "metric_name": "jiradog.percentageStoryStoryPointsToAllStoryPoints",
     "__comment": "SYS-1475",
     "projects": [
       "MACOSNOTE",
@@ -359,7 +359,7 @@
       }
   },
   {
-    "metric_name": "jiradog.percentageRegressionBugs",
+    "metric_name": "jiradog.percentageRegressionBugsToAllBugs",
     "projects": [
       "MACOSNOTE",
       "WINNOTE",
@@ -496,7 +496,7 @@
       }
   },
   {
-    "metric_name": "jiradog.bugsIntroducedVSBugsFixed",
+    "metric_name": "jiradog.percentageNewBugsToFixedBugs",
     "projects": [
       "MACOSNOTE",
       "WINNOTE",

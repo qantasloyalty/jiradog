@@ -154,7 +154,10 @@ None of the following styles, whether followed or not, will break script functio
 
 ##### Whitespace
 Here is a correctly styled JQL query.
-`project={{project}} AND issuetype=Bug AND status NOT IN (Done,Resolved,Closed)`
+
+```
+project={{project}} AND issuetype=Bug AND status NOT IN (Done,Resolved,Closed)
+```
 
 The 'official' whitespace rules are:
 
@@ -208,6 +211,32 @@ Example comment:
 {# foo #}
 ```
 
+### Naming Conventions
+
+This is the jiradog way to name metrics for DataDog
+
+```
+source.[mean[TimeToClose|Age]|percentage|count][Variable 1][Variable 2][Group By]
+```
+
+- source
+  - This is the name of the script: `jiradog`
+- mean[TimeToClose|Age]|percentage|count]
+  - The 3 supported methods of jiradog.
+  - Every metric should state it's method.
+  - percentage should have `To` between the variables
+    - e.g. percentageCommittedIssuesToClosedIssues
+- [Variable 1]
+  - In metrics that have numerators, this is the numerator.
+  - End the variable with the priority of the issue if applicable.
+  - Typically this is the issue type: Bugs, Stories, Tasks, etc.
+  - e.g. UnresolvedBugsP1, OpenStories
+- [Variable 2]
+  - In metrics that have a denominator, this is the denominator
+- [Group By]
+  - If issues are grouped together, specify here.
+  - e.g. PerSprint, PerWeek
+
 ## Citations
 Von Barth, N. (n.d.). Jinja. Retrieved November 09, 2017, from
     https://www.chromium.org/developers/jinja#TOC-Spacing
@@ -217,4 +246,4 @@ Von Barth, N. (n.d.). Jinja. Retrieved November 09, 2017, from
 
 ## Authors
 
-* **Bryce McNab** - *Initial work* - 11/09/2017
+* **Bryce McNab** - *Initial work* - 11/10/2017
