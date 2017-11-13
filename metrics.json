@@ -269,12 +269,12 @@
     "method": "average",
     "numerator": {
       "source": "jira",
-      "jql": "project={{project}} AND issueType=Bug AND updated>endOfDay(-90d) AND status WAS Reopened",
+      "jql": "project={{project}} AND issueType=Bug AND status WAS Reopened DURING (endOfDay(-90d), endOfDay())",
       "method": "ticket_count"
       },
     "denominator": {
       "source": "jira",
-      "jql": "project={{project}} AND issueType=Bug AND updated>endOfDay(-90d) AND (status WAS Reopened OR status IN (Done,Resolved,Closed))",
+      "jql": "project={{project}} AND issueType=Bug AND (created>endOfDay(-90d) OR status WAS Reopened DURING (endOfDay(-90d), endOfDay()))",
       "method": "ticket_count"
       }
   },
@@ -553,7 +553,7 @@
       },
     "denominator": {
       "source": "jira",
-      "jql": "project={{project}} AND sprint={{sprint}}",
+      "jql": "project={{project}} AND sprint={{sprint_id}}",
       "method": "ticket_count"
       },
     "grouping": {

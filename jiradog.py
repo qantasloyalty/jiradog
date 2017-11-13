@@ -50,38 +50,41 @@ class JiraProvider(object):
         ## If/then statement failed, so I want to find  ##
         ## a way to not have to run the jinja statement ##
         ## 2 times.                                     ##
-        if metric_data_loaded.get(position, False).get('grouping', False) != False:
-            sprint_ids = get_sprints(metric_data_loaded, position)
+        if metric_data_loaded.get('grouping', False) != False:
+            sprint_ids = self.get_sprints(metric_data_loaded, position, project)
             queries = []
             for sprint_id in sprint_ids:
-                queries.append(jql_rendered = jinja2.Template(jinja2.Template(metric_data_loaded \
-                                                                              [position] \
-                                                                              ['jql']).render(project=project,
-                                                                                              metric=metric_data_loaded,
-                                                                                              sprint_id=sprint_id)).render(project=project,
-                                                                                                                          sprint_id=sprint_id))
+                queries.append(jinja2.Template(jinja2.Template(metric_data_loaded \
+                                                               [position] \
+                                                               ['jql']).render(project=project,
+                                                                               metric=metric_data_loaded,
+                                                                               sprint_id=sprint_id)).render(project=project,
+                                                                                                            sprint_id=sprint_id))
+            print queries
+            sys.exit(0)
         else:
-            jql_rendered = jinja2.Template(jinja2.Template(metric_data_loaded \
+            queries = [jinja2.Template(jinja2.Template(metric_data_loaded \
                                                            [position] \
                                                            ['jql']).render(project=project,
-                                                                           metric=metric_data_loaded)).render(project=project)
-        jql_sha512 = hashlib.sha512(jql_rendered).hexdigest()
-        if CACHE.get(jql_sha512, False):
-            logging.info("Using cached version of query and results")
-            issues = CACHE[jql_sha512]
-        else:
-            logging.info("Adding query and results to cache")
-            search = self.jira.search_issues(jql_rendered, maxResults=max_results, startAt=0)
-            for issue in search:
-                issues.append(issue)
-            while len(search) == 100:
-                search = self.jira.search_issues(jql_rendered, maxResults=max_results, startAt=start_at)
+                                                                           metric=metric_data_loaded)).render(project=project)]
+        for query in queries:
+            jql_sha512 = hashlib.sha512(query).hexdigest()
+            if CACHE.get(jql_sha512, False):
+                logging.info("Using cached version of query and results")
+                issues = CACHE[jql_sha512]
+            else:
+                logging.info("Adding query and results to cache")
+                search = self.jira.search_issues(query, maxResults=max_results, startAt=0)
                 for issue in search:
                     issues.append(issue)
-                start_at = start_at + max_results
-            if metric_data_loaded.get(position, False).get('filter', False) != False:
-                issues = self.filter_issues(metric_data_loaded, issues, position)
-            CACHE[jql_sha512] = issues
+                while len(search) == 100:
+                    search = self.jira.search_issues(query, maxResults=max_results, startAt=start_at)
+                    for issue in search:
+                        issues.append(issue)
+                    start_at = start_at + max_results
+                if metric_data_loaded.get(position, False).get('filter', False) != False:
+                    issues = self.filter_issues(metric_data_loaded, issues, position)
+                CACHE[jql_sha512] = issues
         return issues
 
     @classmethod
@@ -106,24 +109,26 @@ class JiraProvider(object):
         return filtered_issues
 
     @classmethod
-    def get_sprints(cls, metric_data_loaded, position):
+    def get_sprints(cls, metric_data_loaded, position, project):
         sprints = []
         sprint_ids = []
         max_results = 50
         start_at = max_results
         url = 'https://evernote.jira.com/rest/agile/1.0/board/' + \
-              metric_data_loaded[position]['sprints']['board'] + \
+              metric_data_loaded['grouping']['boards'][project] + \
               '/sprint?maxResults=' + \
-              max_results
-        search = requests.get(url + '&startAt=0', auth=(API_USERNAME, API_PASSWORD)).json
-        sprints = search['values']
-        while search['isLast'] == False:
-            search = requests.get(url + '&startAt=' + start_at, auth=(API_USERNAME, API_PASSWORD)).json
-            sprints.append(search['values'])
-            start_at = start_at + max_results
-        for sprint in sprints:
+              str(max_results)
+        search = json.loads(requests.get(url + '&startAt=0', auth=(API_USERNAME, API_PASSWORD)).text)
+        for sprint in search['values']:
             sprint_ids.append(sprint['id'])
-        return sprint_ids[metric_data_loaded['grouping']['last']:]
+        while search['isLast'] == False:
+            search = json.loads(requests.get(url + '&startAt=' + str(start_at), auth=(API_USERNAME, API_PASSWORD)).text)
+            for sprint in search['values']:
+                sprint_ids.append(sprint['id'])
+            start_at = start_at + max_results
+        sprint_ids.sort(key=int)
+        print sprint_ids[int(metric_data_loaded['grouping']['count']):]
+        return sprint_ids[int(metric_data_loaded['grouping']['count']):]
 
 def mean_time_between_statuses(first_date, second_date):
     """Calculates the length of time between two statuses
