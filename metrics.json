@@ -9,7 +9,8 @@
       "IOSNOTE",
       "DRDNOTE",
       "CE",
-      "ENB"
+      "ENB",
+      "CORENOTE"
       ],
     "method": "direct",
     "issues": {
@@ -19,7 +20,7 @@
       }
   },
   {
-    "metric_name": "jiradog.percentageCommittedIssuesToClosedIssuesPerSprint",
+    "metric_name": "jiradog.percentCommittedIssuesToClosedIssuesPerSprint",
     "__comment": "SYS-1479",
     "projects": [
       "MACOSNOTE",
@@ -28,28 +29,21 @@
       "IOSNOTE",
       "DRDNOTE",
       "CE",
-      "ENB"
+      "ENB",
+      "CORENOTE"
       ],
     "method": "average",
     "numerator": {
       "__comment": "Get all issues updated the last 90 days, that were in a sprint, and are not completed",
       "source": "jira",
       "jql": "{{metric.denominator.jql}} AND status IN (Done,Resolved,Closed)",
-      "method": "ticket_count",
-      "group_by": {
-        "key": "sprint",
-        "board_ids": {
-          "MACOSNOTE": 368
-          },
-        "last": 6
-        }
+      "method": "ticket_count"
       },
     "denominator": {
       "__comment": "Get all issues updated the last 90 days, that were in a sprint",
       "source": "jira",
       "jql": "project={{project}} AND sprint IN (closedSprints()) AND updated>endOfDay(-90d)",
-      "method": "ticket_count",
-      "group_by": "{{metric.numerator.group_by}}"
+      "method": "ticket_count"
       }
   },
   {
@@ -62,7 +56,8 @@
       "IOSNOTE",
       "DRDNOTE",
       "CE",
-      "ENB"
+      "ENB",
+      "CORENOTE"
       ],
     "method": "average",
     "numerator": {
@@ -90,7 +85,8 @@
       "IOSNOTE",
       "DRDNOTE",
       "CE",
-      "ENB"
+      "ENB",
+      "CORENOTE"
       ],
     "method": "average",
     "numerator": {
@@ -118,7 +114,8 @@
       "IOSNOTE",
       "DRDNOTE",
       "CE",
-      "ENB"
+      "ENB",
+      "CORENOTE"
       ],
     "method": "average",
     "numerator": {
@@ -146,7 +143,8 @@
       "IOSNOTE",
       "DRDNOTE",
       "CE",
-      "ENB"
+      "ENB",
+      "CORENOTE"
       ],
     "method": "average",
     "numerator": {
@@ -174,7 +172,8 @@
       "IOSNOTE",
       "DRDNOTE",
       "CE",
-      "ENB"
+      "ENB",
+      "CORENOTE"
       ],
     "method": "average",
     "numerator": {
@@ -205,7 +204,8 @@
       "IOSNOTE",
       "DRDNOTE",
       "CE",
-      "ENB"
+      "ENB",
+      "CORENOTE"
       ],
     "method": "average",
     "numerator": {
@@ -233,7 +233,8 @@
       "IOSNOTE",
       "DRDNOTE",
       "CE",
-      "ENB"
+      "ENB",
+      "CORENOTE"
       ],
     "method": "average",
     "numerator": {
@@ -253,7 +254,7 @@
       }
   },
   {
-    "metric_name": "jiradog.percentageReopenedBugsToAllBugs",
+    "metric_name": "jiradog.percentReopenedBugsToAllBugs",
     "__comment": "SYS-1633",
     "projects": [
       "MACOSNOTE",
@@ -262,7 +263,8 @@
       "IOSNOTE",
       "DRDNOTE",
       "CE",
-      "ENB"
+      "ENB",
+      "CORENOTE"
       ],
     "method": "average",
     "numerator": {
@@ -277,7 +279,7 @@
       }
   },
   {
-    "metric_name": "jiradog.percentageIssuesP1P2ToAllIssues",
+    "metric_name": "jiradog.percentIssuesP1P2ToAllIssues",
     "__comment": "SYS-1476",
     "projects": [
       "MACOSNOTE",
@@ -286,7 +288,8 @@
       "IOSNOTE",
       "DRDNOTE",
       "CE",
-      "ENB"
+      "ENB",
+      "CORENOTE"
       ],
     "method": "average",
     "numerator": {
@@ -303,7 +306,7 @@
       }
   },
   {
-    "metric_name": "jiradog.percentageBugStoryPointsToAllStoryPoints",
+    "metric_name": "jiradog.percentBugStoryPointsToAllStoryPoints",
     "__comment": "SYS-1475",
     "projects": [
       "MACOSNOTE",
@@ -312,7 +315,8 @@
       "IOSNOTE",
       "DRDNOTE",
       "CE",
-      "ENB"
+      "ENB",
+      "CORENOTE"
       ],
     "method": "average",
     "numerator": {
@@ -331,7 +335,7 @@
       }
   },
   {
-    "metric_name": "jiradog.percentageStoryStoryPointsToAllStoryPoints",
+    "metric_name": "jiradog.percentStoryStoryPointsToAllStoryPoints",
     "__comment": "SYS-1475",
     "projects": [
       "MACOSNOTE",
@@ -340,7 +344,8 @@
       "IOSNOTE",
       "DRDNOTE",
       "CE",
-      "ENB"
+      "ENB",
+      "CORENOTE"
       ],
     "method": "average",
     "numerator": {
@@ -359,7 +364,7 @@
       }
   },
   {
-    "metric_name": "jiradog.percentageRegressionBugsToAllBugs",
+    "metric_name": "jiradog.percentRegressionBugsToAllBugs",
     "projects": [
       "MACOSNOTE",
       "WINNOTE",
@@ -367,7 +372,8 @@
       "IOSNOTE",
       "DRDNOTE",
       "CE",
-      "ENB"
+      "ENB",
+      "CORENOTE"
       ],
     "method": "average",
     "numerator": {
@@ -392,7 +398,8 @@
       "IOSNOTE",
       "DRDNOTE",
       "CE",
-      "ENB"
+      "ENB",
+      "CORENOTE"
       ],
     "method": "average",
     "numerator": {
@@ -420,7 +427,8 @@
       "IOSNOTE",
       "DRDNOTE",
       "CE",
-      "ENB"
+      "ENB",
+      "CORENOTE"
       ],
     "method": "average",
     "numerator": {
@@ -448,7 +456,8 @@
       "IOSNOTE",
       "DRDNOTE",
       "CE",
-      "ENB"
+      "ENB",
+      "CORENOTE"
       ],
     "method": "average",
     "numerator": {
@@ -476,7 +485,8 @@
       "IOSNOTE",
       "DRDNOTE",
       "CE",
-      "ENB"
+      "ENB",
+      "COTENOTE"
       ],
     "method": "average",
     "numerator": {
@@ -496,7 +506,7 @@
       }
   },
   {
-    "metric_name": "jiradog.percentageNewBugsToFixedBugs",
+    "metric_name": "jiradog.percentNewBugsToFixedBugs",
     "projects": [
       "MACOSNOTE",
       "WINNOTE",
@@ -504,7 +514,8 @@
       "IOSNOTE",
       "DRDNOTE",
       "CE",
-      "ENB"
+      "ENB",
+      "CORENOTE"
       ],
     "method": "average",
     "numerator": {
@@ -518,6 +529,45 @@
       "source": "jira",
       "jql": "project={{project}} AND issueType=Bug AND resolved>=endOfDay(-90d)",
       "method": "ticket_count"
+      }
+  },
+  {
+    "metric_name": "jiradog.percentResolvedIssuesPerSprint",
+    "__comment": "SYS-1717",
+    "projects": [
+      "MACOSNOTE",
+      "WINNOTE",
+      "ION",
+      "IOSNOTE",
+      "DRDNOTE",
+      "CE",
+      "ENB",
+      "CORENOTE"
+      ],
+    "method": "average",
+    "numerator": {
+      "__comment": "Find all issues that were done at the end of the sprint",
+      "source": "jira",
+      "jql": "{{metric.denominator.jql}} AND resolution!=unresolved",
+      "method": "ticket_count"
+      },
+    "denominator": {
+      "source": "jira",
+      "jql": "project={{project}} AND sprint={{sprint}}",
+      "method": "ticket_count"
+      },
+    "grouping": {
+      "by": "sprint",
+      "count": "-6",
+      "boards": {
+        "MACOSNOTE": "368",
+        "WINNOTE": "",
+        "ION": "398",
+        "IOSNOTE": "325",
+        "DRDNOTE": "72",
+        "CE": "270",
+        "ENB": "536"
+        }
       }
   }
 ]

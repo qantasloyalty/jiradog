@@ -50,8 +50,21 @@ class JiraProvider(object):
         ## If/then statement failed, so I want to find  ##
         ## a way to not have to run the jinja statement ##
         ## 2 times.                                     ##
-        jql_rendered = jinja2.Template(jinja2.Template(metric_data_loaded[position]['jql']).render(project=project,
-                                                                                                   metric=metric_data_loaded)).render(project=project)
+        if metric_data_loaded.get(position, False).get('grouping', False) != False:
+            sprint_ids = get_sprints(metric_data_loaded, position)
+            queries = []
+            for sprint_id in sprint_ids:
+                queries.append(jql_rendered = jinja2.Template(jinja2.Template(metric_data_loaded \
+                                                                              [position] \
+                                                                              ['jql']).render(project=project,
+                                                                                              metric=metric_data_loaded,
+                                                                                              sprint_id=sprint_id)).render(project=project,
+                                                                                                                          sprint_id=sprint_id))
+        else:
+            jql_rendered = jinja2.Template(jinja2.Template(metric_data_loaded \
+                                                           [position] \
+                                                           ['jql']).render(project=project,
+                                                                           metric=metric_data_loaded)).render(project=project)
         jql_sha512 = hashlib.sha512(jql_rendered).hexdigest()
         if CACHE.get(jql_sha512, False):
             logging.info("Using cached version of query and results")
@@ -95,6 +108,7 @@ class JiraProvider(object):
     @classmethod
     def get_sprints(cls, metric_data_loaded, position):
         sprints = []
+        sprint_ids = []
         max_results = 50
         start_at = max_results
         url = 'https://evernote.jira.com/rest/agile/1.0/board/' + \
@@ -107,7 +121,9 @@ class JiraProvider(object):
             search = requests.get(url + '&startAt=' + start_at, auth=(API_USERNAME, API_PASSWORD)).json
             sprints.append(search['values'])
             start_at = start_at + max_results
-        return sprints
+        for sprint in sprints:
+            sprint_ids.append(sprint['id'])
+        return sprint_ids[metric_data_loaded['grouping']['last']:]
 
 def mean_time_between_statuses(first_date, second_date):
     """Calculates the length of time between two statuses

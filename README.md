@@ -216,7 +216,7 @@ Example comment:
 This is the jiradog way to name metrics for DataDog
 
 ```
-source.[mean[TimeToClose|Age]|percentage|count][Variable 1][Variable 2][Group By]
+source.[mean[TimeToClose|Age]|percent|count][Variable 1][Variable 2][Group By]
 ```
 
 - source
