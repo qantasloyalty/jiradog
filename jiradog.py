@@ -17,9 +17,9 @@ import json
 import time
 import logging
 import os
-import requests
 from pprint import pprint
 import hashlib
+import requests
 import jinja2
 from datadog import initialize, api
 from jira import JIRA
@@ -51,7 +51,7 @@ class JiraProvider(object):
         ## a way to not have to run the jinja statement ##
         ## 2 times.                                     ##
         if metric_data_loaded.get('grouping', False) != False:
-            sprint_ids = self.get_sprints(metric_data_loaded, position, project)
+            sprint_ids = self.get_sprints(metric_data_loaded, project)
             queries = []
             for sprint_id in sprint_ids:
                 queries.append(jinja2.Template(jinja2.Template(metric_data_loaded \
@@ -78,7 +78,9 @@ class JiraProvider(object):
                 for issue in search:
                     issues.append(issue)
                 while len(search) == 100:
-                    search = self.jira.search_issues(query, maxResults=max_results, startAt=start_at)
+                    search = self.jira.search_issues(query,
+                                                     maxResults=max_results,
+                                                     startAt=start_at)
                     for issue in search:
                         issues.append(issue)
                     start_at = start_at + max_results
@@ -109,8 +111,16 @@ class JiraProvider(object):
         return filtered_issues
 
     @classmethod
-    def get_sprints(cls, metric_data_loaded, position, project):
-        sprints = []
+    def get_sprints(cls, metric_data_loaded, project):
+        """Retrieves a list of sprint ids from a board.
+
+        Args:
+            metric_data_loaded:	Dictionary	JSON object from the metric config block.
+            project:		Stirng		JIRA project key.
+
+        Returns:
+            List of integers that are the ids of JIRA sprints.
+        """
         sprint_ids = []
         max_results = 50
         start_at = max_results
@@ -118,11 +128,15 @@ class JiraProvider(object):
               metric_data_loaded['grouping']['boards'][project] + \
               '/sprint?maxResults=' + \
               str(max_results)
-        search = json.loads(requests.get(url + '&startAt=0', auth=(API_USERNAME, API_PASSWORD)).text)
+        search = json.loads(requests.get(url,
+                                         auth=(API_USERNAME,
+                                               API_PASSWORD)).text)
         for sprint in search['values']:
             sprint_ids.append(sprint['id'])
-        while search['isLast'] == False:
-            search = json.loads(requests.get(url + '&startAt=' + str(start_at), auth=(API_USERNAME, API_PASSWORD)).text)
+        while search['isLast'] is False:
+            search = json.loads(requests.get(url + '&startAt=' + str(start_at),
+                                             auth=(API_USERNAME,
+                                                   API_PASSWORD)).text)
             for sprint in search['values']:
                 sprint_ids.append(sprint['id'])
             start_at = start_at + max_results
@@ -130,16 +144,25 @@ class JiraProvider(object):
         print sprint_ids[int(metric_data_loaded['grouping']['count']):]
         return sprint_ids[int(metric_data_loaded['grouping']['count']):]
 
-def mean_time_between_statuses(first_date, second_date):
-    """Calculates the length of time between two statuses
+def mean_time_between_statuses(metric_data_loaded, position, issue):
+    """Calculates the length of time between two statuses in an issue.
 
     Args:
-        first_date:	String	A simple string of the start date in the format '%Y-%m-%dT%H:%M:%S'
-        second_date:	String	A simple string of the end date in the format '%Y-%m-%dT%H:%M:%S'
+        metric_data_loaded:	Dictionary	The metric configuration JSON block.
+        position:		String		Either 'numerator' or 'denominator'.
+        issue:			Dictionary	The JSON block of the issue.
 
     Returns:
         Floating point number in days
     """
+    first_date = jinja2.Template(metric_data_loaded \
+                                 [position] \
+                                 ['statuses'] \
+                                 [0]).render(issue=issue)
+    second_date = jinja2.Template(metric_data_loaded \
+                                  [position] \
+                                  ['statuses'] \
+                                  [1]).render(issue=issue)
     first_date_sec = time.strptime(first_date.split('.')[0], '%Y-%m-%dT%H:%M:%S')
     second_date_sec = time.strptime(second_date.split('.')[0], '%Y-%m-%dT%H:%M:%S')
     return (time.mktime(second_date_sec) - time.mktime(first_date_sec)) / (60 * 60 * 24)
@@ -184,7 +207,7 @@ def load_metric_file(metric_file, metrics):
         for requested_metric in metrics:
             for metric in metric_file_full:
                 if requested_metric == metric['metric_name']:
-                    metric_configs.append(metric)  
+                    metric_configs.append(metric)
     return metric_configs
 
 
@@ -203,7 +226,7 @@ def main():
                         help='Get a list of defined metrics',
                         action='store_true')
     parser.add_argument('-n', '--noop',
-                        help='Outputs the payload to stdin, does not upload. Default format is JSON',
+                        help='Outputs the payload to stdin, does not upload. Default: JSON',
                         action='store_true')
     parser.add_argument('-f', '--formatting',
                         help='Specifies output format, default is JSON',
@@ -235,7 +258,7 @@ def main():
         if args.metric:
             for metric in metric_file_full:
                 if args.metric in metric['metric_name']:
-                        pprint(metric)
+                    pprint(metric)
         else:
             pprint(metric_file_full)
         sys.exit(0)
@@ -271,16 +294,9 @@ def main():
                                                             metric_data_loaded[position]['field']))
                         elif metric_data_loaded[position]['method'] == 'mean_time_between_statuses':
                             for issue in issues:
-                                first_date = jinja2.Template(metric_data_loaded \
-                                                             [position] \
-                                                             ['statuses'] \
-                                                             [0]).render(issue=issue)
-                                second_date = jinja2.Template(metric_data_loaded \
-                                                             [position] \
-                                                             ['statuses'] \
-                                                             [1]).render(issue=issue)
-                                m_t = mean_time_between_statuses(first_date,
-                                                                 second_date)
+                                m_t = mean_time_between_statuses(metric_data_loaded,
+                                                                 position,
+                                                                 issue)
                                 total_time_between_statuses = total_time_between_statuses + m_t
                             numbers.append(total_time_between_statuses)
                     elif metric_data_loaded[position]['source'] == 'constant':
@@ -317,7 +333,21 @@ def main():
                 print '|metric|project|points|'
                 print '| ----- | ----- | ----- |'
             for payload in PAYLOAD:
-                print '|' + payload['metric'] + '|' + payload['tags'][0] + '|' + str(payload['points'][1]) + '|'
+                print '|' + \
+                      payload['metric'] + \
+                      '|' + \
+                      payload['tags'][0] + \
+                      '|' + \
+                      str(payload['points'][1]) + \
+                      '|'
+        elif args.formatting == 'csv':
+            print 'metric,project,points'
+            for payload in PAYLOAD:
+                print payload['metric'] + \
+                      ',' + \
+                      payload['tags'][0] + \
+                      ',' + \
+                      str(payload['points'][1])
     else:
         # Upload to DataDog
         api.Metric.send(PAYLOAD)
