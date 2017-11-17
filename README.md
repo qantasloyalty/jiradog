@@ -1,6 +1,6 @@
 # jiradog
 
-Version 1.1.2
+Version 1.2.1
 A tool to poll data from JIRA to upload as a metric to DataDog.
 
 ## Prerequisites
@@ -213,19 +213,24 @@ Example comment:
 
 ### Naming Conventions
 
-This is the jiradog way to name metrics for DataDog
+This is the jiradog way to name metrics for DataDog, using a similar psuedo-heirarchical dot list that the DataDog agent uses.
 
 ```
-source.[mean[TimeToClose|Age]|percent|count][Variable 1][Variable 2][Group By]
+source.[[Variable 1][Variable 2].[Group By]].[mean[timeToClose|Age]|percent|count]
 ```
+
+- e.g.
+  - jiradog.openBugs.count
+  - jiradog.bugsP1.meanTimeToClose
+  - jiradog.reopenedBugsToAllBugs.percent
 
 - source
   - This is the name of the script: `jiradog`
-- mean[TimeToClose|Age]|percentage|count]
+- mean[TimeToClose|Age]|percent|count]
   - The 3 supported methods of jiradog.
   - Every metric should state it's method.
   - percentage should have `To` between the variables
-    - e.g. percentageCommittedIssuesToClosedIssues
+    - e.g. jiradog.reopenedBugsToAllBugs.percent
 - [Variable 1]
   - In metrics that have numerators, this is the numerator.
   - End the variable with the priority of the issue if applicable.
@@ -246,4 +251,4 @@ Von Barth, N. (n.d.). Jinja. Retrieved November 09, 2017, from
 
 ## Authors
 
-* **Bryce McNab** - *Initial work* - 11/10/2017
+* **Bryce McNab** - *Initial work* - 11/17/2017

@@ -10,7 +10,8 @@
       "DRDNOTE",
       "CE",
       "ENB",
-      "CORENOTE"
+      "CORENOTE",
+      "CLIPPER"
       ],
     "method": "direct",
     "issues": {
@@ -30,7 +31,8 @@
       "DRDNOTE",
       "CE",
       "ENB",
-      "CORENOTE"
+      "CORENOTE",
+      "CLIPPER"
       ],
     "method": "average",
     "numerator": {
@@ -57,7 +59,8 @@
       "DRDNOTE",
       "CE",
       "ENB",
-      "CORENOTE"
+      "CORENOTE",
+      "CLIPPER"
       ],
     "method": "average",
     "numerator": {
@@ -86,7 +89,8 @@
       "DRDNOTE",
       "CE",
       "ENB",
-      "CORENOTE"
+      "CORENOTE",
+      "CLIPPER"
       ],
     "method": "average",
     "numerator": {
@@ -115,7 +119,8 @@
       "DRDNOTE",
       "CE",
       "ENB",
-      "CORENOTE"
+      "CORENOTE",
+      "CLIPPER"
       ],
     "method": "average",
     "numerator": {
@@ -144,7 +149,8 @@
       "DRDNOTE",
       "CE",
       "ENB",
-      "CORENOTE"
+      "CORENOTE",
+      "CLIPPER"
       ],
     "method": "average",
     "numerator": {
@@ -173,7 +179,8 @@
       "DRDNOTE",
       "CE",
       "ENB",
-      "CORENOTE"
+      "CORENOTE",
+      "CLIPPER"
       ],
     "method": "average",
     "numerator": {
@@ -205,7 +212,8 @@
       "DRDNOTE",
       "CE",
       "ENB",
-      "CORENOTE"
+      "CORENOTE",
+      "CLIPPER"
       ],
     "method": "average",
     "numerator": {
@@ -234,7 +242,8 @@
       "DRDNOTE",
       "CE",
       "ENB",
-      "CORENOTE"
+      "CORENOTE",
+      "CLIPPER"
       ],
     "method": "average",
     "numerator": {
@@ -264,7 +273,8 @@
       "DRDNOTE",
       "CE",
       "ENB",
-      "CORENOTE"
+      "CORENOTE",
+      "CLIPPER"
       ],
     "method": "average",
     "numerator": {
@@ -289,7 +299,8 @@
       "DRDNOTE",
       "CE",
       "ENB",
-      "CORENOTE"
+      "CORENOTE",
+      "CLIPPER"
       ],
     "method": "average",
     "numerator": {
@@ -316,7 +327,8 @@
       "DRDNOTE",
       "CE",
       "ENB",
-      "CORENOTE"
+      "CORENOTE",
+      "CLIPPER"
       ],
     "method": "average",
     "numerator": {
@@ -373,7 +385,8 @@
       "DRDNOTE",
       "CE",
       "ENB",
-      "CORENOTE"
+      "CORENOTE",
+      "CLIPPER"
       ],
     "method": "average",
     "numerator": {
@@ -399,7 +412,8 @@
       "DRDNOTE",
       "CE",
       "ENB",
-      "CORENOTE"
+      "CORENOTE",
+      "CLIPPER"
       ],
     "method": "average",
     "numerator": {
@@ -428,7 +442,8 @@
       "DRDNOTE",
       "CE",
       "ENB",
-      "CORENOTE"
+      "CORENOTE",
+      "CLIPPER"
       ],
     "method": "average",
     "numerator": {
@@ -457,7 +472,8 @@
       "DRDNOTE",
       "CE",
       "ENB",
-      "CORENOTE"
+      "CORENOTE",
+      "CLIPPER"
       ],
     "method": "average",
     "numerator": {
@@ -486,7 +502,8 @@
       "DRDNOTE",
       "CE",
       "ENB",
-      "COTENOTE"
+      "COTENOTE",
+      "CLIPPER"
       ],
     "method": "average",
     "numerator": {
@@ -515,7 +532,8 @@
       "DRDNOTE",
       "CE",
       "ENB",
-      "CORENOTE"
+      "CORENOTE",
+      "CLIPPER"
       ],
     "method": "average",
     "numerator": {
@@ -542,7 +560,8 @@
       "DRDNOTE",
       "CE",
       "ENB",
-      "CORENOTE"
+      "CORENOTE",
+      "CLIPPER"
       ],
     "method": "average",
     "numerator": {
@@ -567,7 +586,8 @@
         "DRDNOTE": "72",
         "CE": "270",
         "ENB": "536",
-        "CORENOTE": "420"
+        "CORENOTE": "420",
+        "CLIPPER": "334"
         }
       }
   }

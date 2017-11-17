@@ -152,9 +152,7 @@ class JiraProvider(object):
         for sprint in sprints:
             if sprint['id'] in last_N_sprints:
                 sprint_ids_with_end_date[str(sprint['id'])] = time.strftime('%Y-%m-%d %I:%M',
-                                                                            time.strptime(sprint \
-                                                                                          ['endDate'].split('.')[0],
-                                                                                          '%Y-%m-%dT%H:%M:%S'))
+                                                                            pretty_date(sprint['endDate']))
         return sprint_ids_with_end_date                
 
 def mean_time_between_statuses(metric_data_loaded, position, issue):
@@ -176,9 +174,12 @@ def mean_time_between_statuses(metric_data_loaded, position, issue):
                                   [position] \
                                   ['statuses'] \
                                   [1]).render(issue=issue)
-    first_date_sec = time.strptime(first_date.split('.')[0], '%Y-%m-%dT%H:%M:%S')
-    second_date_sec = time.strptime(second_date.split('.')[0], '%Y-%m-%dT%H:%M:%S')
-    return (time.mktime(second_date_sec) - time.mktime(first_date_sec)) / (60 * 60 * 24)
+    return (time.mktime(pretty_date(second_date)) - \
+           time.mktime(pretty_date(first_date))) / \
+           (60 * 60 * 24)
+
+def pretty_date(date):
+    return time.strptime(date.split('.')[0], '%Y-%m-%dT%H:%M:%S')
 
 def custom_field_sum(issues, custom_field):
     """Sums custom field values together.
@@ -217,7 +218,7 @@ def load_metric_file(metric_file, metrics):
             logging.error(METRIC_JSON + ' ' + 'is not properly formatted using the JSON specification')
             print METRIC_JSON + ' ' + 'is not properly formatted using the JSON specification'
             sys.exit(1)
-    metric_configr = metric_file_full
+    metric_configs = metric_file_full
     if metrics:
         metric_configs = []
         for requested_metric in metrics:
@@ -371,7 +372,7 @@ def main():
 
 if __name__ == "__main__":
     # Setting important variables, all static.
-    VERSION = '1.1.2'
+    VERSION = '1.2.1'
     FUNCTION_MAP = {
         'mean_time_between_statuses': mean_time_between_statuses,
         'custom_field_sum': custom_field_sum
