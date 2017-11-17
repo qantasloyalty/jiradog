@@ -548,7 +548,7 @@
     "numerator": {
       "__comment": "Find all issues that were done at the end of the sprint",
       "source": "jira",
-      "jql": "{{metric.denominator.jql}} AND resolution!=unresolved",
+      "jql": "{{metric.denominator.jql}} AND status WAS NOT IN (closed,done,resolved) BEFORE '{{sprint_end_date}}'",
       "method": "ticket_count"
       },
     "denominator": {
@@ -561,12 +561,13 @@
       "count": "-6",
       "boards": {
         "MACOSNOTE": "368",
-        "WINNOTE": "",
+        "WINNOTE": "185",
         "ION": "398",
         "IOSNOTE": "325",
         "DRDNOTE": "72",
         "CE": "270",
-        "ENB": "536"
+        "ENB": "536",
+        "CORENOTE": "420"
         }
       }
   }

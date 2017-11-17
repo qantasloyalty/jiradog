@@ -50,18 +50,18 @@ class JiraProvider(object):
         ## If/then statement failed, so I want to find  ##
         ## a way to not have to run the jinja statement ##
         ## 2 times.                                     ##
-        if metric_data_loaded.get('grouping', False) != False:
+        if metric_data_loaded.get('grouping', False) is not False:
             sprint_ids = self.get_sprints(metric_data_loaded, project)
             queries = []
-            for sprint_id in sprint_ids:
+            for key, value in sprint_ids.iteritems():
                 queries.append(jinja2.Template(jinja2.Template(metric_data_loaded \
                                                                [position] \
                                                                ['jql']).render(project=project,
                                                                                metric=metric_data_loaded,
-                                                                               sprint_id=sprint_id)).render(project=project,
-                                                                                                            sprint_id=sprint_id))
-            print queries
-            sys.exit(0)
+                                                                               sprint_id=key,
+                                                                               sprint_end_date=value)).render(project=project,
+                                                                                                            sprint_id=key,
+                                                                                                            sprint_end_date=value))
         else:
             queries = [jinja2.Template(jinja2.Template(metric_data_loaded \
                                                            [position] \
@@ -121,7 +121,9 @@ class JiraProvider(object):
         Returns:
             List of integers that are the ids of JIRA sprints.
         """
+        sprints = []
         sprint_ids = []
+        sprint_ids_with_end_date = {}
         max_results = 50
         start_at = max_results
         url = 'https://evernote.jira.com/rest/agile/1.0/board/' + \
@@ -132,17 +134,28 @@ class JiraProvider(object):
                                          auth=(API_USERNAME,
                                                API_PASSWORD)).text)
         for sprint in search['values']:
-            sprint_ids.append(sprint['id'])
+            if sprint.get('endDate', False) is not False:
+                sprints.append(sprint)
+                sprint_ids.append(sprint['id'])
+
         while search['isLast'] is False:
             search = json.loads(requests.get(url + '&startAt=' + str(start_at),
                                              auth=(API_USERNAME,
                                                    API_PASSWORD)).text)
             for sprint in search['values']:
-                sprint_ids.append(sprint['id'])
+                if sprint.get('endDate', False) is not False:
+                    sprints.append(sprint)
+                    sprint_ids.append(sprint['id'])
             start_at = start_at + max_results
         sprint_ids.sort(key=int)
-        print sprint_ids[int(metric_data_loaded['grouping']['count']):]
-        return sprint_ids[int(metric_data_loaded['grouping']['count']):]
+        last_N_sprints = sprint_ids[int(metric_data_loaded['grouping']['count']):]
+        for sprint in sprints:
+            if sprint['id'] in last_N_sprints:
+                sprint_ids_with_end_date[str(sprint['id'])] = time.strftime('%Y-%m-%d %I:%M',
+                                                                            time.strptime(sprint \
+                                                                                          ['endDate'].split('.')[0],
+                                                                                          '%Y-%m-%dT%H:%M:%S'))
+        return sprint_ids_with_end_date                
 
 def mean_time_between_statuses(metric_data_loaded, position, issue):
     """Calculates the length of time between two statuses in an issue.
@@ -167,9 +180,7 @@ def mean_time_between_statuses(metric_data_loaded, position, issue):
     second_date_sec = time.strptime(second_date.split('.')[0], '%Y-%m-%dT%H:%M:%S')
     return (time.mktime(second_date_sec) - time.mktime(first_date_sec)) / (60 * 60 * 24)
 
-## data provider methods
 def custom_field_sum(issues, custom_field):
-    ## Using JIRA SDK
     """Sums custom field values together.
 
     Args:
@@ -200,8 +211,13 @@ def load_metric_file(metric_file, metrics):
         Dictionary of the values in the metrics.json file.
     """
     with open(metric_file) as metric_file_loaded:
-        metric_file_full = json.load(metric_file_loaded)
-    metric_configs = metric_file_full
+        try:
+            metric_file_full = json.load(metric_file_loaded)
+        except ValueError:
+            logging.error(METRIC_JSON + ' ' + 'is not properly formatted using the JSON specification')
+            print METRIC_JSON + ' ' + 'is not properly formatted using the JSON specification'
+            sys.exit(1)
+    metric_configr = metric_file_full
     if metrics:
         metric_configs = []
         for requested_metric in metrics:
