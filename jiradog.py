@@ -60,8 +60,8 @@ class JiraProvider(object):
                                                                                metric=metric_data_loaded,
                                                                                sprint_id=key,
                                                                                sprint_end_date=value)).render(project=project,
-                                                                                                            sprint_id=key,
-                                                                                                            sprint_end_date=value))
+                                                                                                              sprint_id=key,
+                                                                                                              sprint_end_date=value))
         else:
             queries = [jinja2.Template(jinja2.Template(metric_data_loaded \
                                                            [position] \
@@ -148,12 +148,11 @@ class JiraProvider(object):
                     sprint_ids.append(sprint['id'])
             start_at = start_at + max_results
         sprint_ids.sort(key=int)
-        last_N_sprints = sprint_ids[int(metric_data_loaded['grouping']['count']):]
         for sprint in sprints:
-            if sprint['id'] in last_N_sprints:
+            if sprint['id'] in sprint_ids[int(metric_data_loaded['grouping']['count']):]:
                 sprint_ids_with_end_date[str(sprint['id'])] = time.strftime('%Y-%m-%d %I:%M',
                                                                             pretty_date(sprint['endDate']))
-        return sprint_ids_with_end_date                
+        return sprint_ids_with_end_date
 
 def mean_time_between_statuses(metric_data_loaded, position, issue):
     """Calculates the length of time between two statuses in an issue.
@@ -179,6 +178,14 @@ def mean_time_between_statuses(metric_data_loaded, position, issue):
            (60 * 60 * 24)
 
 def pretty_date(date):
+    """Format date from YYYY-mm-ddTHH:MM:SS to a python time structure
+
+    Args:
+        date:	String	Usually taken from a JIRA JSON response.
+
+    Returns:
+        Python timestruct
+    """
     return time.strptime(date.split('.')[0], '%Y-%m-%dT%H:%M:%S')
 
 def custom_field_sum(issues, custom_field):
