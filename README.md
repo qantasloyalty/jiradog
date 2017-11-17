@@ -16,6 +16,7 @@ Dependencies (outside of python standard library)
 Clone the engineering\_velocity\_metrics project from the operations source control repository
 
 ## metrics.json syntax
+(`schema.json` file to be added at a later date.)
 
 How to build a metric.
 
@@ -23,120 +24,52 @@ The information you are pulling from JIRA is built around JIRA's own query langu
 
 ```
   {
-    "metric_name": "jiradog.avgOpenBugsPerDeveloper",
-    "__comment": "SYS-1473",
+    "metric_name": "[name of DataDog metric]",
+    "__comment": "[comment]",
     "projects": [
-      "MACOSNOTE",
-      "WINNOTE",
-      "ION",
-      "IOSNOTE",
-      "DRDNOTE",
-      "CE",
-      "ENB"
+      "KEY1",
+      "KEY2",
+      "KEY3"
       ],
-    "method": "average",
-    "numerator": {
+    "method": "[average|direct]",
+    "[numerator|issues]": {
       "source": "jira",
-      "jql": "project={{project}} AND issuetype=Bug AND status NOT IN (Done,Resolved,Closed)",
-      "method": "ticket_count"
+      "jql": "[JQL; check 'JQL with Jinja2 variables' below]",
+      "filter": "[jinja if/then statement; must return true]"
+      "method": "[ticket_count|mean_time_between_statuses]"
       },
     "denominator": {
       "source": "constant",
       "data": {
-        "MACOSNOTE": "7",
-        "WINNOTE": "4",
-        "ION": "9",
-        "IOSNOTE": "8",
-        "DRDNOTE": "7",
-        "CE": "6",
-        "ENB": "9"  
+        "[KEY1; data applied to project only]": "[data]",
+        "[KEY2]": "[data]",
+        "[KEY3]": "[data]"
         }
-      }
-  }
+      },
+    "grouping": {
+      "by": "[sprint]",
+      "count": "[number; negative for 'last']",
+      "boards:" {
+        "KEY1": "[board id]",
+        "KEY2": "[board id]",
+        "KEY3": "[board id]"
+        }
+      },
+    }
 ```
 
 Using standard JSON syntax we are defining what information to poll from JIRA, how to process it, and what to name the metric in DataDog.
-
-```
-     "metric_name": "jiradog.avgOpenBugsPerDeveloper",
-```
-The metric name in DataDog. After uploading to DataDog, this is the name you use when searching for the metric.
-
-```
-    "__comment": "SYS-1473",
-```
-The JSON spec doesn't define a way to handle in line comments. This is the 'official' jiradog comment method. Ensure all comment methods are prepended with two underscores ("\_"). In this case, the comment is the issue key that defined the creation of this metric.
-
-```
-    "projects": [
-      "MACOSNOTE",
-      "WINNOTE",
-      "ION",
-      "IOSNOTE",
-      "DRDNOTE",
-      "CE",
-      "ENB"
-      ],
-```
-Every metric needs a defined list of projects to run against. This must be a JSON list, even if there is only one value.
-
-```
-    "method": "average",
-```
-The 'method' defines the post-processing of the results returned from the JIRA API queries. In this case, we are finding the average between two data providers. The method also defines how the two data providers are labelled.
-
-post-processing methods:
-* **average**: Find the mean of 2 values.
-* **mean\_time\_to\_between\_statuses**: Find the mean time between a status and last updated (for now).
-* **direct**: Upload a direct result with no post-processing math.
-
-```
-    "numerator": {
-      "source": "jira",
-      "jql": "project={{project}} AND issuetype=Bug AND status NOT IN (Done, Resolved, Closed)",
-      "method": "ticket_count"
-      },
-```
-For the method 'average', the script looks for both the 'numerator' and 'denominator' dictionaries in the metric config block. These are both data providers, describing the source and any needed information for getting what is needed.
-
-In this case: We are getting information from Jira (`"source": "jira",`), and defines the JQL (`"jql": "project={{project}} AND issuetype=Bug AND status NOT IN (Done, Resolved, Closed)",`). A few things to note about the JQL: Instead of a hard-set project, there is a jinja2 style variable `{{project}}`. The script uses this jql string as a jinja2 template to build the actual JQL call. Later versions of the script will include other inline jinja2 style templates for more granularity.
-
-Inside the data provider block here there is another `method` key-value pair. This is similar to the parent `method`, only applied to inside the data provider. Here we are looking for the total ticket count from this query.
-
-per data provider methos:
-* **ticket\_count**: Get the total issue count returned from the JIRA API poll.
-* **custom\_field\_sum**: Get the sum of the values of a custom field.
-
-```
-    "denominator": {
-      "source": "constant",
-      "data": {
-        "__comment": "Total number of developers per project."
-        "MACOSNOTE": "7",
-        "WINNOTE": "4",
-        "ION": "9",
-        "IOSNOTE": "8",
-        "DRDNOTE": "7",
-        "CE": "6",
-        "ENB": "9"  
-        }
-      }
-```
-The next data provider uses the source `constant`. This provider is for hard-coded information that is, well, constant. The comment adds some constext to what this information is. Right now the script only supports constant source separated by project.
 
 ### script-based filtering
 We use a jinja2/nunjucks style filtering with if/then statements. JQL currently doesn't support selecting fixVersions with a "~" (contains) or "LIKE" operator. To get around this, take a look at the `filter` key-value pair in this example data provider block:
 
 ```
-    "issues": {
-      "__comment": "List of issues released to GA (Global Acceptance)/Production",
-      "source": "jira",
-      "jql": "Project={{project}} AND issuetype=Story AND fixVersion!=EMPTY AND resolved>endOfDay(-180d)",
-      "filter": "{% if 'GA' in issue.fields.fixVersions[0].name %}true{% endif %}"
-      }
+"filter": "{% if 'GA' in issue.fields.fixVersions[0].name %}true{% endif %}"
 ```
 
-Following the typical jinja2 if/then statement, we have the statement, which is declared by the surrounding `{%` and `%}`. Inside is a basic structure: `if issue.fields.fixVersions.0.name ~ 'GA'`. `issue.fields.fixVersions.0.name` is the 'path' of the key-value pair in the issue we are looking to compare with the value, in this case `GA`. This will filter all issues to see if they have a `fixVerions` that contains `GA`.
+Following the typical jinja2 if/then statement, we have the statement, which is declared by the surrounding `{%` and `%}`. Inside is a basic structure: `if issue.fields.fixVersions.0.name ~ 'GA'`. `issue.fields.fixVersions.0.name` is the 'path' of the key-value pair in the issue we are looking to compare with the value, in this case `GA`. This will filter all issues to see if they have a `fixVerions` name that contains `GA`.
+
+The jinja statement must return `true`.
 
 ### More on the metrics.json
 
@@ -184,6 +117,12 @@ Operators are used to join several conditions or expand on a condition.
 - Operators should be surrounded by whitespace (`x AND y`, `status NOT IN (foo,bar)`)
 - Mathmatical operators (=, !=, >, <, >=, <=, etc) should not be surrounded by whitespace (`x=4`, `assignee!=currentUser()`, `updated>=endOfDay(-90d)`)
 
+##### JQL with Jinja2 variables
+
+- {{project}}
+- {{sprint_id}}
+- {{sprint_end_date}}
+
 #### Jinja2
 
 None of the following styles, whether followed or not, will break script functionality.
@@ -213,34 +152,40 @@ Example comment:
 
 ### Naming Conventions
 
+#### DataDog Metric Name
+
 This is the jiradog way to name metrics for DataDog, using a similar psuedo-heirarchical dot list that the DataDog agent uses.
 
 ```
-source.[[Variable 1][Variable 2].[Group By]].[mean[timeToClose|Age]|percent|count]
+[source].[Variable][Variable][Group By].[method]
 ```
-
-- e.g.
-  - jiradog.openBugs.count
-  - jiradog.bugsP1.meanTimeToClose
-  - jiradog.reopenedBugsToAllBugs.percent
 
 - source
   - This is the name of the script: `jiradog`
-- mean[TimeToClose|Age]|percent|count]
-  - The 3 supported methods of jiradog.
-  - Every metric should state it's method.
-  - percentage should have `To` between the variables
-    - e.g. jiradog.reopenedBugsToAllBugs.percent
-- [Variable 1]
-  - In metrics that have numerators, this is the numerator.
-  - End the variable with the priority of the issue if applicable.
-  - Typically this is the issue type: Bugs, Stories, Tasks, etc.
-  - e.g. UnresolvedBugsP1, OpenStories
-- [Variable 2]
-  - In metrics that have a denominator, this is the denominator
-- [Group By]
-  - If issues are grouped together, specify here.
-  - e.g. PerSprint, PerWeek
+- [Variable]
+  - [p1P2P3P4][issueType][filter][groupBy]
+    - [p1P2P3P4]
+      - priority list, can be any combination of them:
+        - e.g. p1, p2, p3, p4, p1P2, p2P3, p1P2P3, etc.
+      - If the metric includes all priorities, omit this part.
+    - [issueType]:
+      - JIRA issue type
+      - Typed in camelCase
+      - All non alphanumeric characters are removed
+    - [filter]
+      - This is to specify more about the search.
+      - This could be the issue status we are searching on (Reopened) or a label on the issue (Regression).
+      - Written in camelCase
+    - [groupBy]
+      - PerSprint, PerWeek, etc.
+- [method]
+  - [mean[TimeToClose|Age]|percent|count]
+  - How the metric is post-processed
+
+- e.g.
+  - jiradog.bugsOpen.count
+  - jiradog.p1P2BugsPerSprint.meanTimeToClose
+  - jiradog.bugsReopened.percent
 
 ## Citations
 Von Barth, N. (n.d.). Jinja. Retrieved November 09, 2017, from
