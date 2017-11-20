@@ -60,17 +60,15 @@ class JiraProvider(object):
                                                       metric=metric_data_loaded,
                                                       sprint_id=key,
                                                       sprint_end_date=value)
-                jql = jinja2.Template(jql).render(project=project,
-                                                  sprint_id=key,
-                                                  sprint_end_date=value)
-                queries.append(jql)
+                queries.append(jinja2.Template(jql).render(project=project,
+                                                           sprint_id=key,
+                                                           sprint_end_date=value))
         else:
             jql = jinja2.Template(metric_data_loaded \
                                   [position] \
                                   ['jql']).render(project=project,
                                                   metric=metric_data_loaded)
-            jql = jinja2.Template(jql).render(project=project)
-            queries = [jql]
+            queries = [jinja2.Template(jql).render(project=project)]
         for query in queries:
             jql_sha512 = hashlib.sha512(query).hexdigest()
             if CACHE.get(jql_sha512, False):
@@ -88,7 +86,7 @@ class JiraProvider(object):
                     for issue in search:
                         issues.append(issue)
                     start_at = start_at + max_results
-                if metric_data_loaded.get(position, False).get('filter', False) != False:
+                if metric_data_loaded.get(position, False).get('filter', False) is not False:
                     issues = self.filter_issues(metric_data_loaded, issues, position)
                 CACHE[jql_sha512] = issues
         return issues
