@@ -45,7 +45,7 @@ class JiraProvider(object):
             List of issues returned from JIRA JQL query.
         """
         max_results = 100
-        start_at = 100
+        start_at = max_results
         issues = []
         ## If/then statement failed, so I want to find  ##
         ## a way to not have to run the jinja statement ##
@@ -54,19 +54,23 @@ class JiraProvider(object):
             sprint_ids = self.get_sprints(metric_data_loaded, project)
             queries = []
             for key, value in sprint_ids.iteritems():
-                queries.append(jinja2.Template(jinja2.Template(metric_data_loaded \
-                                                               [position] \
-                                                               ['jql']).render(project=project,
-                                                                               metric=metric_data_loaded,
-                                                                               sprint_id=key,
-                                                                               sprint_end_date=value)).render(project=project,
-                                                                                                              sprint_id=key,
-                                                                                                              sprint_end_date=value))
+                jql = jinja2.Template(metric_data_loaded \
+                                      [position] \
+                                      ['jql']).render(project=project,
+                                                      metric=metric_data_loaded,
+                                                      sprint_id=key,
+                                                      sprint_end_date=value)
+                jql = jinja2.Template(jql).render(project=project,
+                                                  sprint_id=key,
+                                                  sprint_end_date=value)
+                queries.append(jql)
         else:
-            queries = [jinja2.Template(jinja2.Template(metric_data_loaded \
-                                                           [position] \
-                                                           ['jql']).render(project=project,
-                                                                           metric=metric_data_loaded)).render(project=project)]
+            jql = jinja2.Template(metric_data_loaded \
+                                  [position] \
+                                  ['jql']).render(project=project,
+                                                  metric=metric_data_loaded)
+            jql = jinja2.Template(jql).render(project=project)
+            queries = [jql]
         for query in queries:
             jql_sha512 = hashlib.sha512(query).hexdigest()
             if CACHE.get(jql_sha512, False):
@@ -77,7 +81,7 @@ class JiraProvider(object):
                 search = self.jira.search_issues(query, maxResults=max_results, startAt=0)
                 for issue in search:
                     issues.append(issue)
-                while len(search) == 100:
+                while len(search) == max_results:
                     search = self.jira.search_issues(query,
                                                      maxResults=max_results,
                                                      startAt=start_at)
@@ -222,8 +226,9 @@ def load_metric_file(metric_file, metrics):
         try:
             metric_file_full = json.load(metric_file_loaded)
         except ValueError:
-            logging.error(METRIC_JSON + ' ' + 'is not properly formatted using the JSON specification')
-            print METRIC_JSON + ' ' + 'is not properly formatted using the JSON specification'
+            logging.error(METRIC_JSON + \
+                          ' ' + \
+                          'is not properly formatted using the JSON specification')
             sys.exit(1)
     metric_configs = metric_file_full
     if metrics:
@@ -350,19 +355,26 @@ def main():
     if args.noop:
         if not args.formatting or args.formatting == 'json':
             pprint(PAYLOAD)
-        elif args.formatting == 'jira' or args.formatting == 'markdown':
-            if args.formatting == 'jira':
-                print '||metric||project||points||'
-            elif args.formatting == 'markdown':
-                print '|metric|project|points|'
-                print '| ----- | ----- | ----- |'
-            for payload in PAYLOAD:
+        elif args.formatting == 'jira':
+            print '||metric||project||points||'
+            for line in PAYLOAD:
                 print '|' + \
-                      payload['metric'] + \
+                      line['metric'] + \
                       '|' + \
-                      payload['tags'][0] + \
+                      line['tags'][0] + \
                       '|' + \
-                      str(payload['points'][1]) + \
+                      str(line['points'][1]) + \
+                      '|'
+        elif args.formatting == 'markdown':
+            print '|metric|project|points|'
+            print '| ----- | ----- | ----- |'
+            for line in PAYLOAD:
+                print '|' + \
+                      line['metric'] + \
+                      '|' + \
+                      line['tags'][0] + \
+                      '|' + \
+                      str(line['points'][1]) + \
                       '|'
         elif args.formatting == 'csv':
             print 'metric,project,points'

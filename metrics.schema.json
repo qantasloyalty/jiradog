@@ -1,0 +1,100 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "type": "object",
+    
+  "definitions": {
+    "data_provider": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string"
+        },
+        "jql": {
+          "type": "string"
+        },
+        "method": {
+          "type": "string"
+        },
+        "filter": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "source",
+        "jql",
+        "method"
+      ]
+    }
+  },
+    
+  "properties": {
+    "metric_name": {
+      "type": "string"
+    },
+    "__comment": {
+      "type": "string"
+    },
+    "projects": {
+      "type": "array"
+    },
+    "method": {
+      "type": "string"
+    },
+    "issues": {
+      "$ref": "#/definitions/data_provider"
+    },
+    "numerator": {
+      "$ref": "#/definitions/data_provider"
+    },
+    "denominator": {
+      "$ref": "#/definitions/data_provider"
+    },
+    "grouping": {
+      "type": "object",
+      "properties": {
+        "by": {
+          "type": "string"
+        },
+        "count": {
+          "type": "string"
+        },
+        "boards": {
+          "type": "object",
+          "patternProperties": {
+            "[A-Z]*": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "required": [
+        "by",
+        "count"
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "required": [
+        "metric_name",
+        "projects",
+        "method"
+      ]
+    },
+    {
+      "oneOf": [
+        {
+          "required": [
+            "issues"
+          ]
+        },
+        {
+          "required": [
+            "numerator",
+            "denominator"
+          ]
+        }
+      ]
+    }
+  ]
+}
