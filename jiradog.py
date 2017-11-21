@@ -395,7 +395,7 @@ if __name__ == "__main__":
         'custom_field_sum': custom_field_sum
         }
     MAX_RESULTS = str(100)
-    CONFIG_FILE = 'config.json'
+    CONFIG_FILE = '/etc/jiradog.conf.json'
     HEADERS = {'Content-type': 'application/json'}
     CACHE = {}
     PAYLOAD = []
