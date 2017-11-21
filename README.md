@@ -187,6 +187,15 @@ This is the jiradog way to name metrics for DataDog, using a similar psuedo-heir
   - jiradog.p1P2BugsPerSprint.meanTimeToClose
   - jiradog.bugsReopened.percent
 
+## To Do
+
+- Extract methods from script and add them as 'plugins'.
+- Extract data providers from script and add them as 'plugins'.
+- Make script import all methods and providers instead of by name.
+- Keep pylint score above 9.
+- Allow more custom tagging, currently only per project.
+- Add per [time] grouping like week/month/day/etc.
+
 ## Citations
 Von Barth, N. (n.d.). Jinja. Retrieved November 09, 2017, from
     https://www.chromium.org/developers/jinja#TOC-Spacing
