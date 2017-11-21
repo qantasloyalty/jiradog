@@ -2,6 +2,7 @@
 
 Version 1.2.1
 A tool to poll data from JIRA to upload as a metric to DataDog.
+Confluence page: https://evernote.jira.com/wiki/spaces/OPS/pages/220135425/jiradog
 
 ## Prerequisites
 
