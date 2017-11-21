@@ -13,7 +13,10 @@ Dependencies (outside of python standard library)
 
 ## Installing
 
-Clone the engineering\_velocity\_metrics project from the operations source control repository
+Clone the jiradog repo from the operations source control repository:
+```
+git clone ssh://git@stash.ba1.etonreve.com:7999/ops/jiradog.git
+```
 
 ## metrics.json syntax
 (`schema.json` file to be added at a later date.)
