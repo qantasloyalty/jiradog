@@ -1,6 +1,6 @@
 # jiradog
 
-Version 1.2.1
+Version 1.2.10
 A tool to poll data from JIRA to upload as a metric to DataDog.
 Confluence page: https://evernote.jira.com/wiki/spaces/OPS/pages/220135425/jiradog
 
@@ -191,6 +191,20 @@ This is the jiradog way to name metrics for DataDog, using a similar psuedo-heir
   - jiradog.p1P2BugsPerSprint.meanTimeToClose
   - jiradog.bugsReopened.percent
 
+#### Version Numbering
+
+jiradog follows the [SemVer](https://semver.org/spec/v2.0.0.html) method of software versionsing.
+
+> Given a version number MAJOR.MINOR.PATCH, increment the:
+>
+> - MAJOR version when you make incompatible API changes,
+> - MINOR version when you add functionality in a backwards-compatible manner, and
+> - PATCH version when you make backwards-compatible bug fixes.m
+>
+> Additional labels for pre-release and build metadata are available as extensions to the MAJOR.MINOR.PATCH format. (Preston-Warner, 2013)
+
+Please read the full spec at the link above or in the citations.
+
 ## To Do
 
 - Extract methods from script and add them as 'plugins'.
@@ -206,6 +220,9 @@ Von Barth, N. (n.d.). Jinja. Retrieved November 09, 2017, from
     
 Von Barth, N. (n.d.). Jinja. Retrieved November 09, 2017, from
     https://www.chromium.org/developers/jinja#TOC-Comment-end-of-long-blocks
+
+Preston-Warner, T. (2013). Semantic Versioning 2.0.0. Retrieved November 27, 2017, from
+    https://semver.org/spec/v2.0.0.html
 
 ## Authors
 

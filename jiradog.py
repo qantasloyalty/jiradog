@@ -389,7 +389,7 @@ def main():
 
 if __name__ == "__main__":
     # Setting important variables, all static.
-    VERSION = '1.2.1'
+    VERSION = '1.2.10'
     FUNCTION_MAP = {
         'mean_time_between_statuses': mean_time_between_statuses,
         'custom_field_sum': custom_field_sum
