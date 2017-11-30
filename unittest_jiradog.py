@@ -31,13 +31,10 @@ class JiradogTestCase(unittest.TestCase):
         MORALS = randint(0, 9)
         DAYS_TO_SUBTRACT = randint(1, 50)
         NOW_DATE_TIME = datetime.datetime.now()
-        print NOW_DATE_TIME
         NOW = datetime.date.strftime(NOW_DATE_TIME,
                                      '%Y-%m-%dT%H:%M:%S.000')
         THEN = datetime.date.strftime(NOW_DATE_TIME - datetime.timedelta(days=DAYS_TO_SUBTRACT),
                                       '%Y-%m-%dT%H:%M:%S.000')
-        print NOW
-        print THEN
         METRIC_DATA_LOADED = {
             'numerator': {
                 'statuses': [
@@ -71,13 +68,13 @@ class JiradogTestCase(unittest.TestCase):
         Returns:
             expected True
         """
-        CONFIG_FILE = 'config.json'
+        CONFIG_FILE = '/etc/jiradog/config.json'
         with open(CONFIG_FILE) as config_data_file:
             CONFIG_DATA_LOADED = json.load(config_data_file)
         METRIC_FILE = CONFIG_DATA_LOADED['local']['metric_file']
         with open(METRIC_FILE) as metric_data_file:
             METRIC_DATA_LOADED = json.load(metric_data_file)
-        self.assertEqual(load_metric_file(METRIC_FILE, True), METRIC_DATA_LOADED)
+        self.assertEqual(load_metric_file(METRIC_FILE, False), METRIC_DATA_LOADED)
 
 if __name__ == '__main__':
     unittest.main()
