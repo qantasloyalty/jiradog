@@ -1,0 +1,36 @@
+#!/bin/bash
+
+# ./build script to build package from pristine source tarball
+
+# Package attributes
+NAME=jiradog
+VERSION=1.2.10
+RELEASE=2
+
+#. buildtools
+# Set up build environment
+set -x -e
+export PATH=$PATH:/usr/local/ruby-sdk/ruby-1.9.3-p194/bin
+export INSTALLROOT=~/opsbuild/install_root
+export BUILDROOT=~/opsbuild/build
+rm -rf $INSTALLROOT $BUILDROOT
+mkdir -p $INSTALLROOT $BUILDROOT
+
+# Unpack tarball in build environment, configure and install
+# %setup 
+(
+    mkdir -p $INSTALLROOT/usr/local/bin $INSTALLROOT/etc/jiradog
+    cp metrics.schema.json $INSTALLROOT/etc/jiradog/
+    cp README.md $INSTALLROOT/etc/jiradog/
+    cp jiradog $INSTALLROOT/usr/local/bin/
+)
+
+# Package "installed" software using fpm command
+fpm -n $NAME -v $VERSION --iteration $RELEASE \
+    -s dir -t deb --template-scripts \
+    $INSTALLROOT/usr/local/bin=/usr/local/ $INSTALLROOT/etc/jiradog=/etc/
+
+# Clean up build environment
+# %clean
+rm -rf $INSTALLROOT
+rm -rf $BUILDROOT

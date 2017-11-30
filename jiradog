@@ -194,8 +194,8 @@ def custom_field_sum(issues, custom_field):
     """Sums custom field values together.
 
     Args:
-        issues:		List		The issue list from the JQL query
-        custom_field:	String		The custom field to sum.
+        issues: 	    List        The issue list from the JQL query
+        custom_field:   String      The custom field to sum.
 
     Returns:
         Integer of the sum of all the found values of the custom_field.
