@@ -404,6 +404,9 @@ if __name__ == "__main__":
     # Loads the configuration file for the script.
     with open(CONFIG_FILE) as config_data_file:
         CONFIG_DATA_LOADED = json.load(config_data_file)
+    if CONFIG_DATA_LOADED['default'] is True:
+        logging.error("The default config hasn't been modified.")
+        sys.exit(1)
 
     # Set important information scraped from the configuration file.
     API_USERNAME = CONFIG_DATA_LOADED['jira']['username']

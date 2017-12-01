@@ -19,6 +19,30 @@ Clone the jiradog repo from the operations source control repository:
 git clone ssh://git@stash.ba1.etonreve.com:7999/ops/jiradog.git
 ```
 
+## config.json syntax
+An example config file is included:
+
+```
+{
+  "default": true,
+  "local": {
+    "log_file": "/var/log/jiradog/jiradog.log",
+    "metric_file": "/etc/jiradog/metrics.json"
+    },
+  "jira": {
+    "username": "[username]",
+    "password": "[password]",
+    "server": "https://example.jira.com"
+    },
+  "datadog": {
+    "app_key": "[app key]",
+    "api_key": "[api key]"
+    }
+}
+```
+
+ensure that you replace all words in `[]` and change the `default` tag to `false`, with no quotes (as it is a boolean value).
+
 ## metrics.json syntax
 (`schema.json` file to be added at a later date.)
 

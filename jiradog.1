@@ -1,0 +1,31 @@
+.TH JIRADOG 1 "2017-12-01" "1.2.10"
+.SH NAME
+jiradog - pull information from JIRA and upload as metrics to DataDog
+.SH SYNOPSIS
+.B jiradog
+[\fB\-l\fR]
+[\fB\-m\fR \fIMETRIC_NAME\fR]
+[\fB\-n\fR]
+[\fB\-f\fR \fIFORMAT\fR]
+.SH DESCRIPTION
+.B jiradog
+pulls information/statistics from JIRA and uploads to DataDog
+.SH OPTIONS
+.TP
+.BR \-l ", " \-\-list
+List metrics from the metric config.
+.TP
+.BR \-m ", " \-\-metric " " \fIMETRIC_NAME\fR
+Specify a metric name from the metrics file to only run that metric config.
+.TP
+.BR \-n ", " \-\-noop
+Run the metrics without uploading to Datadog, and output to stdout.
+.TP
+.BR \-f ", " \-\-format " " \fIFORMAT\fR
+Specify the format [jira, csv, markdown] to output to stdin with --noop is set.
+.TP
+.BR \-h ", " \-\-help
+Show the help page.
+.TP
+.BR \-v ", " \-\-version
+Show the version number.

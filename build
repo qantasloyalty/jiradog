@@ -5,7 +5,7 @@
 # Package attributes
 NAME=jiradog
 VERSION=1.2.10
-RELEASE=2
+RELEASE=4
 
 #. buildtools
 # Set up build environment
@@ -19,16 +19,22 @@ mkdir -p $INSTALLROOT $BUILDROOT
 # Unpack tarball in build environment, configure and install
 # %setup 
 (
-    mkdir -p $INSTALLROOT/usr/local/bin $INSTALLROOT/etc/jiradog
+    mkdir -p $INSTALLROOT/usr/local/bin $INSTALLROOT/etc/jiradog $INSTALLROOT/usr/share/man/man1
     cp metrics.schema.json $INSTALLROOT/etc/jiradog/
     cp README.md $INSTALLROOT/etc/jiradog/
+    cp config.json $INSTALLROOT/etc/jiradog/
+    cp metrics.json $INSTALLROOT/etc/jiradog/
     cp jiradog $INSTALLROOT/usr/local/bin/
+    cp jiradog.1 $INSTALLROOT/usr/share/man/man1/
 )
 
 # Package "installed" software using fpm command
 fpm -n $NAME -v $VERSION --iteration $RELEASE \
     -s dir -t deb --template-scripts \
-    $INSTALLROOT/usr/local/bin=/usr/local/ $INSTALLROOT/etc/jiradog=/etc/
+    --depends 'python-jinja2' \
+    $INSTALLROOT/usr/local/bin=/usr/local/ \
+    $INSTALLROOT/etc/jiradog=/etc/ \
+    $INSTALLROOT/usr/share/man/man1=/user/share/man
 
 # Clean up build environment
 # %clean

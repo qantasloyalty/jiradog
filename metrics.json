@@ -1,0 +1,17 @@
+[
+  {
+    "metric_name": "jiradog.countOpenBugs",
+    "__comment": "example metrics file",
+    "projects": [
+      "[project0]",
+      "[project1]",
+      "[project2]"
+      ],
+    "method": "direct",
+    "issues": {
+      "source": "jira",
+      "jql": "project={{project}} AND issueType=Bug AND resolution=unresolved",
+      "method": "ticket_count"
+      }
+  }
+]
