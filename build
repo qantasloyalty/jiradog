@@ -24,7 +24,7 @@ mkdir -p $INSTALLROOT $BUILDROOT
     cp README.md $INSTALLROOT/etc/jiradog/
     cp config.json $INSTALLROOT/etc/jiradog/
     cp metrics.json $INSTALLROOT/etc/jiradog/
-    cp jiradog $INSTALLROOT/usr/local/bin/
+    cp jiradog.py $INSTALLROOT/usr/local/bin/jiradog
     cp jiradog.1 $INSTALLROOT/usr/share/man/man1/
 )
 
