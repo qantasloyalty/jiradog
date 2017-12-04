@@ -4,7 +4,7 @@
 
 # Package attributes
 NAME=jiradog
-VERSION=1.2.10
+VERSION=$(grep "VERSION = " jiradog.py | awk -F'= ' '{print $2}' | sed "s/'//g")
 RELEASE=5
 
 #. buildtools
