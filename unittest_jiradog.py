@@ -5,13 +5,12 @@ import unittest
 import json
 import time
 import datetime
-from random import randint
+import random
 from jiradog import mean_time_between_statuses
 from jiradog import load_metric_file
 from jiradog import pretty_date
 from jiradog import custom_field_sum
 from jiradog import JiraProvider
-import random
 
 class JiradogTestCase(unittest.TestCase):
     """Testing for `jiradog.py`"""
@@ -22,8 +21,8 @@ class JiradogTestCase(unittest.TestCase):
         Returns:
             expected True
         """
-        DATE = '1993-11-22T03:04:05.000'
-        self.assertEqual(pretty_date(DATE), time.strptime(DATE.split('.')[0], '%Y-%m-%dT%H:%M:%S'))
+        date = '1993-11-22T03:04:05.000'
+        self.assertEqual(pretty_date(date), time.strptime(date.split('.')[0], '%Y-%m-%dT%H:%M:%S'))
 
     def test_mean_time_between_statuses(self):
         """Test if 2 given dates are N days apart.
@@ -31,14 +30,14 @@ class JiradogTestCase(unittest.TestCase):
         Returns:
             expected True ~80%, False ~20%
         """
-        MORALS = randint(0, 9)
-        DAYS_TO_SUBTRACT = randint(1, 50)
-        NOW_DATE_TIME = datetime.datetime.now()
-        NOW = datetime.date.strftime(NOW_DATE_TIME,
+        morals = random.randint(0, 9)
+        days_to_subtract = random.randint(1, 50)
+        now_date_time = datetime.datetime.now()
+        now = datetime.date.strftime(now_date_time,
                                      '%Y-%m-%dT%H:%M:%S.000')
-        THEN = datetime.date.strftime(NOW_DATE_TIME - datetime.timedelta(days=DAYS_TO_SUBTRACT),
+        then = datetime.date.strftime(now_date_time - datetime.timedelta(days=days_to_subtract),
                                       '%Y-%m-%dT%H:%M:%S.000')
-        METRIC_DATA_LOADED = {
+        metric_data_loaded = {
             'numerator': {
                 'statuses': [
                     '{{issue.fields.created}}',
@@ -46,23 +45,23 @@ class JiradogTestCase(unittest.TestCase):
                     ]
                 }
             }
-        POSITION = 'numerator'
-        ISSUE = {
-        'fields': {
-            'created': THEN,
-            'updated': NOW
+        position = 'numerator'
+        issue = {
+            'fields': {
+                'created': then,
+                'updated': now
             }
         }
-        if MORALS <= 7:
-            DAYS_TO_CHECK = DAYS_TO_SUBTRACT
-            self.assertEqual(mean_time_between_statuses(METRIC_DATA_LOADED, POSITION, ISSUE),
-                             DAYS_TO_CHECK)
+        if morals <= 7:
+            days_to_check = days_to_subtract
+            self.assertEqual(mean_time_between_statuses(metric_data_loaded, position, issue),
+                             days_to_check)
         else:
-            DAYS_TO_CHECK = randint(1, 50)
-            while DAYS_TO_CHECK == DAYS_TO_SUBTRACT:
-                DAYS_TO_CHECK = randint(1, 50)
-            self.assertNotEqual(mean_time_between_statuses(METRIC_DATA_LOADED, POSITION, ISSUE),
-                                DAYS_TO_CHECK)
+            days_to_check = random.randint(1, 50)
+            while days_to_check == days_to_subtract:
+                days_to_check = random.randint(1, 50)
+            self.assertNotEqual(mean_time_between_statuses(metric_data_loaded, position, issue),
+                                days_to_check)
 
     def test_load_metric_file(self):
         """Test if given json loads.
@@ -70,13 +69,13 @@ class JiradogTestCase(unittest.TestCase):
         Returns:
             expected True
         """
-        CONFIG_FILE = '/etc/jiradog/config.json'
-        with open(CONFIG_FILE) as config_data_file:
-            CONFIG_DATA_LOADED = json.load(config_data_file)
-        METRIC_FILE = CONFIG_DATA_LOADED['local']['metric_file']
-        with open(METRIC_FILE) as metric_data_file:
-            METRIC_DATA_LOADED = json.load(metric_data_file)
-        self.assertEqual(load_metric_file(METRIC_FILE, False), METRIC_DATA_LOADED)
+        config_file = '/etc/jiradog/config.json'
+        with open(config_file) as config_data_file:
+            config_data_loaded = json.load(config_data_file)
+        metric_file = config_data_loaded['local']['metric_file']
+        with open(metric_file) as metric_data_file:
+            metric_data_loaded = json.load(metric_data_file)
+        self.assertEqual(load_metric_file(metric_file, False), metric_data_loaded)
 
     def test_custom_field_sum(self):
         """Test if given custom fields are added properly.
@@ -84,127 +83,141 @@ class JiradogTestCase(unittest.TestCase):
         Returns:
             expected True ~80%, False ~20%
         """
-        class pretend_jira_object(object):
-            pass
+        class PretendJiraObject(object): #pylint: disable=R0903
+            """Fake object, used to imitate the return from the JIRA SDK."""
+            def __init__(self):
+                """Defining fake attributes"""
+                self.fields = None
+                self.custom_field_0 = None
 
-        CUSTOM_FIELD = 'custom_field_0'
-        MORALS = randint(0, 9)
-        CUSTOM_FIELD_VALUES = [
-            randint(0, 99),
-            randint(0, 99),
-            randint(0, 99),
-            randint(0, 99),
-            randint(0, 99)
+        custom_field = 'custom_field_0'
+        morals = random.randint(0, 9)
+        custom_field_values = [
+            random.randint(0, 99),
+            random.randint(0, 99),
+            random.randint(0, 99),
+            random.randint(0, 99),
+            random.randint(0, 99)
         ]
 
-        ISSUE_ONE = pretend_jira_object()
-        ISSUE_ONE.fields = pretend_jira_object()
-        ISSUE_ONE.fields.custom_field_0 = CUSTOM_FIELD_VALUES[0]
+        issue_one = PretendJiraObject()
+        issue_one.fields = PretendJiraObject()
+        issue_one.fields.custom_field_0 = custom_field_values[0]
 
-        ISSUE_TWO = pretend_jira_object()
-        ISSUE_TWO.fields = pretend_jira_object()
-        ISSUE_TWO.fields.custom_field_0 = CUSTOM_FIELD_VALUES[1]
+        issue_two = PretendJiraObject()
+        issue_two.fields = PretendJiraObject()
+        issue_two.fields.custom_field_0 = custom_field_values[1]
 
-        ISSUE_THR = pretend_jira_object()
-        ISSUE_THR.fields = pretend_jira_object()
-        ISSUE_THR.fields.custom_field_0 = CUSTOM_FIELD_VALUES[2]
+        issue_thr = PretendJiraObject()
+        issue_thr.fields = PretendJiraObject()
+        issue_thr.fields.custom_field_0 = custom_field_values[2]
 
-        ISSUE_FOU = pretend_jira_object()
-        ISSUE_FOU.fields = pretend_jira_object()
-        ISSUE_FOU.fields.custom_field_0 = CUSTOM_FIELD_VALUES[3]
+        issue_fou = PretendJiraObject()
+        issue_fou.fields = PretendJiraObject()
+        issue_fou.fields.custom_field_0 = custom_field_values[3]
 
-        ISSUE_FIV = pretend_jira_object()
-        ISSUE_FIV.fields = pretend_jira_object()
-        ISSUE_FIV.fields.custom_field_0 = CUSTOM_FIELD_VALUES[4]
+        issue_fiv = PretendJiraObject()
+        issue_fiv.fields = PretendJiraObject()
+        issue_fiv.fields.custom_field_0 = custom_field_values[4]
 
-        ISSUES = [
-            ISSUE_ONE,
-            ISSUE_TWO,
-            ISSUE_THR,
-            ISSUE_FOU,
-            ISSUE_FIV
+        issues = [
+            issue_one,
+            issue_two,
+            issue_thr,
+            issue_fou,
+            issue_fiv
         ]
 
-        if MORALS <= 7:
-            CUSTOM_FIELD_SUM = sum(CUSTOM_FIELD_VALUES)
-            self.assertEqual(custom_field_sum(ISSUES, CUSTOM_FIELD), CUSTOM_FIELD_SUM)
+        if morals <= 7:
+            custom_fields_sum = sum(custom_field_values)
+            self.assertEqual(custom_field_sum(issues, custom_field), custom_fields_sum)
         else:
-            CUSTOM_FIELD_SUM = randint(0,99)
-            while CUSTOM_FIELD_SUM == sum(CUSTOM_FIELD_VALUES):
-                CUSTOM_FIELD_SUM = randint(0,99)
-            self.assertNotEqual(custom_field_sum(ISSUES, CUSTOM_FIELD), CUSTOM_FIELD_SUM)
+            custom_fields_sum = random.randint(0, 99)
+            while custom_fields_sum == sum(custom_field_values):
+                custom_fields_sum = random.randint(0, 99)
+            self.assertNotEqual(custom_field_sum(issues, custom_field), custom_fields_sum)
 
-    def test_JiraProvider_filter_issues(self):
+    def test_jira_filter_issues(self):
         """Test if given filter properly filters the correct issues
 
         Returns:
             expected True
         """
-        class pretend_jira_object(object):
-            pass
+        class PretendJiraObject(object): #pylint: disable=R0903
+            """Fake object, used to imitate the return from the JIRA SDK."""
+            def __init__(self):
+                """Define fake attributes"""
+                self.fields = None
+                self.fixVersions = None #pylint: disable=C0103
+                self.name = None
 
-        MORALS = randint(0, 9)
-        ALL_FIXVERSIONS = [
+        morals = random.randint(0, 9)
+        all_fixversions = [
             'faint',
             'replace',
             'rare',
         ]
 
-        FIXVERSIONS = [
-            random.choice(ALL_FIXVERSIONS),
-            random.choice(ALL_FIXVERSIONS),
-            random.choice(ALL_FIXVERSIONS),
-            random.choice(ALL_FIXVERSIONS),
-            random.choice(ALL_FIXVERSIONS)
+        fixversions = [
+            random.choice(all_fixversions),
+            random.choice(all_fixversions),
+            random.choice(all_fixversions),
+            random.choice(all_fixversions),
+            random.choice(all_fixversions)
         ]
-        FIXVERSION = random.choice(FIXVERSIONS)
-        COUNT = FIXVERSIONS.count(FIXVERSION)
-        FILTER = {
+        fixversion = random.choice(fixversions)
+        count = fixversions.count(fixversion)
+        jinja2_filter = {
             "only": {
-                "filter": "{% if '" + FIXVERSION + "' in issue.fields.fixVersions[0].name %}true{% endif %}"
+                "filter": "{% if '" + \
+                          fixversion + \
+                          "' in issue.fields.fixVersions[0].name %}true{% endif %}"
             }
         }
 
-        ISSUE_ONE = pretend_jira_object()
-        ISSUE_ONE.fields = pretend_jira_object()
-        ISSUE_ONE.fields.fixVersions = [pretend_jira_object()]
-        ISSUE_ONE.fields.fixVersions[0].name = FIXVERSIONS[0] 
+        issue_one = PretendJiraObject()
+        issue_one.fields = PretendJiraObject()
+        issue_one.fields.fixVersions = [PretendJiraObject()] #pylint: disable=C0103
+        issue_one.fields.fixVersions[0].name = fixversions[0]
 
-        ISSUE_TWO = pretend_jira_object()
-        ISSUE_TWO.fields = pretend_jira_object()
-        ISSUE_TWO.fields.fixVersions = [pretend_jira_object()]
-        ISSUE_TWO.fields.fixVersions[0].name = FIXVERSIONS[1]
+        issue_two = PretendJiraObject()
+        issue_two.fields = PretendJiraObject()
+        issue_two.fields.fixVersions = [PretendJiraObject()]
+        issue_two.fields.fixVersions[0].name = fixversions[1]
 
-        ISSUE_THR = pretend_jira_object()
-        ISSUE_THR.fields = pretend_jira_object()
-        ISSUE_THR.fields.fixVersions = [pretend_jira_object()]
-        ISSUE_THR.fields.fixVersions[0].name = FIXVERSIONS[2]
+        issue_thr = PretendJiraObject()
+        issue_thr.fields = PretendJiraObject()
+        issue_thr.fields.fixVersions = [PretendJiraObject()]
+        issue_thr.fields.fixVersions[0].name = fixversions[2]
 
-        ISSUE_FOU = pretend_jira_object()
-        ISSUE_FOU.fields = pretend_jira_object()
-        ISSUE_FOU.fields.fixVersions = [pretend_jira_object()]
-        ISSUE_FOU.fields.fixVersions[0].name = FIXVERSIONS[3]
+        issue_fou = PretendJiraObject()
+        issue_fou.fields = PretendJiraObject()
+        issue_fou.fields.fixVersions = [PretendJiraObject()]
+        issue_fou.fields.fixVersions[0].name = fixversions[3]
 
-        ISSUE_FIV = pretend_jira_object()
-        ISSUE_FIV.fields = pretend_jira_object()
-        ISSUE_FIV.fields.fixVersions = [pretend_jira_object()]
-        ISSUE_FIV.fields.fixVersions[0].name = FIXVERSIONS[4]
+        issue_fiv = PretendJiraObject()
+        issue_fiv.fields = PretendJiraObject()
+        issue_fiv.fields.fixVersions = [PretendJiraObject()]
+        issue_fiv.fields.fixVersions[0].name = fixversions[4]
 
-        ISSUES = [
-            ISSUE_ONE,
-            ISSUE_TWO,
-            ISSUE_THR,
-            ISSUE_FOU,
-            ISSUE_FIV
+        issues = [
+            issue_one,
+            issue_two,
+            issue_thr,
+            issue_fou,
+            issue_fiv
         ]
 
-        if MORALS <= 7:
-            self.assertEqual(len(JiraProvider.filter_issues(FILTER, ISSUES, "only")), COUNT)
+        if morals <= 7:
+            self.assertEqual(len(JiraProvider.filter_issues(jinja2_filter, issues, "only")), count)
         else:
-            WRONG_COUNT = randint(0, 99)
-            while WRONG_COUNT == COUNT:
-                WRONG_COUNT = randint(0,99)
-            self.assertNotEqual(len(JiraProvider.filter_issues(FILTER, ISSUES, "only")), WRONG_COUNT)
+            wrong_count = random.randint(0, 99)
+            while wrong_count == count:
+                wrong_count = random.randint(0, 99)
+            self.assertNotEqual(len(JiraProvider.filter_issues(jinja2_filter,
+                                                               issues,
+                                                               "only")),
+                                wrong_count)
 
 if __name__ == '__main__':
     unittest.main()
