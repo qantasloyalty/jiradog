@@ -5,7 +5,7 @@
 # Package attributes
 NAME=jiradog
 VERSION=$(grep "VERSION = " jiradog.py | awk -F'= ' '{print $2}' | sed "s/'//g")
-RELEASE=5
+RELEASE=6
 
 #. buildtools
 # Set up build environment
@@ -32,9 +32,22 @@ mkdir -p $INSTALLROOT $BUILDROOT
 fpm -n $NAME -v $VERSION --iteration $RELEASE \
     -s dir -t deb --template-scripts \
     --depends 'python-jinja2' \
+    --python-bin python2.7 \
+    --python-easyinstall easyinstall2.7 \
+    --python-easyinstall sys \
+    --python-easyinstall json \
+    --python-easyinstall time \
+    --python-easyinstall logging \
+    --python-easyinstall os \
+    --python-easyinstall pprint \
+    --python-easyinstall hashlib \
+    --python-easyinstall requests \
+    --python-easyinstall jinja2 \
+    --python-easyinstall datadog \
+    --python-easyinstall jira \
     $INSTALLROOT/usr/local/bin=/usr/local/ \
     $INSTALLROOT/etc/jiradog=/etc/ \
-    $INSTALLROOT/usr/share/man/man1=/usr/share/man
+    $INSTALLROOT/usr/share/man/man1=/usr/share/man \
 
 # Clean up build environment
 # %clean

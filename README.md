@@ -250,4 +250,4 @@ Preston-Warner, T. (2013). Semantic Versioning 2.0.0. Retrieved November 27, 201
 
 ## Authors
 
-* **Bryce McNab** - *Initial work* - 11/17/2017
+* **Bryce McNab** - *Initial work* - 12/04/2017
