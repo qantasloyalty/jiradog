@@ -389,17 +389,20 @@ def main():
 
 if __name__ == "__main__":
     # Setting important variables, all static.
-    VERSION = '1.2.10'
     FUNCTION_MAP = {
         'mean_time_between_statuses': mean_time_between_statuses,
         'custom_field_sum': custom_field_sum
         }
     MAX_RESULTS = str(100)
+    VERSION_FILE = '/etc/jiradog/meta/VERSION'
     CONFIG_FILE = '/etc/jiradog/config.json'
     HEADERS = {'Content-type': 'application/json'}
     CACHE = {}
     PAYLOAD = []
     NOW = time.time()
+
+    with open(VERSION_FILE) as version:
+        VERSION = version.read()
 
     # Loads the configuration file for the script.
     with open(CONFIG_FILE) as config_data_file:

@@ -4,7 +4,7 @@
 
 # Package attributes
 NAME=jiradog
-VERSION=$(grep "VERSION = " jiradog.py | awk -F'= ' '{print $2}' | sed "s/'//g")
+VERSION=$(cat meta/VERSION)
 RELEASE=6
 
 #. buildtools
@@ -19,11 +19,12 @@ mkdir -p $INSTALLROOT $BUILDROOT
 # Unpack tarball in build environment, configure and install
 # %setup 
 (
-    mkdir -p $INSTALLROOT/usr/local/bin $INSTALLROOT/etc/jiradog $INSTALLROOT/usr/share/man/man1
+    mkdir -p $INSTALLROOT/usr/local/bin $INSTALLROOT/etc/jiradog $INSTALLROOT/etc/jiradog/meta $INSTALLROOT/usr/share/man/man1
     cp metrics.schema.json $INSTALLROOT/etc/jiradog/
     cp README.md $INSTALLROOT/etc/jiradog/
     cp config.json $INSTALLROOT/etc/jiradog/
     cp metrics.json $INSTALLROOT/etc/jiradog/
+    cp meta/VERSION $INSTALLROOT/etc/jiradog/meta
     cp jiradog.py $INSTALLROOT/usr/local/bin/jiradog
     cp jiradog.1 $INSTALLROOT/usr/share/man/man1/
 )
@@ -47,7 +48,7 @@ fpm -n $NAME -v $VERSION --iteration $RELEASE \
     --python-easyinstall jira \
     $INSTALLROOT/usr/local/bin=/usr/local/ \
     $INSTALLROOT/etc/jiradog=/etc/ \
-    $INSTALLROOT/usr/share/man/man1=/usr/share/man \
+    $INSTALLROOT/usr/share/man/man1=/usr/share/man/ \
 
 # Clean up build environment
 # %clean
