@@ -10,6 +10,8 @@ from jiradog import mean_time_between_statuses
 from jiradog import load_metric_file
 from jiradog import pretty_date
 from jiradog import custom_field_sum
+from jiradog import JiraProvider
+import random
 
 class JiradogTestCase(unittest.TestCase):
     """Testing for `jiradog.py`"""
@@ -131,6 +133,78 @@ class JiradogTestCase(unittest.TestCase):
             while CUSTOM_FIELD_SUM == sum(CUSTOM_FIELD_VALUES):
                 CUSTOM_FIELD_SUM = randint(0,99)
             self.assertNotEqual(custom_field_sum(ISSUES, CUSTOM_FIELD), CUSTOM_FIELD_SUM)
+
+    def test_JiraProvider_filter_issues(self):
+        """Test if given filter properly filters the correct issues
+
+        Returns:
+            expected True
+        """
+        class pretend_jira_object(object):
+            pass
+
+        MORALS = randint(0, 9)
+        ALL_FIXVERSIONS = [
+            'faint',
+            'replace',
+            'rare',
+        ]
+
+        FIXVERSIONS = [
+            random.choice(ALL_FIXVERSIONS),
+            random.choice(ALL_FIXVERSIONS),
+            random.choice(ALL_FIXVERSIONS),
+            random.choice(ALL_FIXVERSIONS),
+            random.choice(ALL_FIXVERSIONS)
+        ]
+        FIXVERSION = random.choice(FIXVERSIONS)
+        COUNT = FIXVERSIONS.count(FIXVERSION)
+        FILTER = {
+            "only": {
+                "filter": "{% if '" + FIXVERSION + "' in issue.fields.fixVersions[0].name %}true{% endif %}"
+            }
+        }
+
+        ISSUE_ONE = pretend_jira_object()
+        ISSUE_ONE.fields = pretend_jira_object()
+        ISSUE_ONE.fields.fixVersions = [pretend_jira_object()]
+        ISSUE_ONE.fields.fixVersions[0].name = FIXVERSIONS[0] 
+
+        ISSUE_TWO = pretend_jira_object()
+        ISSUE_TWO.fields = pretend_jira_object()
+        ISSUE_TWO.fields.fixVersions = [pretend_jira_object()]
+        ISSUE_TWO.fields.fixVersions[0].name = FIXVERSIONS[1]
+
+        ISSUE_THR = pretend_jira_object()
+        ISSUE_THR.fields = pretend_jira_object()
+        ISSUE_THR.fields.fixVersions = [pretend_jira_object()]
+        ISSUE_THR.fields.fixVersions[0].name = FIXVERSIONS[2]
+
+        ISSUE_FOU = pretend_jira_object()
+        ISSUE_FOU.fields = pretend_jira_object()
+        ISSUE_FOU.fields.fixVersions = [pretend_jira_object()]
+        ISSUE_FOU.fields.fixVersions[0].name = FIXVERSIONS[3]
+
+        ISSUE_FIV = pretend_jira_object()
+        ISSUE_FIV.fields = pretend_jira_object()
+        ISSUE_FIV.fields.fixVersions = [pretend_jira_object()]
+        ISSUE_FIV.fields.fixVersions[0].name = FIXVERSIONS[4]
+
+        ISSUES = [
+            ISSUE_ONE,
+            ISSUE_TWO,
+            ISSUE_THR,
+            ISSUE_FOU,
+            ISSUE_FIV
+        ]
+
+        if MORALS <= 7:
+            self.assertEqual(len(JiraProvider.filter_issues(FILTER, ISSUES, "only")), COUNT)
+        else:
+            WRONG_COUNT = randint(0, 99)
+            while WRONG_COUNT == COUNT:
+                WRONG_COUNT = randint(0,99)
+            self.assertNotEqual(len(JiraProvider.filter_issues(FILTER, ISSUES, "only")), WRONG_COUNT)
 
 if __name__ == '__main__':
     unittest.main()
