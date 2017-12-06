@@ -29,6 +29,13 @@ mkdir -p $INSTALLROOT $BUILDROOT
     cp jiradog.1 $INSTALLROOT/usr/share/man/man1/
 )
 
+# Run tests
+./test_jiradog.py
+if [[ $? -eq 1 ]]
+then
+  exit
+fi
+
 # Package "installed" software using fpm command
 fpm -n $NAME -v $VERSION --iteration $RELEASE \
     -s dir -t deb --template-scripts \
