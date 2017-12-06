@@ -47,6 +47,7 @@ class JiraProvider(object):
         max_results = 100
         start_at = max_results
         issues = []
+        CACHE = {}
         ## If/then statement failed, so I want to find  ##
         ## a way to not have to run the jinja statement ##
         ## 2 times.                                     ##
@@ -397,7 +398,6 @@ if __name__ == "__main__":
     VERSION_FILE = '/etc/jiradog/meta/VERSION'
     CONFIG_FILE = '/etc/jiradog/config.json'
     HEADERS = {'Content-type': 'application/json'}
-    CACHE = {}
     PAYLOAD = []
     NOW = time.time()
 

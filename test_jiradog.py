@@ -6,6 +6,8 @@ import json
 import time
 import datetime
 import random
+from jira import JIRA
+import requests
 from jiradog import mean_time_between_statuses
 from jiradog import load_metric_file
 from jiradog import pretty_date
@@ -225,7 +227,23 @@ class JiradogTestCase(unittest.TestCase):
         Returns:
             expected True
         """
-        query = 'issueType=bug'
+        config_file = '/etc/jiradog/config.json'
+        with open(config_file) as config_data_file:
+            config_data_loaded = json.load(config_data_file)
+        project = "OPS"
+        position = "only"
+        metric_data_loaded = {
+            "projects": [
+                project
+            ],
+            position: {
+                "jql": "issueType=bug AND updated>=endOfDay(-3)"
+            }
+        }
+        JP = JiraProvider(config_data_loaded['jira']['server'],
+                          config_data_loaded['jira']['username'],
+                          config_data_loaded['jira']['password'])
+        self.assertIs(type(JP.get_issues(metric_data_loaded, position, project)), list)
 
     def test_jira_get_sprints(self):
         """Test if given board returns sprints
