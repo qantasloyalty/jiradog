@@ -219,5 +219,20 @@ class JiradogTestCase(unittest.TestCase):
                                                                "only")),
                                 wrong_count)
 
+    def test_jira_get_issues(self):
+        """Test if given JQL returns issues
+
+        Returns:
+            expected True
+        """
+        query = 'issueType=bug'
+
+    def test_jira_get_sprints(self):
+        """Test if given board returns sprints
+
+        Returns:
+            expected True
+        """
+
 if __name__ == '__main__':
     unittest.main()
