@@ -6,8 +6,6 @@ import json
 import time
 import datetime
 import random
-from jira import JIRA
-import requests
 from jiradog import mean_time_between_statuses
 from jiradog import load_metric_file
 from jiradog import pretty_date
@@ -240,10 +238,10 @@ class JiradogTestCase(unittest.TestCase):
                 "jql": "issueType=bug AND updated>=endOfDay(-3)"
             }
         }
-        JP = JiraProvider(config_data_loaded['jira']['server'],
-                          config_data_loaded['jira']['username'],
-                          config_data_loaded['jira']['password'])
-        self.assertIs(type(JP.get_issues(metric_data_loaded, position, project)), list)
+        jira = JiraProvider(config_data_loaded['jira']['server'],
+                            config_data_loaded['jira']['username'],
+                            config_data_loaded['jira']['password'])
+        self.assertIs(type(jira.get_issues(metric_data_loaded, position, project)), list)
 
     def test_jira_get_sprints(self):
         """Test if given board returns sprints
@@ -251,6 +249,36 @@ class JiradogTestCase(unittest.TestCase):
         Returns:
             expected True
         """
+        morals = random.randint(0, 9)
+        config_file = '/etc/jiradog/config.json'
+        with open(config_file) as config_data_file:
+            config_data_loaded = json.load(config_data_file)
+        project = "SYS"
+        count = random.randint(1, 10)
+        metric_data_loaded = {
+            "grouping": {
+                "count": "-" + str(count),
+                "boards": {
+                    project: "478"
+                }
+            }
+        }
+
+        if morals <= 7:
+            self.assertIs(len(JiraProvider.get_sprints(metric_data_loaded,
+                                                          config_data_loaded['jira']['username'],
+                                                          config_data_loaded['jira']['password'],
+                                                          project)),
+                             count)
+        else:
+            wrong_count = random.randint(0, 99)
+            while wrong_count == count:
+                wrong_count = random.randint(0, 99)
+            self.assertIsNot(len(JiraProvider.get_sprints(metric_data_loaded,
+                                                             config_data_loaded['jira']['username'],
+                                                             config_data_loaded['jira']['password'],
+                                                             project)),
+                                count)
 
 if __name__ == '__main__':
     unittest.main()

@@ -52,7 +52,7 @@ class JiraProvider(object):
         ## a way to not have to run the jinja statement ##
         ## 2 times.                                     ##
         if metric_data_loaded.get('grouping', False) is not False:
-            sprint_ids = self.get_sprints(metric_data_loaded, project)
+            sprint_ids = self.get_sprints(metric_data_loaded, API_USERNAME, API_PASSWORD, project)
             queries = []
             for key, value in sprint_ids.iteritems():
                 jql = jinja2.Template(metric_data_loaded \
@@ -114,12 +114,14 @@ class JiraProvider(object):
         return filtered_issues
 
     @classmethod
-    def get_sprints(cls, metric_data_loaded, project):
+    def get_sprints(cls, metric_data_loaded, api_username, api_password, project):
         """Retrieves a list of sprint ids from a board.
 
         Args:
-            metric_data_loaded:	Dictionary	JSON object from the metric config block.
-            project:		Stirng		JIRA project key.
+            metric_data_loaded: Dictionary	JSON object from the metric config block.
+            api_username:       String      JIRA api username.
+            api_password:       String      JIRA api password.
+            project:            String      JIRA project key.
 
         Returns:
             List of integers that are the ids of JIRA sprints.
@@ -134,8 +136,8 @@ class JiraProvider(object):
               '/sprint?maxResults=' + \
               str(max_results)
         search = json.loads(requests.get(url,
-                                         auth=(API_USERNAME,
-                                               API_PASSWORD)).text)
+                                         auth=(api_username,
+                                               api_password)).text)
         for sprint in search['values']:
             if sprint.get('endDate', False) is not False:
                 sprints.append(sprint)
