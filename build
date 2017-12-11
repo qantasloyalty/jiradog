@@ -5,7 +5,7 @@
 # Package attributes
 NAME=jiradog
 VERSION=$(cat meta/VERSION)
-RELEASE=6
+RELEASE=1
 
 #. buildtools
 # Set up build environment
