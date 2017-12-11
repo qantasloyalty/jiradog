@@ -155,8 +155,10 @@ class JiraProvider(object):
         sprint_ids.sort(key=int)
         for sprint in sprints:
             if sprint['id'] in sprint_ids[int(metric_data_loaded['grouping']['count']):]:
-                sprint_ids_with_end_date[str(sprint['id'])] = time.strftime('%Y-%m-%d %I:%M',
-                                                                            pretty_date(sprint['endDate']))
+                sprint_ids_with_end_date[str(sprint
+                                             ['id'])] = time.strftime('%Y-%m-%d %I:%M',
+                                                                      pretty_date(sprint
+                                                                      ['endDate']))
         return sprint_ids_with_end_date
 
 def mean_time_between_statuses(metric_data_loaded, position, issue):
@@ -178,9 +180,11 @@ def mean_time_between_statuses(metric_data_loaded, position, issue):
                                   [position] \
                                   ['statuses'] \
                                   [1]).render(issue=issue)
+    time.mktime(pretty_date(second_date))
+    time.mktime(pretty_date(first_date))
     return (time.mktime(pretty_date(second_date)) - \
-           time.mktime(pretty_date(first_date))) / \
-           (60 * 60 * 24)
+            time.mktime(pretty_date(first_date))) / \
+            86400
 
 def pretty_date(date):
     """Format date from YYYY-mm-ddTHH:MM:SS to a python time structure

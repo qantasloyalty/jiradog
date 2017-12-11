@@ -31,7 +31,8 @@ class JiradogTestCase(unittest.TestCase):
             expected True ~80%, False ~20%
         """
         morals = random.randint(0, 9)
-        days_to_subtract = random.randint(1, 50)
+        days_to_subtract = random.randint(1, 10)
+        days_to_check = days_to_subtract
         now_date_time = datetime.datetime.now()
         now = datetime.date.strftime(now_date_time,
                                      '%Y-%m-%dT%H:%M:%S.000')
@@ -52,16 +53,8 @@ class JiradogTestCase(unittest.TestCase):
                 'updated': now
             }
         }
-        if morals <= 7:
-            days_to_check = days_to_subtract
-            self.assertEqual(mean_time_between_statuses(metric_data_loaded, position, issue),
-                             days_to_check)
-        else:
-            days_to_check = random.randint(1, 50)
-            while days_to_check == days_to_subtract:
-                days_to_check = random.randint(1, 50)
-            self.assertNotEqual(mean_time_between_statuses(metric_data_loaded, position, issue),
-                                days_to_check)
+        self.assertEqual(mean_time_between_statuses(metric_data_loaded, position, issue),
+                         days_to_check)
 
     def test_load_metric_file(self):
         """Test if given json loads.
@@ -249,7 +242,6 @@ class JiradogTestCase(unittest.TestCase):
         Returns:
             expected True
         """
-        morals = random.randint(0, 9)
         config_file = '/etc/jiradog/config.json'
         with open(config_file) as config_data_file:
             config_data_loaded = json.load(config_data_file)
@@ -264,21 +256,11 @@ class JiradogTestCase(unittest.TestCase):
             }
         }
 
-        if morals <= 7:
-            self.assertIs(len(JiraProvider.get_sprints(metric_data_loaded,
-                                                          config_data_loaded['jira']['username'],
-                                                          config_data_loaded['jira']['password'],
-                                                          project)),
-                             count)
-        else:
-            wrong_count = random.randint(0, 99)
-            while wrong_count == count:
-                wrong_count = random.randint(0, 99)
-            self.assertIsNot(len(JiraProvider.get_sprints(metric_data_loaded,
-                                                             config_data_loaded['jira']['username'],
-                                                             config_data_loaded['jira']['password'],
-                                                             project)),
-                                count)
+        self.assertIs(len(JiraProvider.get_sprints(metric_data_loaded,
+                                                   config_data_loaded['jira']['username'],
+                                                   config_data_loaded['jira']['password'],
+                                                   project)),
+                       count)
 
 if __name__ == '__main__':
     unittest.main()
