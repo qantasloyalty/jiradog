@@ -21,7 +21,7 @@ class JiradogTestCase(unittest.TestCase):
         Returns:
             expected True
         """
-        date = '1993-11-22T03:04:05.000'
+        date = '1993-11-22T03:04:05'
         self.assertEqual(pretty_date(date), time.strptime(date.split('.')[0], '%Y-%m-%dT%H:%M:%S'))
 
     def test_mean_time_between_statuses(self):
