@@ -11,8 +11,9 @@ RELEASE=1
 # Set up build environment
 set -x -e
 export PATH=$PATH:/usr/local/ruby-sdk/ruby-1.9.3-p194/bin
-export INSTALLROOT=~/opsbuild/install_root
-export BUILDROOT=~/opsbuild/build
+export ROOT=~/opsbuild
+export INSTALLROOT=$ROOT/install_root
+export BUILDROOT=$ROOT/build
 rm -rf $INSTALLROOT $BUILDROOT
 mkdir -p $INSTALLROOT $BUILDROOT
 
@@ -61,3 +62,4 @@ fpm -n $NAME -v $VERSION --iteration $RELEASE \
 # %clean
 rm -rf $INSTALLROOT
 rm -rf $BUILDROOT
+rm -rf $ROOT
