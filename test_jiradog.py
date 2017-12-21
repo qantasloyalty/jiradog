@@ -274,7 +274,6 @@ class JiradogTestCase(unittest.TestCase):
         jira = JiraProvider(config_data_loaded['jira']['server'],
                             config_data_loaded['jira']['username'],
                             config_data_loaded['jira']['password'])
-        ## Assert here ##
 
 if __name__ == '__main__':
     unittest.main()
