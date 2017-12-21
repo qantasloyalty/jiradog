@@ -262,5 +262,19 @@ class JiradogTestCase(unittest.TestCase):
                                                    project)),
                        count)
 
+    def test_get_issue_changelog(self):
+        """Test if given issue's changelog is successfully retrieved.
+
+        Returns:
+            expected: True
+        """
+        config_file = '/etc/jiradog/config.json'
+        with open(config_file) as config_data_file:
+            config_data_loaded = json.load(config_data_file)
+        jira = JiraProvider(config_data_loaded['jira']['server'],
+                            config_data_loaded['jira']['username'],
+                            config_data_loaded['jira']['password'])
+        ## Assert here ##
+
 if __name__ == '__main__':
     unittest.main()
