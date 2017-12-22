@@ -172,14 +172,24 @@ def mean_time_between_statuses(metric_data_loaded, position, issue):
     Returns:
         Floating point number in days
     """
-    first_date = jinja2.Template(metric_data_loaded \
-                                 [position] \
-                                 ['statuses'] \
-                                 [0]).render(issue=issue)
-    second_date = jinja2.Template(metric_data_loaded \
-                                  [position] \
-                                  ['statuses'] \
-                                  [1]).render(issue=issue)
+    if metric_data_loaded[position]['statuses'][0]['source'] == "issue":
+        first_date = jinja2.Template(metric_data_loaded \
+                                     [position] \
+                                     ['statuses'] \
+                                     [0] \
+                                     ['date']).render(issue=issue)
+    elif metric_data_loaded[position]['statuses'][0]['source'] == "changelog":
+        pass
+
+    if metric_data_loaded[position]['statuses'][1]['source'] == "issue":
+        second_date = jinja2.Template(metric_data_loaded \
+                                      [position] \
+                                      ['statuses'] \
+                                      [1] \
+                                      ['date']).render(issue=issue)
+    elif metric_data_loaded[position]['statuses'][0]['source'] == "changelog":
+        pass
+
     time.mktime(pretty_date(second_date))
     time.mktime(pretty_date(first_date))
     return (time.mktime(pretty_date(second_date)) - \
