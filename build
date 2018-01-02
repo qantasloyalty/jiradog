@@ -5,7 +5,7 @@
 # Package attributes
 NAME=jiradog
 VERSION=$(cat meta/VERSION)
-RELEASE=1
+RELEASE=$(cat meta/REALEASE)
 
 #. buildtools
 # Set up build environment
@@ -63,3 +63,4 @@ fpm -n $NAME -v $VERSION --iteration $RELEASE \
 rm -rf $INSTALLROOT
 rm -rf $BUILDROOT
 rm -rf $ROOT
+echo "$(cat meta/RELEASE)+1" | bc > meta/RELEASE
