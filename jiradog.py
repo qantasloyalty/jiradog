@@ -106,10 +106,11 @@ class JiraProvider(object):
         """
         filtered_issues = []
         for issue in issues:
-            if jinja2.Template(jinja2.Template(metric_data_loaded \
-                                               [position] \
+            if jinja2.Template(jinja2.Template(metric_data_loaded
+                                               [position]
                                                ['filter']).render(issue=issue,
-                                                                  metric=metric_data_loaded)).render(issue=issue) == u'true':
+                                                                  metric=metric_data_loaded)
+                              ).render(issue=issue) == u'true':
                 filtered_issues.append(issue)
         return filtered_issues
 
@@ -158,7 +159,7 @@ class JiraProvider(object):
                 sprint_ids_with_end_date[str(sprint
                                              ['id'])] = time.strftime('%Y-%m-%d %I:%M',
                                                                       pretty_date(sprint
-                                                                      ['endDate']))
+                                                                                  ['endDate']))
         return sprint_ids_with_end_date
 
 def mean_time_between_statuses(metric_data_loaded, position, issue):
