@@ -5,7 +5,7 @@
 # Package attributes
 NAME=jiradog
 VERSION=$(cat meta/VERSION)
-RELEASE=$(cat meta/REALEASE)
+RELEASE=$(cat meta/RELEASE)
 
 #. buildtools
 # Set up build environment
@@ -38,6 +38,7 @@ then
 fi
 
 # Package "installed" software using fpm command
+
 fpm -n $NAME -v $VERSION --iteration $RELEASE \
     -s dir -t deb --template-scripts \
     --depends 'python-jinja2' \
@@ -63,4 +64,4 @@ fpm -n $NAME -v $VERSION --iteration $RELEASE \
 rm -rf $INSTALLROOT
 rm -rf $BUILDROOT
 rm -rf $ROOT
-echo "$(cat meta/RELEASE)+1" | bc > meta/RELEASE
+echo "$RELEASE+1" | bc > meta/RELEASE

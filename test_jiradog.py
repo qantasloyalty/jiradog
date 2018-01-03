@@ -41,11 +41,17 @@ class JiradogTestCase(unittest.TestCase):
         metric_data_loaded = {
             'numerator': {
                 'statuses': [
-                    '{{issue.fields.created}}',
-                    '{{issue.fields.updated}}'
-                    ]
-                }
+                    {
+                        'source': 'issue',
+                        'date': '{{issue.fields.created}}'
+                    },
+                    {
+                        'source': 'issue',
+                        'date': '{{issue.fields.updated}}'
+                    }
+                ]
             }
+        }
         position = 'numerator'
         issue = {
             'fields': {
