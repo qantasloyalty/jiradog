@@ -180,7 +180,11 @@ def mean_time_between_statuses(metric_data_loaded, position, issue):
                                      [0] \
                                      ['date']).render(issue=issue)
     elif metric_data_loaded[position]['statuses'][0]['source'] == "changelog":
-        pass
+        first_date = jinja2.Template(metric_data_loaded \
+                                     [position] \
+                                     ['statuses'] \
+                                     [0] \
+                                     ['date']).render(changelog=issue.changelog)
 
     if metric_data_loaded[position]['statuses'][1]['source'] == "issue":
         second_date = jinja2.Template(metric_data_loaded \
@@ -188,8 +192,12 @@ def mean_time_between_statuses(metric_data_loaded, position, issue):
                                       ['statuses'] \
                                       [1] \
                                       ['date']).render(issue=issue)
-    elif metric_data_loaded[position]['statuses'][0]['source'] == "changelog":
-        pass
+    elif metric_data_loaded[position]['statuses'][1]['source'] == "changelog":
+        first_date = jinja2.Template(metric_data_loaded \
+                                     [position] \
+                                     ['statuses'] \
+                                     [1] \
+                                     ['date']).render(changelog=issue.changelog)
 
     time.mktime(pretty_date(second_date))
     time.mktime(pretty_date(first_date))
