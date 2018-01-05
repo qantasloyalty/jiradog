@@ -47,7 +47,7 @@ class JiraProvider(object):
         max_results = 100
         start_at = max_results
         issues = []
-        CACHE = {}
+        cache = {}
         ## If/then statement failed, so I want to find  ##
         ## a way to not have to run the jinja statement ##
         ## 2 times.                                     ##
@@ -72,9 +72,9 @@ class JiraProvider(object):
             queries = [jinja2.Template(jql).render(project=project)]
         for query in queries:
             jql_sha512 = hashlib.sha512(query).hexdigest()
-            if CACHE.get(jql_sha512, False):
+            if cache.get(jql_sha512, False):
                 logging.info("Using cached version of query and results")
-                issues = CACHE[jql_sha512]
+                issues = cache[jql_sha512]
             else:
                 logging.info("Adding query and results to cache")
                 search = self.jira.search_issues(query, maxResults=max_results, startAt=0)
@@ -89,7 +89,7 @@ class JiraProvider(object):
                     start_at = start_at + max_results
                 if metric_data_loaded.get(position, False).get('filter', False) is not False:
                     issues = self.filter_issues(metric_data_loaded, issues, position)
-                CACHE[jql_sha512] = issues
+                cache[jql_sha512] = issues
         return issues
 
     @classmethod
@@ -162,13 +162,50 @@ class JiraProvider(object):
                                                                                   ['endDate']))
         return sprint_ids_with_end_date
 
+    @classmethod
+    def get_issue_changelog(cls, server_url, api_username, api_password, issue_key):
+        """Returns an issue's changelog
+
+        NOTE:   The JIRA SDK currently doesn't return the changelog creation date
+                like the REST API does, so we have to use the REST API, and not
+                the SDK.
+
+        Args:
+            server_url:     String  server url, taken from config.
+            api_username:   String  Username for JIRA API.
+            api_password:   String  Password for JIRA API.
+            issue_key:      String  Issue key, e.g. KEY-3786.
+
+        Returns:
+            Dictionary of issue history.
+        """
+        max_results = 100
+        start_at = 100
+        issue_url = server_url + \
+                    "/rest/api/2/issue/" + \
+                    issue_key + \
+                    "/changelog?maxResults=" + \
+                    str(max_results)
+        changelog_json = json.loads(requests.get(issue_url, auth=(api_username, api_password)).text)
+        changelog = changelog_json['values']
+        while changelog_json['isLast'] is False:
+            changelog_json = json.loads(requests.get(issue_url + \
+                                                     "&startAt=" + \
+                                                     str(start_at),
+                                                     auth=(api_username,
+                                                           api_password)).text)
+            for change in changelog_json:
+                changelog.append(change)
+            start_at = start_at + max_results
+        return changelog
+
 def mean_time_between_statuses(metric_data_loaded, position, issue):
     """Calculates the length of time between two statuses in an issue.
 
     Args:
         metric_data_loaded:	Dictionary	The metric configuration JSON block.
-        position:		String		Either 'numerator' or 'denominator'.
-        issue:			Dictionary	The JSON block of the issue.
+        position:           String		Either 'numerator' or 'denominator'.
+        issue:              Dictionary	JIRA object of the issue.
 
     Returns:
         Floating point number in days
@@ -177,14 +214,13 @@ def mean_time_between_statuses(metric_data_loaded, position, issue):
         first_date = jinja2.Template(metric_data_loaded \
                                      [position] \
                                      ['statuses'] \
-                                     [0] \
-                                     ['date']).render(issue=issue)
+                                     [0]['date']).render(issue=issue)
     elif metric_data_loaded[position]['statuses'][0]['source'] == "changelog":
+        changelog = JP.get_issue_changelog(API_URL, API_USERNAME, API_PASSWORD, issue.key)
         first_date = jinja2.Template(metric_data_loaded \
                                      [position] \
                                      ['statuses'] \
-                                     [0] \
-                                     ['date']).render(changelog=issue.changelog)
+                                     [0]['date']).render(changelog=changelog)
 
     if metric_data_loaded[position]['statuses'][1]['source'] == "issue":
         second_date = jinja2.Template(metric_data_loaded \
