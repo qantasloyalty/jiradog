@@ -186,7 +186,9 @@ class JiraProvider(object):
                     issue_key + \
                     "/changelog?maxResults=" + \
                     str(max_results)
-        changelog_json = json.loads(requests.get(issue_url, auth=(api_username, api_password)).text)
+        changelog_json = json.loads(requests.get(issue_url,
+                                                 auth=(api_username,
+                                                       api_password)).text)
         changelog = changelog_json['values']
         while changelog_json['isLast'] is False:
             changelog_json = json.loads(requests.get(issue_url + \
@@ -210,36 +212,26 @@ def mean_time_between_statuses(metric_data_loaded, position, issue):
     Returns:
         Floating point number in days
     """
-    if metric_data_loaded[position]['statuses'][0]['source'] == "issue":
-        first_date = jinja2.Template(metric_data_loaded \
-                                     [position] \
-                                     ['statuses'] \
-                                     [0]['date']).render(issue=issue)
-    elif metric_data_loaded[position]['statuses'][0]['source'] == "changelog":
-        changelog = JP.get_issue_changelog(API_URL, API_USERNAME, API_PASSWORD, issue.key)
-        first_date = jinja2.Template(metric_data_loaded \
-                                     [position] \
-                                     ['statuses'] \
-                                     [0]['date']).render(changelog=changelog)
+    DATES = []
+    for index in range(0, 1):
+        if metric_data_loaded[position]['statuses'][index]['source'] == "issue":
+            DATES.append(jinja2.Template(metric_data_loaded \
+                                         [position] \
+                                         ['statuses'] \
+                                         [index] \
+                                         ['date']).render(issue=issue))
+        elif metric_data_loaded[position]['statuses'][index]['source'] == "changelog":
+            changelog = JP.get_issue_changelog(API_URL, API_USERNAME, API_PASSWORD, issue.key)
+            DATES.append(jinja2.Template(metric_data_loaded \
+                                         [position] \
+                                         ['statuses'] \
+                                         [index] \
+                                         ['date']).render(changelog=changelog))
 
-    if metric_data_loaded[position]['statuses'][1]['source'] == "issue":
-        second_date = jinja2.Template(metric_data_loaded \
-                                      [position] \
-                                      ['statuses'] \
-                                      [1] \
-                                      ['date']).render(issue=issue)
-    elif metric_data_loaded[position]['statuses'][1]['source'] == "changelog":
-        first_date = jinja2.Template(metric_data_loaded \
-                                     [position] \
-                                     ['statuses'] \
-                                     [1] \
-                                     ['date']).render(changelog=issue.changelog)
-
-    time.mktime(pretty_date(second_date))
-    time.mktime(pretty_date(first_date))
-    return (time.mktime(pretty_date(second_date)) - \
-            time.mktime(pretty_date(first_date))) / \
-            86400
+    if len(DATES) == 2:
+        return (time.mktime(pretty_date(DATES[1])) - \
+                time.mktime(pretty_date(DATES[0]))) / \
+                86400
 
 def pretty_date(date):
     """Format date from YYYY-mm-ddTHH:MM:SS to a python time structure
