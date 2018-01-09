@@ -215,7 +215,7 @@ This is the jiradog way to name metrics for DataDog, using a similar psuedo-heir
 
 #### Version Numbering
 
-jiradog follows the [SemVer](https://semver.org/spec/v2.0.0.html) method of software versionsing.
+jiradog follows the [SemVer](https://semver.org/spec/v2.0.0.html) method of software versioning.
 
 > Given a version number MAJOR.MINOR.PATCH, increment the:
 >
@@ -224,6 +224,15 @@ jiradog follows the [SemVer](https://semver.org/spec/v2.0.0.html) method of soft
 > - PATCH version when you make backwards-compatible bug fixes.
 >
 > Additional labels for pre-release and build metadata are available as extensions to the MAJOR.MINOR.PATCH format. (Preston-Warner, 2013)
+
+> Build metadata MAY be denoted by appending a plus sign and a series of dot separated identifiers immediately following the patch or pre-release version.
+
+Example: `1.23.4+5`:
+
+- Major version `1`
+- Minor version `23`
+- Patch version `4`
+- Build numnber `5`
 
 Please read the full spec at the link above or in the citations.
 

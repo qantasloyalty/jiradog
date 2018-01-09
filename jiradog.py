@@ -230,7 +230,7 @@ def mean_time_between_statuses(metric_data_loaded, position, issue):
             logging.info("first_date: didn't find what we were looking for in the changelog, " + \
                          "using creation date")
             first_date = str("")
-            
+
         if str(first_date) == "":
             first_date = jinja2.Template("{{issue.fields.created}}").render(issue=issue)
         print first_date
@@ -476,13 +476,19 @@ if __name__ == "__main__":
         }
     MAX_RESULTS = str(100)
     VERSION_FILE = '/etc/jiradog/meta/VERSION'
+    RELEASE_FILE = '/etc/jiradog/meta/RELEASE'
     CONFIG_FILE = '/etc/jiradog/config.json'
     HEADERS = {'Content-type': 'application/json'}
     PAYLOAD = []
     NOW = time.time()
 
     with open(VERSION_FILE) as version:
-        VERSION = version.read()
+        VERSION_NUMBER = version.read().rstrip()
+
+    with open(RELEASE_FILE) as release:
+        RELEASE_NUMBER = release.read().rstrip()
+
+    VERSION = VERSION_NUMBER + "+" + RELEASE_NUMBER
 
     # Loads the configuration file for the script.
     with open(CONFIG_FILE) as config_data_file:
