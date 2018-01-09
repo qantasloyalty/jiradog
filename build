@@ -64,4 +64,5 @@ fpm -n $NAME -v $VERSION --iteration $RELEASE \
 rm -rf $INSTALLROOT
 rm -rf $BUILDROOT
 rm -rf $ROOT
+rm -rf jiradog.pyc
 echo "$RELEASE+1" | bc > meta/RELEASE

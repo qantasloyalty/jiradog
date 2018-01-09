@@ -218,26 +218,43 @@ def mean_time_between_statuses(metric_data_loaded, position, issue):
                                      ['statuses'] \
                                      [0] \
                                      ['date']).render(issue=issue)
-#   elif metric_data_loaded[position]['statuses'][0]['source'] == "changelog":
-#       changelog = JP.get_issue_changelog(API_URL, API_USERNAME, API_PASSWORD, issue.key)
-#       first_date = jinja2.Template(metric_data_loaded \
-#                                    [position] \
-#                                    ['statuses'] \
-#                                    [0] \
-#                                    ['date']).render(changelog=changelog)
+    elif metric_data_loaded[position]['statuses'][0]['source'] == "changelog":
+        changelog = JP.get_issue_changelog(API_URL, API_USERNAME, API_PASSWORD, issue.key)
+        try:
+            first_date = jinja2.Template(metric_data_loaded \
+                                         [position] \
+                                         ['statuses'] \
+                                         [0] \
+                                         ['date']).render(changelog=changelog)
+        except:
+            logging.info("first_date: didn't find what we were looking for in the changelog, " + \
+                         "using creation date")
+            first_date = str("")
+            
+        if str(first_date) == "":
+            first_date = jinja2.Template("{{issue.fields.created}}").render(issue=issue)
+        print first_date
     if metric_data_loaded[position]['statuses'][1]['source'] == "issue":
         second_date = jinja2.Template(metric_data_loaded \
                                       [position] \
                                       ['statuses'] \
                                       [1] \
                                       ['date']).render(issue=issue)
-#   elif metric_data_loaded[position]['statuses'][1]['source'] == "changelog":
-#       changelog = JP.get_issue_changelog(API_URL, API_USERNAME, API_PASSWORD, issue.key)
-#       second_date = jinja2.Template(metric_data_loaded \
-#                                     [position] \
-#                                     ['statuses'] \
-#                                     [1] \
-#                                     ['date']).render(changelog=changelog)
+    elif metric_data_loaded[position]['statuses'][1]['source'] == "changelog":
+        changelog = JP.get_issue_changelog(API_URL, API_USERNAME, API_PASSWORD, issue.key)
+        try:
+            second_date = jinja2.Template(metric_data_loaded \
+                                          [position] \
+                                          ['statuses'] \
+                                          [1] \
+                                          ['date']).render(changelog=changelog)
+        except:
+            logging.info("second_date: didn't find what we were looking for in the changelog, " + \
+                         "using creation date")
+            second_date = str("")
+
+        if str(second_date) == "":
+            second_date = jinja2.Template("{{issue.fields.created}}").render(issue=issue)
 
     return (time.mktime(pretty_date(second_date)) - \
             time.mktime(pretty_date(first_date))) / \
