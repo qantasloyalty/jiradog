@@ -232,7 +232,7 @@ Example: `1.23.4+5`:
 - Major version `1`
 - Minor version `23`
 - Patch version `4`
-- Build numnber `5`
+- Build number `5`
 
 Please read the full spec at the link above or in the citations.
 
