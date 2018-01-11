@@ -236,14 +236,9 @@ Example: `1.23.4+5`:
 
 Please read the full spec at the link above or in the citations.
 
-## To Do
+#### todo.txt
 
-- Extract methods from script and add them as 'plugins'.
-- Extract data providers from script and add them as 'plugins'.
-- Make script import all methods and providers instead of by name.
-- Keep pylint score above 9.
-- Allow more custom tagging, currently only per project.
-- Add per [time] grouping like week/month/day/etc.
+Things todo are kept in the todo.txt file, following the todo.txt syntax found [here](https://github.com/todotxt/todo.txt).
 
 ## Citations
 Von Barth, N. (n.d.). Jinja. Retrieved November 09, 2017, from
@@ -257,4 +252,4 @@ Preston-Warner, T. (2013). Semantic Versioning 2.0.0. Retrieved November 27, 201
 
 ## Authors
 
-* **Bryce McNab** - *Initial work* - 12/04/2017
+* **Bryce McNab** - *Initial work* - 01/12/2018

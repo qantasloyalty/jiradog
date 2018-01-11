@@ -1,0 +1,4 @@
+2018-01-12 Create a plugin-like model for methods (mean_time_between_statuses, etc.) version:minor
+2018-01-12 Create a plugin-like model for data providers (jira, datadog, static, etc.) version:minor
+2018-01-12 Allow more custom tagging, currently only tags by JIRA project version:major
+(A) 2018-01-12 Add per [time] grouping like week/month version:minor
