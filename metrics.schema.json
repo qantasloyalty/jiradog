@@ -1,11 +1,13 @@
 {
   "$schema": "http://json-schema.org/draft-06/schema#",
-  "type": "object",
-    
+  "type": "array",
   "definitions": {
     "data_provider": {
       "type": "object",
       "properties": {
+        "__comment": {
+          "type": "string"
+        },
         "source": {
           "type": "string"
         },
@@ -17,6 +19,22 @@
         },
         "filter": {
           "type": "string"
+        },
+        "statuses": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "source": {
+                "type": "string",
+                "pattern": "issue|changelog"
+              },
+              "date": {
+                "type": "string",
+                "pattern": "^{({|%|#).*(}|%|#)}$"
+              }
+            }
+          }
         }
       },
       "required": [
@@ -26,16 +44,21 @@
       ]
     }
   },
-    
+  "items": {
+  "type": "object",
   "properties": {
     "metric_name": {
-      "type": "string"
+      "type": "string",
+      "pattern": "(jiradog)(\\.)(([a-z0-9]+)([A-Z]{1}[a-z]*)*)\\.(([a-z0-9]+)([A-Za-z]*)+)"
     },
     "__comment": {
       "type": "string"
     },
     "projects": {
-      "type": "array"
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
     },
     "method": {
       "type": "string"
@@ -53,7 +76,8 @@
       "type": "object",
       "properties": {
         "by": {
-          "type": "string"
+          "type": "string",
+          "pattern": "sprint"
         },
         "count": {
           "type": "string"
@@ -71,30 +95,31 @@
         "by",
         "count"
       ]
-    }
+  }
+},
+"allOf": [
+  {
+    "required": [
+      "metric_name",
+      "projects",
+      "method"
+    ]
   },
-  "allOf": [
-    {
-      "required": [
-        "metric_name",
-        "projects",
-        "method"
-      ]
-    },
-    {
-      "oneOf": [
-        {
-          "required": [
-            "issues"
-          ]
-        },
-        {
-          "required": [
-            "numerator",
-            "denominator"
-          ]
-        }
-      ]
-    }
-  ]
+  {
+    "oneOf": [
+      {
+        "required": [
+          "issues"
+        ]
+      },
+      {
+        "required": [
+          "numerator",
+          "denominator"
+        ]
+      }
+    ]
+  }
+]
+}
 }

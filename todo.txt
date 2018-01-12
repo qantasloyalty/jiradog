@@ -3,3 +3,6 @@
 2018-01-11 Allow more custom tagging, currently only tags by JIRA project version:major
 (A) 2018-01-11 Add per [time] grouping like week/month version:minor
 (A) 2018-01-12 Change argparse to create a list of metrics using one '-m'/'--metric' instead of one per metric version:major
+2018-01-12 Change schema/metrics.json 'jql' field to more generic 'query'
+2018-01-12 Add schema validation function to validate metrics.json on run
+2018-01-12 Add schema to validate individual metrics, alongside the overall file, to valid single metric runs

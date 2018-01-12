@@ -21,6 +21,7 @@ from pprint import pprint
 import hashlib
 import requests
 import jinja2
+import jsonschema
 from datadog import initialize, api
 from jira import JIRA
 
