@@ -1,8 +1,9 @@
 2018-01-11 Create a plugin-like model for methods (mean_time_between_statuses, etc.) version:minor
 2018-01-11 Create a plugin-like model for data providers (jira, datadog, static, etc.) version:minor
 2018-01-11 Allow more custom tagging, currently only tags by JIRA project version:major
-(A) 2018-01-11 Add per [time] grouping like week/month version:minor
-(A) 2018-01-12 Change argparse to create a list of metrics using one '-m'/'--metric' instead of one per metric version:major
+(B) 2018-01-11 Add per [time] grouping like week/month version:minor
+(B) 2018-01-12 Change argparse to create a list of metrics using one '-m'/'--metric' instead of one per metric version:major
 2018-01-12 Change schema/metrics.json 'jql' field to more generic 'query'
 2018-01-12 Add schema validation function to validate metrics.json on run, add to unit tests.
 2018-01-12 Add schema to validate individual metrics, alongside the overall file, to valid single metric runs, add to unit tests.
+(A) Use python try clause to test sprint board numbers; if board doesn't exist, through plain english error in log. version:minor
