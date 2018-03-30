@@ -5,7 +5,7 @@
 # Package attributes
 NAME=jiradog
 VERSION=$(cat meta/VERSION)
-RELEASE=$(cat meta/RELEASE)
+RELEASE="$(cat meta/RELEASE)"
 
 #. buildtools
 # Set up build environment
@@ -33,7 +33,7 @@ mkdir -p $INSTALLROOT $BUILDROOT
 
 # Run tests
 ./test_jiradog.py
-if [[ $? -eq 1 ]]
+if [[ $? -ne 0 ]]
 then
   exit
 fi
@@ -66,4 +66,3 @@ rm -rf $INSTALLROOT
 rm -rf $BUILDROOT
 rm -rf $ROOT
 rm -rf jiradog.pyc
-echo "$RELEASE+1" | bc > meta/RELEASE
