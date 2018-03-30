@@ -137,31 +137,35 @@ class JiraProvider(object):
               metric_data_loaded['grouping']['boards'][project] + \
               '/sprint?maxResults=' + \
               str(max_results)
-        search = json.loads(requests.get(url,
-                                         auth=(api_username,
-                                               api_password)).text)
-        for sprint in search['values']:
-            if sprint.get('endDate', False) is not False:
-                sprints.append(sprint)
-                sprint_ids.append(sprint['id'])
+        search_request = requests.get(url,
+                                      auth=(api_username,
+                                            api_password))
+        search = json.loads(search_request.text)
 
-        while search['isLast'] is False:
-            search = json.loads(requests.get(url + '&startAt=' + str(start_at),
-                                             auth=(API_USERNAME,
-                                                   API_PASSWORD)).text)
+        if search_request.status_code is 200:
             for sprint in search['values']:
                 if sprint.get('endDate', False) is not False:
                     sprints.append(sprint)
                     sprint_ids.append(sprint['id'])
-            start_at = start_at + max_results
-        sprint_ids.sort(key=int)
-        for sprint in sprints:
-            if sprint['id'] in sprint_ids[int(metric_data_loaded['grouping']['count']):]:
-                sprint_ids_with_end_date[str(sprint
-                                             ['id'])] = time.strftime('%Y-%m-%d %I:%M',
-                                                                      pretty_date(sprint
-                                                                                  ['endDate']))
-        return sprint_ids_with_end_date
+            while search['isLast'] is False:
+                search = json.loads(requests.get(url + '&startAt=' + str(start_at),
+                                                 auth=(API_USERNAME,
+                                                       API_PASSWORD)).text)
+                for sprint in search['values']:
+                    if sprint.get('endDate', False) is not False:
+                        sprints.append(sprint)
+                        sprint_ids.append(sprint['id'])
+                start_at = start_at + max_results
+            sprint_ids.sort(key=int)
+            for sprint in sprints:
+                if sprint['id'] in sprint_ids[int(metric_data_loaded['grouping']['count']):]:
+                    sprint_ids_with_end_date[str(sprint
+                                                 ['id'])] = time.strftime('%Y-%m-%d %I:%M',
+                                                                          pretty_date(sprint
+                                                                                      ['endDate']))
+            return sprint_ids_with_end_date
+        else:
+            logging.error("API call did not return 200 (OK). HTTP Code: " + str(search_request.status_code) + "; URL: " + url + "; Result: " + search)
 
     @classmethod
     def get_issue_changelog(cls, server_url, api_username, api_password, issue_key):
