@@ -227,12 +227,18 @@ jiradog follows the [SemVer](https://semver.org/spec/v2.0.0.html) method of soft
 
 > Build metadata MAY be denoted by appending a plus sign and a series of dot separated identifiers immediately following the patch or pre-release version.
 
-Example: `1.23.4+5`:
+Build version follows [RFC-1912 section 2.2](https://tools.ietf.org/html/rfc1912#section-2.2):
+
+> The recommended syntax is YYYYMMDDnn
+> (YYYY=year, MM=month, DD=day, nn=revision number.  This won't
+> overflow until the year 4294" (Barr, 1996)
+
+Example: `1.23.4+2018033000`:
 
 - Major version `1`
 - Minor version `23`
 - Patch version `4`
-- Build number `5`
+- Build number `2018033000` => `2018` `03` `30` `00`
 
 Please read the full spec at the link above or in the citations.
 
@@ -249,6 +255,9 @@ Von Barth, N. (n.d.). Jinja. Retrieved November 09, 2017, from
 
 Preston-Warner, T. (2013). Semantic Versioning 2.0.0. Retrieved November 27, 2017, from
     https://semver.org/spec/v2.0.0.html
+
+Barr, D. (1996). _Common DNS Operational and Configuration Errors_. Retrieved on March 30, 2018,
+    from https://tools.ietf.org/html/rfc1912#section-2.2
 
 ## Authors
 
