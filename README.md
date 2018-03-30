@@ -215,7 +215,7 @@ This is the jiradog way to name metrics for DataDog, using a similar psuedo-heir
 
 #### Version Numbering
 
-jiradog follows the [SemVer](https://semver.org/spec/v2.0.0.html) method of software versioning.
+jiradog follows the three major tenents of the [SemVer](https://semver.org/spec/v2.0.0.html) method of software versioning.
 
 > Given a version number MAJOR.MINOR.PATCH, increment the:
 >
@@ -225,7 +225,7 @@ jiradog follows the [SemVer](https://semver.org/spec/v2.0.0.html) method of soft
 >
 > Additional labels for pre-release and build metadata are available as extensions to the MAJOR.MINOR.PATCH format. (Preston-Warner, 2013)
 
-> Build metadata MAY be denoted by appending a plus sign and a series of dot separated identifiers immediately following the patch or pre-release version.
+Build metadata MAY be denoted by appending a hyphen and a series of dot separated identifiers immediately following the patch or pre-release version.
 
 Build version follows [RFC-1912 section 2.2](https://tools.ietf.org/html/rfc1912#section-2.2):
 
@@ -233,7 +233,7 @@ Build version follows [RFC-1912 section 2.2](https://tools.ietf.org/html/rfc1912
 > (YYYY=year, MM=month, DD=day, nn=revision number.  This won't
 > overflow until the year 4294" (Barr, 1996)
 
-Example: `1.23.4+2018033000`:
+Example: `1.23.4-2018033000`:
 
 - Major version `1`
 - Minor version `23`
