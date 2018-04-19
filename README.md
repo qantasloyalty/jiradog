@@ -2,6 +2,10 @@
 
 A tool to poll data from JIRA to upload as a metric to DataDog.
 
+# Sections
+
+1. [Prerequisites](#markdown-header-Prerequisites)
+
 ## Prerequisites
 
 Dependencies (outside of python standard library)
