@@ -205,7 +205,7 @@ This is the jiradog way to name metrics for DataDog, using a similar psuedo-heir
     - [groupBy]
       - PerSprint, PerWeek, etc.
 - [method]
-  - [mean[TimeToClose|Age]|percent|count]
+  - [mean[TimeToClose|Age]|percent|count|leadTime|cycleTime|taktTime]
   - How the metric is post-processed
 
 - e.g.
