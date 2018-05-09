@@ -238,7 +238,6 @@ def mean_time_between_statuses(metric_data_loaded, position, issue):
 
         if str(first_date) == "":
             first_date = jinja2.Template("{{issue.fields.created}}").render(issue=issue)
-        print first_date
     if metric_data_loaded[position]['statuses'][1]['source'] == "issue":
         second_date = jinja2.Template(metric_data_loaded \
                                       [position] \
