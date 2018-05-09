@@ -517,7 +517,8 @@ if __name__ == "__main__":
         'error': logging.ERROR,
         'critical': logging.CRITICAL
         }
-    LOGGING_LEVEL = LOGGING_LEVELS.get('debug', logging.NOTSET)
+    LOGGING_LEVEL = LOGGING_LEVELS.get(CONFIG_DATA_LOADED['local']['logging_level'],
+                                       logging.NOTSET)
     logging.basicConfig(filename=LOG_FILE,
                         format='%(asctime)s %(levelname)s %(message)s',
                         level=LOGGING_LEVEL)
