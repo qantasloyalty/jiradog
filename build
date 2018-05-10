@@ -7,6 +7,13 @@ NAME=jiradog
 VERSION=$(cat meta/VERSION)
 RELEASE="$(cat meta/RELEASE)"
 
+# Run tests
+./test_jiradog.py
+if [[ $? -ne 0 ]]
+then
+  exit
+fi
+
 #. buildtools
 # Set up build environment
 set -x -e
@@ -30,13 +37,6 @@ mkdir -p $INSTALLROOT $BUILDROOT
     cp jiradog.py $INSTALLROOT/usr/local/bin/jiradog
     cp jiradog.1 $INSTALLROOT/usr/share/man/man1/
 )
-
-# Run tests
-./test_jiradog.py
-if [[ $? -ne 0 ]]
-then
-  exit
-fi
 
 # Package "installed" software using fpm command
 

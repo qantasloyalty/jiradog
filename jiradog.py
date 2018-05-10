@@ -332,8 +332,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-m', '--metric',
                         metavar='METRIC',
-                        action='append',
-                        help='Run only the specific metric')
+                        nargs='*',
+                        help='Run only the specific metric(s)')
     parser.add_argument('-l', '--list',
                         help='Get a list of defined metrics',
                         action='store_true')
