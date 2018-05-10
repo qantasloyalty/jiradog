@@ -1,4 +1,4 @@
-.TH JIRADOG 1 "2018-05-10" "1.2.17"
+.TH JIRADOG 1 "2018-05-10" "1.2.18"
 .SH NAME
 jiradog - pull information from JIRA and upload as metrics to DataDog
 .SH SYNOPSIS
@@ -23,6 +23,12 @@ Run the metrics without uploading to Datadog, and output to stdout.
 .TP
 .BR \-f ", " \-\-formatting " " \fIFORMAT\fR
 Specify the format [jira, csv, markdown] to output to stdin with --noop is set.
+.TP
+.BR \-d ", " \-\-describe
+Prints the configuration block for the specified metric(s).
+.TP
+.BR \-V ", " \-\-verbosity " " \fIVERBOSITY\fR
+Sets verbosity level: notset, debug, info, warning, error, critical.
 .TP
 .BR \-h ", " \-\-help
 Show the help page.

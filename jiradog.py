@@ -21,7 +21,6 @@ from pprint import pprint
 import hashlib
 import requests
 import jinja2
-import jsonschema
 from datadog import initialize, api
 from jira import JIRA
 
@@ -142,7 +141,7 @@ class JiraProvider(object):
                                             api_password))
         search = json.loads(search_request.text)
 
-        if search_request.status_code is 200:
+        if search_request.status_code == 200:
             for sprint in search['values']:
                 if sprint.get('endDate', False) is not False:
                     sprints.append(sprint)
@@ -165,7 +164,12 @@ class JiraProvider(object):
                                                                                       ['endDate']))
             return sprint_ids_with_end_date
         else:
-            logging.error("API call did not return 200 (OK). HTTP Code: " + str(search_request.status_code) + "; URL: " + url + "; Result: " + search)
+            logging.error("API call did not return 200 (OK). HTTP Code: " + \
+                          str(search_request.status_code) + \
+                          "; URL: " + \
+                          url + \
+                          "; Result: " + \
+                          search)
 
     @classmethod
     def get_issue_changelog(cls, server_url, api_username, api_password, issue_key):
@@ -232,6 +236,7 @@ def mean_time_between_statuses(metric_data_loaded, position, issue):
                                          [0] \
                                          ['date']).render(changelog=changelog)
         except:
+            # Find exact exception here and specify
             logging.info("first_date: didn't find what we were looking for in the changelog, " + \
                          "using creation date")
             first_date = str("")
@@ -253,6 +258,7 @@ def mean_time_between_statuses(metric_data_loaded, position, issue):
                                           [1] \
                                           ['date']).render(changelog=changelog)
         except:
+            # Find exact exception here and specify
             logging.info("second_date: didn't find what we were looking for in the changelog, " + \
                          "using creation date")
             second_date = str("")
@@ -346,6 +352,8 @@ def main():
     parser.add_argument('-d', '--describe',
                         help='Prints the configuration block for the specified metric',
                         action='store_true')
+    parser.add_argument('-V', '--verbosity',
+                        help='Sets verbosity level: notset, debug, info, warning, error, critical.')
     parser.add_argument('-v', '--version',
                         help='Display the version number',
                         action='store_true')
@@ -378,6 +386,20 @@ def main():
     if args.version:
         print os.path.basename(__file__) + ' ' + VERSION
         sys.exit(0)
+
+    if args.verbosity and str(args.verbosity).upper() in LOGGING_LEVELS:
+        # Clear config for root logger
+        for handler in logging.root.handlers[:]:
+            logging.root.removeHandler(handler)
+
+        # Set new logging level
+        logging.basicConfig(filename=LOG_FILE,
+                            format='%(asctime)s %(levelname)s %(message)s',
+                            level=LOGGING_LEVELS[str(args.verbosity).upper()])
+    else:
+        logging.critical('logging level arg given is not supported, ' +
+                         'please only use support logging level terms.')
+        sys.exit(2)
 
     logging.info('loaded metric config')
 
@@ -511,17 +533,24 @@ if __name__ == "__main__":
 
     # Set logging config
     LOGGING_LEVELS = {
-        'info': logging.INFO,
-        'debug': logging.DEBUG,
-        'warning': logging.WARNING,
-        'error': logging.ERROR,
-        'critical': logging.CRITICAL
-        }
-    LOGGING_LEVEL = LOGGING_LEVELS.get(CONFIG_DATA_LOADED['local']['logging_level'],
-                                       logging.NOTSET)
-    logging.basicConfig(filename=LOG_FILE,
-                        format='%(asctime)s %(levelname)s %(message)s',
-                        level=LOGGING_LEVEL)
+        "NOTSET": 0,
+        "DEBUG": 10,
+        "INFO": 20,
+        "WARNING": 30,
+        "ERROR": 40,
+        "CRITICAL": 50
+    }
+    if CONFIG_DATA_LOADED['local']['logging_level'].upper() in LOGGING_LEVELS:
+        logging.basicConfig(filename=LOG_FILE,
+                            format='%(asctime)s %(levelname)s %(message)s',
+                            level=LOGGING_LEVELS[CONFIG_DATA_LOADED['local']\
+                                                                   ['logging_level'].upper()])
+    else:
+        logging.critical('logging level given in config is not supported, ' +
+                         'please only use support logging level terms.')
+        sys.exit(2)
+
+    # Provision JIRA connection
     JP = JiraProvider(API_URL, API_USERNAME, API_PASSWORD)
 
     # Executing script
