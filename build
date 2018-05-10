@@ -27,7 +27,12 @@ mkdir -p $INSTALLROOT $BUILDROOT
 # Unpack tarball in build environment, configure and install
 # %setup 
 (
-    mkdir -p $INSTALLROOT/usr/local/bin $INSTALLROOT/etc/jiradog $INSTALLROOT/etc/jiradog/meta $INSTALLROOT/usr/share/man/man1
+    mkdir -p $INSTALLROOT/usr/local/bin \
+             $INSTALLROOT/etc/jiradog \
+             $INSTALLROOT/etc/jiradog/meta \
+             $INSTALLROOT/usr/share/man/man1 \
+             $INSTALLROOT/usr/local/man/man1 \
+             $INSTALLROOT/usr/local/share/man/man1
     cp metrics.schema.json $INSTALLROOT/etc/jiradog/
     cp README.md $INSTALLROOT/etc/jiradog/
     cp config.json $INSTALLROOT/etc/jiradog/
@@ -36,6 +41,8 @@ mkdir -p $INSTALLROOT $BUILDROOT
     cp meta/RELEASE $INSTALLROOT/etc/jiradog/meta
     cp jiradog.py $INSTALLROOT/usr/local/bin/jiradog
     cp jiradog.1 $INSTALLROOT/usr/share/man/man1/
+    cp jiradog.1 $INSTALLROOT/usr/local/man/man1/
+    cp jiradog.1 $INSTALLROOT/usr/local/share/man/man1/
 )
 
 # Package "installed" software using fpm command
