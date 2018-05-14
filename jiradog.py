@@ -387,19 +387,19 @@ def main():
         print os.path.basename(__file__) + ' ' + VERSION
         sys.exit(0)
 
-    if args.verbosity and str(args.verbosity).upper() in LOGGING_LEVELS:
-        # Clear config for root logger
-        for handler in logging.root.handlers[:]:
-            logging.root.removeHandler(handler)
-
-        # Set new logging level
-        logging.basicConfig(filename=LOG_FILE,
-                            format='%(asctime)s %(levelname)s %(message)s',
-                            level=LOGGING_LEVELS[str(args.verbosity).upper()])
-    else:
-        logging.critical('logging level arg given is not supported, ' +
+    if args.verbosity is not None:
+        if str(args.verbosity).upper() in LOGGING_LEVELS:
+            # Clear config for root logger
+            for handler in logging.root.handlers[:]:
+                logging.root.removeHandler(handler)
+            # Set new logging level
+            logging.basicConfig(filename=LOG_FILE,
+                                format='%(asctime)s %(levelname)s %(message)s',
+                                level=LOGGING_LEVELS[str(args.verbosity).upper()])
+        else:
+            logging.critical('logging level arg given is not supported, ' +
                          'please only use support logging level terms.')
-        sys.exit(2)
+            sys.exit(2)
 
     logging.info('loaded metric config')
 
