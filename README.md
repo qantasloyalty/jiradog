@@ -14,7 +14,7 @@ Dependencies (outside of python standard library)
 
 Clone the jiradog repo from the operations source control repository:
 ```
-git clone ssh://git@stash.ba1.etonreve.com:7999/ops/jiradog.git
+git clone git@github.com:evernote/jiradog.git
 ```
 
 ## config.json syntax
