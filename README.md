@@ -12,10 +12,7 @@ Dependencies (outside of python standard library)
 
 ## Installing
 
-Clone the jiradog repo from the operations source control repository:
-```
-git clone ssh://git@stash.ba1.etonreve.com:7999/ops/jiradog.git
-```
+Install the .deb file, or build with fpm.
 
 ## config.json syntax
 An example config file is included:
