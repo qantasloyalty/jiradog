@@ -39,7 +39,7 @@ mkdir -p $INSTALLROOT $BUILDROOT
     cp metrics.json $INSTALLROOT/etc/jiradog/
     cp meta/VERSION $INSTALLROOT/etc/jiradog/meta/
     cp meta/RELEASE $INSTALLROOT/etc/jiradog/meta/
-    cp jiradog.py $INSTALLROOT/usr/local/bin/jiradog/
+    cp jiradog.py $INSTALLROOT/usr/local/bin/jiradog
     cp jiradog.1 $INSTALLROOT/usr/share/man/man1/
     cp jiradog.1 $INSTALLROOT/usr/local/man/man1/
     cp jiradog.1 $INSTALLROOT/usr/local/share/man/man1/
