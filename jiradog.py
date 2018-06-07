@@ -11,18 +11,40 @@ Returns:
     On standard run, returns nothing.
 """
 
+# Importing standard library modules
 import argparse
 import sys
 import json
 import time
 import logging
 import os
-from pprint import pprint
 import hashlib
-import requests
-import jinja2
-from datadog import initialize, api
-from jira import JIRA
+from pprint import pprint
+
+# Check for modules that are required but may not be installed.
+try:
+    import requests
+except ImportError:
+    logging.critical("requests module not found.")
+    sys.exit(71)
+
+try:
+    import jinja2
+except ImportError:
+    logging.critical("jinja2 module not found.")
+    sys.exit(71)
+
+try:
+    from datadog import initialize, api
+except ImportError:
+    logging.critical("datadog module not found.")
+    sys.exit(71)
+
+try:
+    from jira import JIRA
+except ImportError:
+    logging.critical("jira module not found.")
+    sys.exit(71)
 
 class JiraProvider(object):
     """Group of functions/methods to get/manipulate JIRA data
@@ -315,9 +337,7 @@ def load_metric_file(metric_file, metrics):
         try:
             metric_file_full = json.load(metric_file_loaded)
         except ValueError:
-            logging.error(METRIC_JSON + \
-                          ' ' + \
-                          'is not properly formatted using the JSON specification')
+            logging.error("%s is not properly formatted using the JSON spacification", METRIC_JSON)
             sys.exit(1)
     metric_configs = metric_file_full
     if metrics:
@@ -398,7 +418,7 @@ def main():
                                 level=LOGGING_LEVELS[str(args.verbosity).upper()])
         else:
             logging.critical('logging level arg given is not supported, ' +
-                         'please only use support logging level terms.')
+                             'please only use support logging level terms.')
             sys.exit(2)
 
     logging.info('loaded metric config')
@@ -408,12 +428,12 @@ def main():
     for metric_data_loaded in metric_file_full:
         # Loop over specified projects in the metric config file.
         for project in metric_data_loaded['projects']:
-            logging.info('project: ' + project)
+            logging.info('project: %s', project)
             numbers = []
             total_time_between_statuses = 0
             if metric_data_loaded['method'] == 'average':
                 ## Find the average from data providers.
-                logging.info('method: ' + metric_data_loaded['method'])
+                logging.info('method: %s', metric_data_loaded['method'])
 
                 for position in ['numerator', 'denominator']:
                     if metric_data_loaded[position]['source'] == 'jira':
@@ -455,7 +475,7 @@ def main():
                 }
             PAYLOAD.append(metric_data)
 
-    logging.info('payload: ' + str(PAYLOAD))
+    logging.info('payload: %s', PAYLOAD)
 
     if args.noop:
         if not args.formatting or args.formatting == 'json':
@@ -519,7 +539,7 @@ if __name__ == "__main__":
     # Loads the configuration file for the script.
     with open(CONFIG_FILE) as config_data_file:
         CONFIG_DATA_LOADED = json.load(config_data_file)
-    if CONFIG_DATA_LOADED['default'] is True:
+    if CONFIG_DATA_LOADED.get('default', False) is True:
         logging.error("The default config hasn't been modified.")
         sys.exit(1)
 
