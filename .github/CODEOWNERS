@@ -1,0 +1,7 @@
+# Help - https://help.github.com/en/github/creating-cloning-and-archiving-repositories/about-code-owners
+
+# Default owners for everything in the repo. A later match will take precedence.
+*    @qantasloyalty/lto-engineers
+
+# Protect Jenkinsfile and CODEOWNERS from modification without TechOps approval
+.github/**    @qantasloyalty/lto-engineers
